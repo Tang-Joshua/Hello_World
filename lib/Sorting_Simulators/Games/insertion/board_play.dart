@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'radixexamplegame.dart';
-import 'Board.dart';
+import 'Board_insertion.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,11 +18,13 @@ class MyApp extends StatelessWidget {
 }
 
 class GameIntroScreen2 extends StatelessWidget {
+  const GameIntroScreen2({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Radix"),
+        title: const Text("Radix"),
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 100, 72, 34),
       ),
@@ -34,7 +37,7 @@ class GameIntroScreen2 extends StatelessWidget {
               Container(
                 height: MediaQuery.of(context).size.height *
                     0.4, // 40% of screen height
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage(
                         'assets/Slide.png'), // Replace with your image path
@@ -71,12 +74,12 @@ class GameIntroScreen2 extends StatelessWidget {
                           Shadow(
                             blurRadius: 10.0,
                             color: Colors.black.withOpacity(0.6),
-                            offset: Offset(3, 3),
+                            offset: const Offset(3, 3),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     // Game description
                     Text(
                       'This is a classic Sliding Puzzle game. Move the boxes into the correct sort.',
@@ -87,7 +90,7 @@ class GameIntroScreen2 extends StatelessWidget {
                           Shadow(
                             blurRadius: 10.0,
                             color: Colors.black.withOpacity(0.6),
-                            offset: Offset(3, 3),
+                            offset: const Offset(3, 3),
                           ),
                         ],
                       ),
@@ -118,20 +121,20 @@ class GameIntroScreen2 extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 20),
+                        padding: const EdgeInsets.symmetric(vertical: 20),
                         backgroundColor:
                             const Color.fromARGB(255, 199, 103, 13),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         'PLAY',
                         style: TextStyle(fontSize: 29, color: Colors.white),
                       ),
                     ),
                   ),
-                  SizedBox(width: 20), // Space between the buttons
+                  const SizedBox(width: 20), // Space between the buttons
                 ],
               ),
             ),

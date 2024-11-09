@@ -4,6 +4,8 @@ import 'radix.dart';
 import 'merge.dart';
 import 'insertion.dart';
 import 'Games/Games_Choices.dart';
+import 'Games/Games_Choices_insertion.dart';
+import 'Games/merge/guessmerge.dart';
 
 class SortingChoices extends StatefulWidget {
   const SortingChoices({Key? key}) : super(key: key);
@@ -179,11 +181,32 @@ class _SortingChoices extends State<SortingChoices> {
                         const Color.fromARGB(255, 255, 255, 255)),
                   ),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => GameSelectionScreen()),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //       builder: (context) => GameSelectionScreen()),
+                    // );
+
+                    if (text == "Radix Sort") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => GameSelectionScreen()),
+                      );
+                    } else if (text == "Merge Sort") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MergeSortMergeScreen()),
+                      );
+                    } else if (text == "Insertion Sort") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                GameSelectionInsertionScreen()),
+                      );
+                    }
                   },
                   child: Container(
                     width: 230,

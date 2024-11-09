@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'radix/Board.dart';
-import 'radix/board_play.dart';
-import 'radix/card_play.dart';
+import 'insertion/Board_insertion.dart';
+import 'insertion/board_play.dart';
+import 'insertion/Card_play_insertion.dart';
 import 'hangman.dart';
 
 void main() {
@@ -14,12 +14,12 @@ class GameSelectionApp extends StatelessWidget {
     return MaterialApp(
       title: 'Game Selection',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: GameSelectionScreen(),
+      home: GameSelectionInsertionScreen(),
     );
   }
 }
 
-class GameSelectionScreen extends StatelessWidget {
+class GameSelectionInsertionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +52,7 @@ class GameSelectionScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => GameIntroScreen()),
+                              builder: (context) => GameIntroInsertionScreen()),
                         );
                         // Add your action for the first game here
                       },
@@ -89,7 +89,7 @@ class GameSelectionScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Radix Race',
+                                      'Insertion Race',
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w900,

@@ -9,6 +9,8 @@ void main() {
 }
 
 class SliderGameApp extends StatelessWidget {
+  const SliderGameApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,6 +26,8 @@ class SliderGameApp extends StatelessWidget {
 // Import statements and main function as usual...
 
 class SliderGameScreen extends StatefulWidget {
+  const SliderGameScreen({super.key});
+
   @override
   _SliderGameScreenState createState() => _SliderGameScreenState();
 }
@@ -31,11 +35,11 @@ class SliderGameScreen extends StatefulWidget {
 class _SliderGameScreenState extends State<SliderGameScreen> {
   late List<int> _numbers; // The list that holds the numbers
   late List<int> _sortedNumbers; // List representing the sorted state
-  int _gridSize = 4; // Grid size is now 4x4
-  double _tileSize = 80; // Size of each tile for the animation
-  double _tileMargin = 4.0; // Margin between tiles
-  Duration _slideDuration =
-      Duration(milliseconds: 700); // Slide animation duration
+  final int _gridSize = 4; // Grid size is now 4x4
+  final double _tileSize = 80; // Size of each tile for the animation
+  final double _tileMargin = 4.0; // Margin between tiles
+  final Duration _slideDuration =
+      const Duration(milliseconds: 700); // Slide animation duration
 
   // final AudioPlayer _audioPlayer = AudioPlayer(); // Create an instance of AudioPlayer
 
@@ -103,7 +107,7 @@ class _SliderGameScreenState extends State<SliderGameScreen> {
     List<int> sortedNumbers4 = [
       175, 32, 36, 430, // First row
       430, 32, 175, 36, // Second row
-      430, 32, 36, 175, // Third row
+      32, 36, 430, 175, // Third row
       32, 36, 175, 0, // Fourth row (0 represents the empty space)
     ];
 
@@ -143,7 +147,7 @@ class _SliderGameScreenState extends State<SliderGameScreen> {
   }
 
   // Initialize the ListEquality instance
-  final ListEquality _listEquality = ListEquality();
+  final ListEquality _listEquality = const ListEquality();
 
   void _checkWinCondition() {
     // Use ListEquality to compare _numbers with _sortedNumbers
@@ -160,11 +164,11 @@ class _SliderGameScreenState extends State<SliderGameScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Congratulations!"),
-          content: Text("You solved the puzzle correctly."),
+          title: const Text("Congratulations!"),
+          content: const Text("You solved the puzzle correctly."),
           actions: [
             TextButton(
-              child: Text("OK"),
+              child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
                 _initGame(); // Restart the game
@@ -201,10 +205,10 @@ class _SliderGameScreenState extends State<SliderGameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Slider Puzzle Game'),
+        title: const Text('Slider Puzzle Game'),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh),
             onPressed: _initGame,
           ),
         ],
@@ -215,19 +219,19 @@ class _SliderGameScreenState extends State<SliderGameScreen> {
         mainAxisAlignment: MainAxisAlignment.start, // Align content to the top
         crossAxisAlignment: CrossAxisAlignment.center, // Center horizontally
         children: [
-          SizedBox(height: 20), // Adds space from the top
+          const SizedBox(height: 20), // Adds space from the top
           // Replace the text "Solve the Puzzle!" with the first row's numbers
           Text(
             _numbers
                 .sublist(0, _gridSize)
                 .join(', '), // Display first row as text
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 30, // Adjust font size
               fontWeight: FontWeight.bold, // Make it bold
               color: Colors.white, // White text color for contrast
             ),
           ),
-          SizedBox(height: 20), // Adds space between text and puzzle
+          const SizedBox(height: 20), // Adds space between text and puzzle
           Align(
             alignment: Alignment.topCenter, // Align horizontally to the center
             child: Container(
@@ -263,7 +267,8 @@ class _SliderGameScreenState extends State<SliderGameScreen> {
   // Build the tile widget for each number
   Widget _buildTile(int index) {
     int number = _numbers[index]; // Get the number for the current tile
-    if (number == 0) return SizedBox(); // Don't display the empty tile (0)
+    if (number == 0)
+      return const SizedBox(); // Don't display the empty tile (0)
 
     // Calculate the row and column based on the tile's current position (index in _numbers)
     final int targetRow = index ~/ _gridSize;
@@ -289,7 +294,7 @@ class _SliderGameScreenState extends State<SliderGameScreen> {
           child: Center(
             child: Text(
               '$number', // Display the number
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 24,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
