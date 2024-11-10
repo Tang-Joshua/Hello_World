@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:flutterapp/Data_Structure/Data_Choices.dart';
+
 void main() => runApp(TowerOfHanoiApp());
 
 class TowerOfHanoiApp extends StatelessWidget {
@@ -389,7 +391,10 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
           IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DataChoices()),
+              );
             },
           ),
         ],
