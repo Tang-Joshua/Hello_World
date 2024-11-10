@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterapp/Sorting_Simulators/Games/insertion/Bookshelf_Game.dart';
 import 'insertion/Board_insertion.dart';
 import 'insertion/board_play.dart';
 import 'insertion/Card_play_insertion.dart';
@@ -196,7 +197,7 @@ class GameSelectionInsertionScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => HangmanGame()),
+                              builder: (context) => BookshelfGame()),
                         );
                         // Add your action for the first game here
                       },
@@ -233,7 +234,7 @@ class GameSelectionInsertionScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Hangman',
+                                      'Bookshelf',
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w900,

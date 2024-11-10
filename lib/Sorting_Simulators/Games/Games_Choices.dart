@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutterapp/Sorting_Simulators/Games/hangman_play.dart';
+import 'package:flutterapp/Sorting_Simulators/Games/radix/hangman_play.dart';
 import 'radix/board_play.dart';
 import 'radix/card_play.dart';
 
