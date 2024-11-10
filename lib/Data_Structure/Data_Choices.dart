@@ -2,6 +2,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterapp/Data_Structure/Queues.dart';
 import 'package:flutterapp/Data_Structure/stacks.dart';
+import 'Games/Queues_game.dart';
+import 'Games/Stacks_game.dart';
 
 class DataChoices extends StatefulWidget {
   const DataChoices({Key? key}) : super(key: key);
@@ -25,14 +27,6 @@ class _DataChoices extends State<DataChoices> {
     Color.fromARGB(255, 152, 240, 255), // Background color for the third page
     // Add more colors if you have more pages
   ];
-
-  // Define the background images for each page
-  // final List<String> _backgroundImages = [
-  //   'assets/Game.png', // Path to the first background image
-  //   'assets/Learn.png', // Path to the second background image
-  //   'assets/Simulation.png', // Path to the third background image
-  //   // Add more image paths if you have more pages
-  // ];
 
   var text = "??";
 
@@ -163,7 +157,21 @@ class _DataChoices extends State<DataChoices> {
                     foregroundColor: MaterialStateProperty.all<Color>(
                         const Color.fromARGB(255, 255, 255, 255)),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    if (text == "Queues") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CardBattleGame()),
+                      );
+                    } else if (text == "Stacks") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => TowerOfHanoiApp()),
+                      );
+                    }
+                  },
                   child: Container(
                     width: 230,
                     height: 90,
