@@ -5,8 +5,8 @@ import 'package:flutterapp/main.dart';
 import 'radix.dart';
 import 'merge.dart';
 import 'insertion.dart';
-import 'Games/Games_Choices.dart';
-import 'Games/Games_Choices_insertion.dart';
+import 'Games/Menu_RadixGame.dart';
+import 'Games/Menu_InsertionGame.dart';
 import 'Games/merge/guessmerge.dart';
 
 class SortingChoices extends StatefulWidget {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutterapp/Sorting_Simulators/Games/insertion/Bookshelf_Game.dart';
 import 'insertion/Board_insertion.dart';
-import 'insertion/board_play.dart';
-import 'insertion/Card_play_insertion.dart';
+import 'insertion/PlayButton_Sliding.dart';
+import 'insertion/PlayButton_InserRace.dart';
 import 'hangman.dart';
 
 void main() {
