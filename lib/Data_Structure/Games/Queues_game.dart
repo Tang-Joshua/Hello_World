@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutterapp/Data_Structure/Data_Choices.dart';
 
 void main() {
   runApp(CardBattleGame());
@@ -41,7 +42,6 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void drawHands() {
-    // Check if there are enough cards for the next turn and if we are within the turn limit
     if (player1Deck.length >= 2 && player2Deck.length >= 2 && turn <= 10) {
       setState(() {
         player1Hand = [player1Deck.removeLast(), player1Deck.removeLast()];
@@ -65,11 +65,9 @@ class _GameScreenState extends State<GameScreen> {
         int player1InitialHealth = player1SelectedCard!.health;
         int player2InitialHealth = player2SelectedCard!.health;
 
-        // Both cards attack each other
         player1SelectedCard!.health -= player2SelectedCard!.attack;
         player2SelectedCard!.health -= player1SelectedCard!.attack;
 
-        // Determine the outcome of the turn and award points
         if (player1SelectedCard!.health > 0 &&
             player2SelectedCard!.health <= 0) {
           player1Score++;
@@ -85,7 +83,6 @@ class _GameScreenState extends State<GameScreen> {
           message = "Turn $turn: Both cards were defeated!";
         }
 
-        // Reset health for the next round
         player1SelectedCard!.health = player1InitialHealth;
         player2SelectedCard!.health = player2InitialHealth;
 
@@ -107,7 +104,6 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void chooseCardForAI() {
-    // AI chooses the card with the highest attack as a basic strategy
     player2SelectedCard =
         player2Hand!.reduce((a, b) => a.attack >= b.attack ? a : b);
   }
@@ -168,6 +164,39 @@ class _GameScreenState extends State<GameScreen> {
       appBar: AppBar(
         title: Text("Turn-Based Card Game"),
         backgroundColor: Colors.green[700],
+        actions: [
+          IconButton(
+            icon: Icon(Icons.info_outline),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('How to Play'),
+                  content: Text(
+                    'Each player selects a card to play. The card with higher attack and health wins the round.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('Close'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DataChoices()),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -273,11 +302,12 @@ class CardModel {
   int health;
   final Color color;
 
-  CardModel(
-      {required this.name,
-      required this.attack,
-      required this.health,
-      required this.color});
+  CardModel({
+    required this.name,
+    required this.attack,
+    required this.health,
+    required this.color,
+  });
 }
 
 class CardWidget extends StatelessWidget {
@@ -334,10 +364,9 @@ List<CardModel> generateBalancedDeck() {
   ];
   Random random = Random();
 
-  // Create 10 cards with balanced stats
   for (int i = 0; i < 10; i++) {
-    int attack = random.nextInt(5) + 5; // Attack values between 5 and 9
-    int health = random.nextInt(5) + 5; // Health values between 5 and 9
+    int attack = random.nextInt(5) + 5;
+    int health = random.nextInt(5) + 5;
     deck.add(CardModel(
       name: "Card ${i + 1}",
       attack: attack,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterapp/Data_Structure/Data_Choices.dart';
 
 void main() => runApp(TowerOfHanoiApp());
 
@@ -33,8 +34,7 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
 
   void _initializeGame() {
     setState(() {
-      towers[0] =
-          List.generate(numDisks, (index) => numDisks - index); // [4, 3, 2, 1]
+      towers[0] = List.generate(numDisks, (index) => numDisks - index);
       towers[1] = [];
       towers[2] = [];
       moves = 0;
@@ -84,25 +84,19 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
     });
   }
 
-  // Builds a realistic-looking 3D disc with a multi-stop gradient and shadow
   Widget _buildDisk(int size, int towerIndex, bool isTopDisk) {
-    final diskColors = [
-      Colors.blue,
-      Colors.red,
-      Colors.amber,
-      Colors.purple,
-    ];
+    final diskColors = [Colors.blue, Colors.red, Colors.amber, Colors.purple];
     final diskColor = diskColors[size - 1];
 
     final diskWidget = Container(
-      width: 24.0 * size, // Width proportional to size
+      width: 24.0 * size,
       height: 24,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            diskColor.withOpacity(0.8), // Highlight on the left edge
-            diskColor.withOpacity(1.0), // Main color in the center
-            diskColor.withOpacity(0.9), // Darker shadow on the right edge
+            diskColor.withOpacity(0.8),
+            diskColor.withOpacity(1.0),
+            diskColor.withOpacity(0.9),
           ],
           stops: [0.1, 0.5, 0.9],
           begin: Alignment.centerLeft,
@@ -114,19 +108,6 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
             color: Colors.black.withOpacity(0.2),
             offset: Offset(0, 4),
             blurRadius: 8,
-          ),
-          // Inner shadow for a thick edge effect
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            offset: Offset(0, -1),
-            blurRadius: 3,
-            spreadRadius: -2,
-          ),
-          BoxShadow(
-            color: Colors.white.withOpacity(0.1),
-            offset: Offset(0, 1),
-            blurRadius: 3,
-            spreadRadius: -2,
           ),
         ],
       ),
@@ -152,7 +133,6 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
     }
   }
 
-  // Builds an individual tower with a cylindrical gradient look
   Widget _buildTower(int index) {
     return Expanded(
       child: DragTarget<int>(
@@ -164,7 +144,6 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // Cylindrical tower stick with horizontal gradient
                 Positioned(
                   top: 20,
                   bottom: 12,
@@ -184,7 +163,6 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
                     ),
                   ),
                 ),
-                // Disks positioned on the tower
                 Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: towers[index]
@@ -193,7 +171,6 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
                           _buildDisk(disk, index, disk == towers[index].last))
                       .toList(),
                 ),
-                // Sleek cylindrical base with horizontal gradient
                 Positioned(
                   bottom: 0,
                   child: Container(
@@ -224,6 +201,42 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Tower of Hanoi'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.info_outline),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('How to Play'),
+                  content: Text(
+                    'Move all the disks from the first tower to the third tower, using the second tower as an intermediary.',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('Close'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DataChoices()),
+              );
+            },
+          ),
+        ],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
