@@ -34,6 +34,8 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
   List<int> _bfsTraversal = [];
   Set<int> _highlightedNodes = {};
   int? _highlightedIndex;
+  final Map<int, List<int?>> _userTreeStructure =
+      {}; // Store user-defined structure
 
   @override
   void initState() {
@@ -61,6 +63,7 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
     _root = TreeNode(_userNodeValues[0], 0);
     _controllers[_root!.index] =
         TextEditingController(text: _root!.value.toString());
+    _userTreeStructure[0] = [null, null]; // Initialize root with no children
   }
 
   void addNode(TreeNode parentNode, String position, int value) {
@@ -73,9 +76,16 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
     setState(() {
       if (position == "left" && parentNode.left == null) {
         parentNode.left = newNode;
+        _userTreeStructure[parentNode.index]![0] = newIndex; // Track left child
       } else if (position == "right" && parentNode.right == null) {
         parentNode.right = newNode;
+        _userTreeStructure[parentNode.index]![1] =
+            newIndex; // Track right child
       }
+      _userTreeStructure[newIndex] = [
+        null,
+        null
+      ]; // Initialize new node children
       _userNodeValues.add(value);
     });
   }
@@ -85,9 +95,13 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
       if (position == "left" && parentNode.left != null) {
         _removeSubtree(parentNode.left!);
         parentNode.left = null;
+        _userTreeStructure[parentNode.index]![0] =
+            null; // Remove left child reference
       } else if (position == "right" && parentNode.right != null) {
         _removeSubtree(parentNode.right!);
         parentNode.right = null;
+        _userTreeStructure[parentNode.index]![1] =
+            null; // Remove right child reference
       }
     });
   }
@@ -101,6 +115,7 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
     }
     _userNodeValues.remove(node.value);
     _controllers.remove(node.index);
+    _userTreeStructure.remove(node.index);
   }
 
   void clearTree() {
@@ -116,42 +131,25 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
   }
 
   void convertTree() {
-    if (_userNodeValues.isEmpty) return;
+    if (_root == null) return;
 
     setState(() {
-      _root = TreeNode(_userNodeValues[0], 0);
-      _controllers.clear();
-      _controllers[_root!.index] =
-          TextEditingController(text: _root!.value.toString());
-      _root!.left = null;
-      _root!.right = null;
       _isConverted = true;
     });
 
-    // Insert nodes as they appear in the list without sorting
+    // Lock in node values based on user-defined structure
     Queue<TreeNode> queue = Queue<TreeNode>();
     queue.add(_root!);
-    int currentIndex = 1;
 
-    while (queue.isNotEmpty && currentIndex < _userNodeValues.length) {
-      TreeNode currentNode = queue.removeFirst();
+    while (queue.isNotEmpty) {
+      TreeNode node = queue.removeFirst();
+      _controllers[node.index]?.text = node.value.toString();
 
-      if (currentIndex < _userNodeValues.length) {
-        currentNode.left =
-            TreeNode(_userNodeValues[currentIndex], currentNode.index * 2 + 1);
-        _controllers[currentNode.left!.index] = TextEditingController(
-            text: _userNodeValues[currentIndex].toString());
-        queue.add(currentNode.left!);
-        currentIndex++;
+      if (node.left != null) {
+        queue.add(node.left!);
       }
-
-      if (currentIndex < _userNodeValues.length) {
-        currentNode.right =
-            TreeNode(_userNodeValues[currentIndex], currentNode.index * 2 + 2);
-        _controllers[currentNode.right!.index] = TextEditingController(
-            text: _userNodeValues[currentIndex].toString());
-        queue.add(currentNode.right!);
-        currentIndex++;
+      if (node.right != null) {
+        queue.add(node.right!);
       }
     }
   }
@@ -341,8 +339,7 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
           if (_bfsTraversal.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child:
-                  buildBfsList(), // Display the BFS-ordered list after traversal
+              child: buildBfsList(),
             ),
         ],
       ),
@@ -426,10 +423,7 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
           const Center(
             child: Text(
               'Breadth First Search Visualization',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 20),
@@ -447,10 +441,9 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: const [
                         BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 4,
-                          offset: Offset(2, 2),
-                        ),
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(2, 2)),
                       ],
                     ),
                     child: SingleChildScrollView(

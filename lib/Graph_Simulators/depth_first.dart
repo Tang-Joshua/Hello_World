@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:math';
 import 'package:flutter/material.dart';
 
@@ -18,27 +17,42 @@ class TreeNode {
   TreeNode? left;
   TreeNode? right;
   int index;
-  bool isMoving = false;
-  bool isCorrectPosition = true;
 
   TreeNode(this.value, this.index);
 }
 
 class _DepthFirstPageState extends State<DepthFirstPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   TreeNode? _root;
   final Map<int, TextEditingController> _controllers = {};
   late TabController _tabController;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
   bool _isConverted = false;
-  bool _isChecked = false;
   List<int> _userNodeValues = [];
   List<int> _dfsTraversal = [];
+  Set<int> _highlightedNodes = {};
+  int? _highlightedIndex;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _initializeRootNode();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _animationController.dispose();
+    super.dispose();
   }
 
   void _initializeRootNode() {
@@ -93,9 +107,10 @@ class _DepthFirstPageState extends State<DepthFirstPage>
       _controllers.clear();
       _initializeRootNode();
       _isConverted = false;
-      _isChecked = false;
       _userNodeValues = [_root!.value];
       _dfsTraversal.clear();
+      _highlightedNodes.clear();
+      _highlightedIndex = null;
     });
   }
 
@@ -105,99 +120,37 @@ class _DepthFirstPageState extends State<DepthFirstPage>
     });
   }
 
-  void checkTree() {
+  void depthFirstTraversal() async {
+    _dfsTraversal.clear();
+    _highlightedNodes.clear();
+    _highlightedIndex = null;
     if (_root == null) return;
 
-    _resetCorrectness(_root);
+    await _dfsAnimate(_root);
     setState(() {
-      _isChecked = true;
-      _validateBST(_root, null, null);
+      _highlightedIndex = null;
     });
   }
 
-  void _resetCorrectness(TreeNode? node) {
+  Future<void> _dfsAnimate(TreeNode? node) async {
     if (node == null) return;
-    node.isCorrectPosition = true;
-    _resetCorrectness(node.left);
-    _resetCorrectness(node.right);
-  }
-
-  bool _validateBST(TreeNode? node, int? min, int? max) {
-    if (node == null) return true;
-
-    bool isCorrect = true;
-    if ((min != null && node.value <= min) ||
-        (max != null && node.value >= max)) {
-      node.isCorrectPosition = false;
-      isCorrect = false;
-    }
-
-    return _validateBST(node.left, min, node.value) &
-        _validateBST(node.right, node.value, max) &
-        isCorrect;
-  }
-
-  void sortTree() async {
-    if (_userNodeValues.isEmpty) return;
 
     setState(() {
-      _root = TreeNode(_userNodeValues[0], 0);
-      _controllers.clear();
-      _controllers[_root!.index] =
-          TextEditingController(text: _root!.value.toString());
-      _root!.left = null;
-      _root!.right = null;
+      _highlightedNodes.add(node.index);
+      _highlightedIndex = _userNodeValues.indexOf(node.value);
     });
 
-    for (int i = 1; i < _userNodeValues.length; i++) {
-      setState(() {
-        _root!.isMoving = true;
-      });
+    _animationController.forward(from: 0.0);
+    await Future.delayed(const Duration(milliseconds: 600));
 
-      await Future.delayed(const Duration(seconds: 1));
+    _dfsTraversal.add(node.value);
 
-      setState(() {
-        _insertIntoBST(_root!, _userNodeValues[i]);
-        _root!.isMoving = false;
-      });
-    }
-  }
+    setState(() {
+      _highlightedNodes.remove(node.index);
+    });
 
-  void _insertIntoBST(TreeNode node, int value) {
-    if (value < node.value) {
-      if (node.left == null) {
-        setState(() {
-          node.left = TreeNode(value, node.index * 2 + 1)..isMoving = true;
-          _controllers[node.left!.index] =
-              TextEditingController(text: value.toString());
-        });
-      } else {
-        _insertIntoBST(node.left!, value);
-      }
-    } else {
-      if (node.right == null) {
-        setState(() {
-          node.right = TreeNode(value, node.index * 2 + 2)..isMoving = true;
-          _controllers[node.right!.index] =
-              TextEditingController(text: value.toString());
-        });
-      } else {
-        _insertIntoBST(node.right!, value);
-      }
-    }
-  }
-
-  void depthFirstTraversal() {
-    _dfsTraversal.clear();
-    _dfs(_root);
-    setState(() {});
-  }
-
-  void _dfs(TreeNode? node) {
-    if (node == null) return;
-    _dfsTraversal.add(node.value); // Pre-order traversal
-    _dfs(node.left);
-    _dfs(node.right);
+    await _dfsAnimate(node.left);
+    await _dfsAnimate(node.right);
   }
 
   String _getNodeListAsString() {
@@ -209,50 +162,69 @@ class _DepthFirstPageState extends State<DepthFirstPage>
 
     return Column(
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (!_isConverted) ...[
-              IconButton(
-                icon: Icon(
-                  node.left == null
-                      ? Icons.add_circle_outline
-                      : Icons.remove_circle_outline,
-                  color: node.left == null ? Colors.green : Colors.red,
+        AnimatedBuilder(
+          animation: _animationController,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _highlightedNodes.contains(node.index) ||
+                      (_highlightedIndex != null &&
+                          _userNodeValues[_highlightedIndex!] == node.value)
+                  ? _scaleAnimation.value
+                  : 1.0,
+              child: child,
+            );
+          },
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!_isConverted) ...[
+                IconButton(
+                  icon: Icon(
+                    node.left == null
+                        ? Icons.add_circle_outline
+                        : Icons.remove_circle_outline,
+                    color: node.left == null ? Colors.green : Colors.red,
+                  ),
+                  onPressed: () => node.left == null
+                      ? addNode(node, 'left', Random().nextInt(100))
+                      : deleteNode(node, 'left'),
                 ),
-                onPressed: () => node.left == null
-                    ? addNode(node, 'left', Random().nextInt(100))
-                    : deleteNode(node, 'left'),
+              ],
+              SizedBox(
+                width: 60,
+                child: TextField(
+                  controller: _controllers[node.index],
+                  enabled: !_isConverted,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    contentPadding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                    fillColor: _highlightedNodes.contains(node.index) ||
+                            (_highlightedIndex != null &&
+                                _userNodeValues[_highlightedIndex!] ==
+                                    node.value)
+                        ? Colors.lightGreen
+                        : Colors.white,
+                    filled: true,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
+              if (!_isConverted) ...[
+                IconButton(
+                  icon: Icon(
+                    node.right == null
+                        ? Icons.add_circle_outline
+                        : Icons.remove_circle_outline,
+                    color: node.right == null ? Colors.green : Colors.red,
+                  ),
+                  onPressed: () => node.right == null
+                      ? addNode(node, 'right', Random().nextInt(100))
+                      : deleteNode(node, 'right'),
+                ),
+              ],
             ],
-            SizedBox(
-              width: 60,
-              child: TextField(
-                controller: _controllers[node.index],
-                onChanged: (value) => updateNodeValue(node, value),
-                enabled: !_isConverted,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            if (!_isConverted) ...[
-              IconButton(
-                icon: Icon(
-                  node.right == null
-                      ? Icons.add_circle_outline
-                      : Icons.remove_circle_outline,
-                  color: node.right == null ? Colors.green : Colors.red,
-                ),
-                onPressed: () => node.right == null
-                    ? addNode(node, 'right', Random().nextInt(100))
-                    : deleteNode(node, 'right'),
-              ),
-            ],
-          ],
+          ),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -271,21 +243,27 @@ class _DepthFirstPageState extends State<DepthFirstPage>
     );
   }
 
-  void updateNodeValue(TreeNode node, String newValue) {
-    int? value = int.tryParse(newValue);
-    if (value != null) {
-      setState(() {
-        int oldValueIndex = _userNodeValues.indexOf(node.value);
-        if (oldValueIndex != -1) {
-          _userNodeValues[oldValueIndex] = value;
-        }
-        node.value = value;
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid integer value.')),
-      );
-    }
+  Widget buildDfsList() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: _dfsTraversal.map((value) {
+        bool isHighlighted = _highlightedIndex != null &&
+            _userNodeValues[_highlightedIndex!] == value;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 600),
+          margin: const EdgeInsets.symmetric(horizontal: 4.0),
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            color: isHighlighted ? Colors.lightGreenAccent : Colors.green,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            value.toString(),
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+          ),
+        );
+      }).toList(),
+    );
   }
 
   @override
@@ -324,13 +302,11 @@ class _DepthFirstPageState extends State<DepthFirstPage>
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'DFS Traversal: ${_dfsTraversal.join(', ')}',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          if (_dfsTraversal.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: buildDfsList(),
             ),
-          ),
         ],
       ),
     );
@@ -389,34 +365,13 @@ class _DepthFirstPageState extends State<DepthFirstPage>
               ),
               const SizedBox(width: 10),
               ElevatedButton(
-                onPressed: (_isConverted && !_isChecked) ? checkTree : null,
-                style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(12),
-                  backgroundColor: Colors.green,
-                ),
-                child:
-                    const Icon(Icons.check_circle_outline, color: Colors.white),
-              ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: (_isConverted && _isChecked) ? sortTree : null,
-                style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(12),
-                  backgroundColor: Colors.orange,
-                ),
-                child: const Icon(Icons.sort, color: Colors.white),
-              ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: depthFirstTraversal,
+                onPressed: _isConverted ? depthFirstTraversal : null,
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
                   padding: const EdgeInsets.all(12),
                   backgroundColor: Colors.purple,
                 ),
-                child: const Icon(Icons.arrow_downward, color: Colors.white),
+                child: const Icon(Icons.trending_flat, color: Colors.white),
               ),
               const Spacer(),
               ElevatedButton(
@@ -434,17 +389,14 @@ class _DepthFirstPageState extends State<DepthFirstPage>
           const Center(
             child: Text(
               'Depth First Search Visualization',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 20),
           Expanded(
             child: _isConverted
                 ? CustomPaint(
-                    painter: TreePainter(_root, _isChecked),
+                    painter: TreePainter(_root, _highlightedNodes),
                     child: Container(),
                   )
                 : Container(
@@ -455,10 +407,9 @@ class _DepthFirstPageState extends State<DepthFirstPage>
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: const [
                         BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 4,
-                          offset: Offset(2, 2),
-                        ),
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(2, 2)),
                       ],
                     ),
                     child: SingleChildScrollView(
@@ -495,10 +446,8 @@ class _DepthFirstPageState extends State<DepthFirstPage>
             '2. Click the + icons to add nodes.\n'
             '3. Click the - icons to delete nodes.\n'
             '4. Use the "Convert" button to lock in values and create the tree.\n'
-            '5. Use "Check" to highlight incorrect nodes based on BST rules.\n'
-            '6. Use "Sort" to organize the tree in order after checking.\n'
-            '7. Use "DFS Traversal" to perform a depth-first traversal.\n'
-            '8. Use "Clear" to reset and start again.\n',
+            '5. Use "DFS Traversal" to perform a depth-first traversal.\n'
+            '6. Use "Clear" to reset and start again.\n',
             style: TextStyle(fontSize: 14),
           ),
         ],
@@ -509,9 +458,9 @@ class _DepthFirstPageState extends State<DepthFirstPage>
 
 class TreePainter extends CustomPainter {
   final TreeNode? root;
-  final bool isChecked;
+  final Set<int> highlightedNodes;
 
-  TreePainter(this.root, this.isChecked);
+  TreePainter(this.root, this.highlightedNodes);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -543,14 +492,8 @@ class TreePainter extends CustomPainter {
           paint, linePaint);
     }
 
-    paint.color = node.isMoving
-        ? Colors.blue
-        : isChecked && node.isCorrectPosition
-            ? Colors.lightGreen
-            : isChecked && !node.isCorrectPosition
-                ? Colors.red
-                : Colors.blue;
-
+    paint.color =
+        highlightedNodes.contains(node.index) ? Colors.lightGreen : Colors.blue;
     canvas.drawCircle(Offset(x, y), radius, paint);
 
     final textPainter = TextPainter(
