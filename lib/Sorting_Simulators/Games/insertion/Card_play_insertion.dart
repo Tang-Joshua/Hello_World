@@ -94,7 +94,7 @@ class GameIntroInsertionScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     // Game description
                     Text(
-                      'Welcome to the Radix Sort Game! In this game, you will need to find the number by revealing them one by one.',
+                      'Welcome to the Insertion Sort Game! In this game, you will need to find the number by revealing them one by one.',
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.white,
