@@ -187,7 +187,7 @@ class _SortingChoices extends State<SortingChoices> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => MergeSortMergeScreen()),
+                            builder: (context) => SortingGameScreen()),
                       );
                     } else if (text == "Insertion Sort") {
                       Navigator.push(
