@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterapp/main.dart';
 import 'radix.dart';
 import 'merge.dart';
 import 'insertion.dart';
@@ -254,7 +255,13 @@ class _SortingChoices extends State<SortingChoices> {
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black), // Black arrow icon
-          onPressed: () => Navigator.of(context).pop(), // Navigate back
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => MyApp()),
+              (route) => false,
+            );
+          }, // Navigate back
         ),
         title: Text(
           'Sorting Algorithms',

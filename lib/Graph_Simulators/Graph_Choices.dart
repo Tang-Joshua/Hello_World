@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterapp/Graph_Simulators/binary_search_tree.dart';
 import 'package:flutterapp/Graph_Simulators/breadth_first.dart';
 import 'package:flutterapp/Graph_Simulators/depth_first.dart';
+import 'package:flutterapp/main.dart';
 
 class GraphChoices extends StatefulWidget {
   const GraphChoices({Key? key}) : super(key: key);
@@ -229,7 +230,13 @@ class _GraphChoices extends State<GraphChoices> {
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black), // Black arrow icon
-          onPressed: () => Navigator.of(context).pop(), // Navigate back
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => MyApp()),
+              (route) => false,
+            );
+          }, // Navigate back
         ),
         title: Text(
           'Sorting Algorithms',

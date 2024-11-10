@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterapp/Data_Structure/Queues.dart';
 import 'package:flutterapp/Data_Structure/stacks.dart';
+import 'package:flutterapp/main.dart';
 import 'Games/Queues_game.dart';
 import 'Games/Stacks_game.dart';
 
@@ -219,7 +220,13 @@ class _DataChoices extends State<DataChoices> {
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black), // Black arrow icon
-          onPressed: () => Navigator.of(context).pop(), // Navigate back
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => MyApp()),
+              (route) => false,
+            );
+          }, // Navigate back
         ),
         title: Text(
           'Sorting Algorithms',
