@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterapp/Sorting_Simulators/Games/merge/Merge_Game.dart';
 import 'package:flutterapp/main.dart';
 import 'radix.dart';
 import 'merge.dart';
@@ -186,8 +187,7 @@ class _SortingChoices extends State<SortingChoices> {
                     } else if (text == "Merge Sort") {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => MergeSortMergeScreen()),
+                        MaterialPageRoute(builder: (context) => Merge_Game()),
                       );
                     } else if (text == "Insertion Sort") {
                       Navigator.push(
