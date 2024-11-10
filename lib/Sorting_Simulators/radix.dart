@@ -6,7 +6,7 @@ void main() {
   runApp(MaterialApp(
     title: 'Radix Sort Visualization',
     theme: ThemeData(
-      primarySwatch: Colors.green,
+      primarySwatch: Colors.blue,
       visualDensity: VisualDensity.adaptivePlatformDensity,
     ),
     home: RadixSortPage(),
@@ -18,21 +18,40 @@ class RadixSortPage extends StatefulWidget {
   _RadixSortPageState createState() => _RadixSortPageState();
 }
 
-class _RadixSortPageState extends State<RadixSortPage> {
+class _RadixSortPageState extends State<RadixSortPage>
+    with TickerProviderStateMixin {
   final TextEditingController inputController = TextEditingController();
-  List<List<TextEditingController>> stepControllers =
-      []; // List to store history of each step
-  List<String> stepLabels =
-      []; // List to store the label for each step (ones, tens, etc.)
-  List<int> originalNumbers = []; // Store the original list of numbers
+  List<List<TextEditingController>> stepControllers = [];
+  List<String> stepLabels = [];
+  List<int> originalNumbers = [];
   bool canSort = false;
   bool isSorting = false;
-  Duration animationDelay = Duration(seconds: 1); // Control animation speed
+  bool showInsertButton = false; // Control the visibility of the Insert button
+  late TabController _tabController;
+  Duration animationDelay = Duration(milliseconds: 600);
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+
+    // Listen to input changes to control the visibility of the Insert button
+    inputController.addListener(() {
+      setState(() {
+        showInsertButton = inputController.text.isNotEmpty;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    inputController.dispose();
+    _tabController.dispose();
+    super.dispose();
+  }
 
   void _insertit() {
     if (inputController.text.isEmpty) return;
-
-    // Parse input into a list of integers
     List<int> initialNumbers = inputController.text
         .split(',')
         .map((e) => int.tryParse(e.trim()) ?? 0)
@@ -40,17 +59,16 @@ class _RadixSortPageState extends State<RadixSortPage> {
 
     if (initialNumbers.isNotEmpty) {
       setState(() {
-        originalNumbers = initialNumbers; // Store original numbers
+        originalNumbers = initialNumbers;
         stepControllers = [
           initialNumbers
               .map((num) => TextEditingController(text: num.toString()))
               .toList()
         ];
-        stepLabels = [
-          'Initial State'
-        ]; // Initialize the first label as "Initial State"
+        stepLabels = ['Initial State'];
         canSort = true;
         inputController.clear();
+        showInsertButton = false; // Hide the Insert button after insertion
       });
     }
   }
@@ -64,11 +82,16 @@ class _RadixSortPageState extends State<RadixSortPage> {
     });
   }
 
+  void _generateRandomNumbers() {
+    final random = Random();
+    List<int> randomNumbers = List.generate(5, (_) => random.nextInt(100) + 1);
+    inputController.text = randomNumbers.join(', ');
+  }
+
   Future<void> _animateSortingSteps(
       List<List<int>> steps, List<String> labels) async {
     for (int i = 0; i < steps.length; i++) {
       setState(() {
-        // Append each step and its label to the history of steps
         stepControllers.add(steps[i]
             .map((num) => TextEditingController(text: num.toString()))
             .toList());
@@ -77,52 +100,56 @@ class _RadixSortPageState extends State<RadixSortPage> {
       await Future.delayed(animationDelay);
     }
     setState(() {
-      isSorting = false; // End sorting animation
+      isSorting = false;
     });
   }
 
   Future<void> _sort() async {
-    if (!canSort || originalNumbers.isEmpty)
-      return; // Prevent sorting if no numbers are inserted
+    if (!canSort || originalNumbers.isEmpty) return;
 
     setState(() {
       isSorting = true;
+      // Clear previous steps before starting a new sort to avoid duplicates
+      stepControllers.clear();
+      stepLabels.clear();
     });
 
-    List<int> numbers = List.from(originalNumbers); // Copy of original numbers
+    List<int> numbers = List.from(originalNumbers);
     int maxDigits = _getMaxDigits(numbers);
-    List<List<int>> steps = []; // Store every step for animation
-    List<String> labels = []; // Store label for each step
+    List<List<int>> steps = [];
+    List<String> labels = [];
 
-    // Perform radix sort by each digit place (ones, tens, hundreds, etc.)
+    // Add initial state only once
+    steps.add(List.from(numbers));
+    labels.add('Initial State');
+
     for (int digitPlace = 1; digitPlace <= maxDigits; digitPlace++) {
       String digitPlaceLabel = _getDigitPlaceName(digitPlace);
+      List<List<int>> buckets = List.generate(10, (_) => []);
 
       // Place numbers into buckets based on the current digit
-      List<List<int>> buckets = List.generate(10, (_) => []);
       for (int num in numbers) {
         int digit = (num ~/ pow(10, digitPlace - 1)) % 10;
         buckets[digit].add(num);
-
-        // Capture the state after placing each number into a bucket
-        List<int> snapshot = buckets.expand((bucket) => bucket).toList();
-        steps.add(snapshot); // Add the current state to steps
-        labels.add('Placing by $digitPlaceLabel'); // Label for placing phase
       }
 
-      // Reassemble numbers from buckets and capture each step for visualization
+      // Reassemble numbers from buckets and capture each step
       numbers.clear();
+      int stepIndex = 1;
       for (var bucket in buckets) {
-        numbers.addAll(bucket);
-
-        // Capture the state after retrieving numbers from each bucket
-        steps.add(List.from(numbers));
-        labels.add(
-            'Reassembling by $digitPlaceLabel'); // Label for reassembling phase
+        for (var num in bucket) {
+          numbers.add(num);
+          steps.add(List.from(numbers));
+          labels.add('Sorting by $digitPlaceLabel - Step $stepIndex');
+          stepIndex++;
+        }
       }
     }
 
-    // Animate through all captured steps to show the sorting process
+    // Add final sorted state
+    steps.add(List.from(numbers));
+    labels.add('Final Sorted List');
+
     await _animateSortingSteps(steps, labels);
   }
 
@@ -148,6 +175,9 @@ class _RadixSortPageState extends State<RadixSortPage> {
 
   Widget _buildStep(int index) {
     bool isFinalStep = (index == stepControllers.length - 1);
+    String stepLabel = stepLabels[index];
+    int digitPlace = _getCurrentDigitPlace(stepLabel);
+
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8),
       child: Padding(
@@ -174,21 +204,8 @@ class _RadixSortPageState extends State<RadixSortPage> {
                     children: stepControllers[index].map((controller) {
                       return SizedBox(
                         width: 50,
-                        child: TextFormField(
-                          controller: controller,
-                          textAlign: TextAlign.center,
-                          readOnly: true,
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(vertical: 12),
-                            isDense: true,
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: isFinalStep ? Colors.green : Colors.grey,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
+                        child: _buildHighlightedDigit(
+                            controller.text, digitPlace, isFinalStep),
                       );
                     }).toList(),
                   ),
@@ -201,49 +218,225 @@ class _RadixSortPageState extends State<RadixSortPage> {
     );
   }
 
+  // Build the number display with highlighted digit
+  Widget _buildHighlightedDigit(
+      String numberText, int digitPlace, bool isFinalStep) {
+    int number = int.tryParse(numberText) ?? 0;
+    String numberString =
+        number.toString().padLeft(digitPlace, '0'); // Pad for highlighting
+
+    int highlightIndex =
+        numberString.length - digitPlace; // Position of the current digit
+
+    return RichText(
+      textAlign: TextAlign.center,
+      text: TextSpan(
+        children: List.generate(numberString.length, (i) {
+          bool isHighlighted = i == highlightIndex && !isFinalStep;
+          return TextSpan(
+            text: numberString[i],
+            style: TextStyle(
+              fontSize: 16,
+              color: isHighlighted ? Colors.blue : Colors.black,
+              fontWeight: isHighlighted ? FontWeight.bold : FontWeight.normal,
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  int _getCurrentDigitPlace(String label) {
+    if (label.contains("Ones")) return 1;
+    if (label.contains("Tens")) return 2;
+    if (label.contains("Hundreds")) return 3;
+    if (label.contains("Thousands")) return 4;
+    return 1;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Radix Sort Visualization')),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            TextField(
-              controller: inputController,
-              decoration: InputDecoration(
-                labelText: 'Enter numbers (comma-separated)',
-                border: OutlineInputBorder(),
-              ),
-              enabled: !isSorting,
-            ),
-            SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              children: [
-                ElevatedButton(
-                  onPressed: isSorting ? null : _insertit,
-                  child: Text('Insert'),
-                ),
-                ElevatedButton(
-                  onPressed: isSorting ? null : _clearSteps,
-                  child: Text('Clear Steps'),
-                ),
-                ElevatedButton(
-                  onPressed: canSort && !isSorting ? _sort : null,
-                  child: Text('Sort'),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: stepControllers.length,
-                itemBuilder: (context, index) => _buildStep(index),
-              ),
-            ),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text('Radix Sort Visualization',
+            style: TextStyle(color: Colors.black)),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60.0),
+          child: _buildTabBar(),
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildVisualizationTab(),
+          _buildInstructionsTab(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: const [
+            BoxShadow(
+                color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
           ],
+        ),
+        child: TabBar(
+          controller: _tabController,
+          indicator: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: const [
+              BoxShadow(
+                  color: Colors.black12, blurRadius: 2, offset: Offset(0, 2)),
+            ],
+          ),
+          tabs: const [
+            Tab(child: Text('Simulate', style: TextStyle(color: Colors.blue))),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVisualizationTab() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildInputRow(),
+          const SizedBox(height: 16),
+          _buildActionButtonsRow(),
+          const SizedBox(height: 16),
+          const Text(
+            'Radix Sort Visualization:',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          _buildVisualizationContainer(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInstructionsTab() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            'Instructions:',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '1. Enter numbers separated by commas and press Insert to add them.\n'
+            '2. Use the random button to generate random numbers.\n'
+            '3. Press play to start the radix sort visualization.\n'
+            '4. Use the clear button to reset the visualization.\n',
+            style: TextStyle(fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInputRow() {
+    return Row(
+      children: [
+        SizedBox(
+          height: 40,
+          width: 40,
+          child: ElevatedButton(
+            onPressed: _generateRandomNumbers,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.all(8),
+              backgroundColor: Colors.blue,
+              shape: const CircleBorder(),
+            ),
+            child: const Icon(Icons.casino, color: Colors.white),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: TextField(
+            controller: inputController,
+            decoration: const InputDecoration(
+              labelText: 'Enter numbers (comma-separated)',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtonsRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        if (showInsertButton)
+          ElevatedButton(
+            onPressed: isSorting ? null : _insertit,
+            style: ElevatedButton.styleFrom(
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(12),
+              backgroundColor: Colors.green,
+            ),
+            child: const Icon(Icons.check, color: Colors.white),
+          ),
+        const SizedBox(width: 8),
+        ElevatedButton(
+          onPressed: canSort && !isSorting ? _sort : null,
+          style: ElevatedButton.styleFrom(
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(12),
+            backgroundColor: Colors.blue,
+          ),
+          child: const Icon(Icons.play_arrow, color: Colors.white),
+        ),
+        const SizedBox(width: 8),
+        ElevatedButton(
+          onPressed: _clearSteps,
+          style: ElevatedButton.styleFrom(
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(12),
+            backgroundColor: Colors.red,
+          ),
+          child: const Icon(Icons.refresh, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVisualizationContainer() {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.blueAccent),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: ListView.builder(
+          itemCount: stepControllers.length,
+          itemBuilder: (context, index) => _buildStep(index),
         ),
       ),
     );
