@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutterapp/Sorting_Simulators/Games/radix/hangman_play.dart';
-import 'radix/board_play.dart';
-import 'radix/card_play.dart';
+import 'radix/Sliding_radix.dart';
+import 'radix/PlayButton_Sliding.dart';
+import 'radix/PlayButton_RadixRace.dart';
+import 'hangman.dart';
 
 void main() {
   runApp(GameSelectionApp());
@@ -195,7 +196,7 @@ class GameSelectionScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => RadixSortHangmanGame()),
+                              builder: (context) => HangmanGame()),
                         );
                         // Add your action for the first game here
                       },

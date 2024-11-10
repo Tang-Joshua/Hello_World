@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'guessradix.dart';
-import 'Board.dart';
+import 'Radix_Race.dart';
+import 'Sliding_radix.dart';
 
 void main() {
   runApp(MyApp());
