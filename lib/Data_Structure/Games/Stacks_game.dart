@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutterapp/Data_Structure/Data_Choices.dart';
+import 'dart:async';
 
 void main() => runApp(TowerOfHanoiApp());
 
@@ -22,9 +22,12 @@ class TowerOfHanoiScreen extends StatefulWidget {
 }
 
 class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
-  static const int numDisks = 4;
   List<List<int>> towers = [[], [], []];
   int moves = 0;
+  int timeLimit = 20;
+  Timer? timer;
+  bool isFirstMove = true;
+  int numDisks = 4; // Default to 4 disks
 
   @override
   void initState() {
@@ -38,7 +41,135 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
       towers[1] = [];
       towers[2] = [];
       moves = 0;
+      isFirstMove = true;
+      timer?.cancel();
     });
+  }
+
+  void _startTimer() {
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (timeLimit <= 0) {
+        timer.cancel();
+        _showTimeoutDialog();
+      } else {
+        setState(() {
+          timeLimit--;
+        });
+      }
+    });
+  }
+
+  void _setDifficulty(int disks, int difficultyLevel) {
+    setState(() {
+      numDisks = disks;
+      _initializeGame();
+
+      // Set time limits based on difficulty and number of disks
+      switch (difficultyLevel) {
+        case 0:
+          timeLimit = disks == 4
+              ? 20
+              : disks == 6
+                  ? 40
+                  : 120;
+          break;
+        case 1:
+          timeLimit = disks == 4
+              ? 15
+              : disks == 6
+                  ? 30
+                  : 90;
+          break;
+        case 2:
+          timeLimit = disks == 4
+              ? 10
+              : disks == 6
+                  ? 20
+                  : 60;
+          break;
+      }
+    });
+  }
+
+  void _showDifficultyDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Choose Difficulty'),
+        content: Text('Select a difficulty level for the game:'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _setDifficulty(numDisks, 0); // Easy difficulty
+            },
+            child: Text('Easy'),
+            style: TextButton.styleFrom(foregroundColor: Colors.green),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _setDifficulty(numDisks, 1); // Normal difficulty
+            },
+            child: Text('Normal'),
+            style: TextButton.styleFrom(foregroundColor: Colors.orange),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _setDifficulty(numDisks, 2); // Hard difficulty
+            },
+            child: Text('Hard'),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLevelSelectionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Select Number of Disks'),
+        content: Text('Choose the number of disks to play with:'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {
+                numDisks = 4;
+              });
+              _showDifficultyDialog();
+            },
+            child: Text('4 Disks'),
+            style: TextButton.styleFrom(foregroundColor: Colors.blue),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {
+                numDisks = 6;
+              });
+              _showDifficultyDialog();
+            },
+            child: Text('6 Disks'),
+            style: TextButton.styleFrom(foregroundColor: Colors.purple),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {
+                numDisks = 10;
+              });
+              _showDifficultyDialog();
+            },
+            child: Text('10 Disks'),
+            style: TextButton.styleFrom(foregroundColor: Colors.teal),
+          ),
+        ],
+      ),
+    );
   }
 
   bool _isValidMove(int from, int to) {
@@ -52,21 +183,20 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
   }
 
   void _showWinDialog() {
+    timer?.cancel();
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Congratulations!',
-              style: TextStyle(color: Colors.green[800])),
+          title: Text('Congratulations!'),
           content: Text('You solved it in $moves moves!'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _initializeGame();
+                _showLevelSelectionDialog();
               },
-              child: Text('Play Again',
-                  style: TextStyle(color: Colors.green[800])),
+              child: Text('Play Again'),
             ),
           ],
         );
@@ -74,7 +204,37 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
     );
   }
 
+  void _showTimeoutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Time\'s up!'),
+        content: Text('You ran out of time. Would you like to try again?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showLevelSelectionDialog();
+            },
+            child: Text('Try Again'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _initializeGame();
+            },
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _moveDisk(int from, int to) {
+    if (isFirstMove) {
+      _startTimer();
+      isFirstMove = false;
+    }
     setState(() {
       if (_isValidMove(from, to)) {
         towers[to].add(towers[from].removeLast());
@@ -86,7 +246,7 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
 
   Widget _buildDisk(int size, int towerIndex, bool isTopDisk) {
     final diskColors = [Colors.blue, Colors.red, Colors.amber, Colors.purple];
-    final diskColor = diskColors[size - 1];
+    final diskColor = diskColors[(size - 1) % diskColors.length];
 
     final diskWidget = Container(
       width: 24.0 * size,
@@ -229,10 +389,7 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
           IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DataChoices()),
-              );
+              Navigator.pop(context);
             },
           ),
         ],
@@ -266,6 +423,13 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
                   style: TextStyle(fontSize: 18, color: Colors.green[700]),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: Text(
+                  'Time Remaining: $timeLimit seconds',
+                  style: TextStyle(fontSize: 18, color: Colors.red[700]),
+                ),
+              ),
               Expanded(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -279,12 +443,12 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: ElevatedButton(
-                  onPressed: _initializeGame,
-                  child: Text('Restart Game'),
+                  onPressed: _showLevelSelectionDialog,
+                  child: Text('Play Game'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[600],
+                    padding: EdgeInsets.all(20),
                     foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     textStyle:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
