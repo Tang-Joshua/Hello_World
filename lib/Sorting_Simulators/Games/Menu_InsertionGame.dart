@@ -221,7 +221,7 @@ class GameSelectionInsertionScreen extends StatelessWidget {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(15.0),
                                   child: Image.asset(
-                                    'assets/card_image.png', // Replace with your image
+                                    'assets/bookshelf.png', // Replace with your image
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -239,7 +239,7 @@ class GameSelectionInsertionScreen extends StatelessWidget {
                                         fontSize: 20,
                                         fontWeight: FontWeight.w900,
                                         color: Color.fromARGB(
-                                            255, 44, 82, 107), // Text color
+                                            255, 255, 177, 8), // Text color
                                       ),
                                     ),
                                     SizedBox(
@@ -250,7 +250,7 @@ class GameSelectionInsertionScreen extends StatelessWidget {
                                           100, // Adjust width of the underline if needed
                                       height: 5, // Thickness of the underline
                                       color: Color.fromARGB(
-                                          255, 44, 82, 107), // Underline color
+                                          255, 255, 177, 8), // Underline color
                                     ),
                                   ],
                                 ),

@@ -219,7 +219,7 @@ class GameSelectionScreen extends StatelessWidget {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(15.0),
                                   child: Image.asset(
-                                    'assets/card_image.png', // Replace with your image
+                                    'assets/hangman_img.png', // Replace with your image
                                     fit: BoxFit.cover,
                                   ),
                                 ),

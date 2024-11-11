@@ -81,21 +81,21 @@ class GameIntroScreen2 extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     // Game description
-                    Text(
-                      'This is a classic Sliding Puzzle game. Move the boxes into the correct sort.',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 10.0,
-                            color: Colors.black.withOpacity(0.6),
-                            offset: const Offset(3, 3),
-                          ),
-                        ],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    // Text(
+                    //   'This is a classic Sliding Puzzle game. Move the boxes into the correct sort.',
+                    //   style: TextStyle(
+                    //     fontSize: 18,
+                    //     color: Colors.white,
+                    //     shadows: [
+                    //       Shadow(
+                    //         blurRadius: 10.0,
+                    //         color: Colors.black.withOpacity(0.6),
+                    //         offset: const Offset(3, 3),
+                    //       ),
+                    //     ],
+                    //   ),
+                    //   textAlign: TextAlign.center,
+                    // ),
                   ],
                 ),
               ),
