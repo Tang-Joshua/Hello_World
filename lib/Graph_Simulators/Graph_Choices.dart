@@ -1,8 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterapp/Graph_Simulators/binary_search_tree.dart';
+import 'package:flutterapp/Graph_Simulators/binary_search_tree.dart'; // Simulation Page
 import 'package:flutterapp/Graph_Simulators/breadth_first.dart';
 import 'package:flutterapp/Graph_Simulators/depth_first.dart';
+import 'package:flutterapp/Graph_Simulators/learn/binary_search_learn.dart'; // Tutorial Page
 import 'package:flutterapp/main.dart';
 
 class GraphChoices extends StatefulWidget {
@@ -15,26 +16,12 @@ class GraphChoices extends StatefulWidget {
 class _GraphChoices extends State<GraphChoices> {
   int _current = 0;
   dynamic _selectedIndex = {};
-// Only for Ver of 4.2
-  // CarouselController _carouselController = new CarouselController();
 
-  // Define the background colors for each page
   final List<Color> _backgroundColors = [
-    const Color.fromARGB(
-        255, 255, 205, 202), // Background color for the first page
-    const Color.fromARGB(
-        255, 193, 255, 195), // Background color for the second page
-    Color.fromARGB(255, 152, 240, 255), // Background color for the third page
-    // Add more colors if you have more pages
+    const Color.fromARGB(255, 255, 205, 202),
+    const Color.fromARGB(255, 193, 255, 195),
+    const Color.fromARGB(255, 152, 240, 255),
   ];
-
-  // Define the background images for each page
-  // final List<String> _backgroundImages = [
-  //   'assets/Game.png', // Path to the first background image
-  //   'assets/Learn.png', // Path to the second background image
-  //   'assets/Simulation.png', // Path to the third background image
-  //   // Add more image paths if you have more pages
-  // ];
 
   var text = "??";
 
@@ -42,14 +29,18 @@ class _GraphChoices extends State<GraphChoices> {
     {
       'title': 'Binary Search Tree',
       'image': 'assets/Tree_img.png',
-      'description': ''
+      'description': '',
     },
     {
       'title': 'Breadth First',
       'image': 'assets/Tree_img2.png',
-      'description': ''
+      'description': '',
     },
-    {'title': 'Depth First', 'image': 'assets/Tree_img3.png', 'description': ''}
+    {
+      'title': 'Depth First',
+      'image': 'assets/Tree_img3.png',
+      'description': '',
+    },
   ];
 
   void _openAnimationDialog(BuildContext context) {
@@ -57,7 +48,6 @@ class _GraphChoices extends State<GraphChoices> {
       context: context,
       barrierDismissible: true,
       barrierLabel: '',
-      // barrierColor: Colors.black38,
       transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (context, animation1, animation2) {
         return Container();
@@ -67,14 +57,11 @@ class _GraphChoices extends State<GraphChoices> {
           scale: Tween<double>(begin: 0.5, end: 1.0).animate(a1),
           child: AlertDialog(
             backgroundColor: Colors.transparent,
-            // title: const Text('Hello'),
-            // content: const Text('I am Madhi'),
             content: Column(
-              mainAxisSize:
-                  MainAxisSize.min, // Make sure content fits within the dialog
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // const Text('I am Madhi'),
-                SizedBox(height: 20), // Add spacing between content and button
+                // Tutorial Button
+                SizedBox(height: 20),
                 TextButton(
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(
@@ -83,9 +70,13 @@ class _GraphChoices extends State<GraphChoices> {
                         Color.fromARGB(255, 255, 255, 255)),
                   ),
                   onPressed: () {
-                    // Handle button press if needed
-                    Navigator.of(context)
-                        .pop(); // Close the dialog on button press
+                    if (text == "Binary Search Tree") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BinarySearchLearnPage()),
+                      );
+                    }
                   },
                   child: Container(
                     width: 230,
@@ -93,15 +84,14 @@ class _GraphChoices extends State<GraphChoices> {
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     alignment: Alignment.centerLeft,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment
-                          .start, // Center align the content in the row
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Image.asset(
                           'assets/Learn.png',
-                          width: 40, // Adjust width as needed
-                          height: 40, // Adjust height as needed
+                          width: 40,
+                          height: 40,
                         ),
-                        SizedBox(width: 8), // Ad
+                        SizedBox(width: 8),
                         Text(
                           'Tutorial',
                           style: TextStyle(fontSize: 30),
@@ -110,7 +100,8 @@ class _GraphChoices extends State<GraphChoices> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20), // Adds vertical space
+                // Simulation Button
+                SizedBox(height: 20),
                 TextButton(
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(
@@ -145,15 +136,14 @@ class _GraphChoices extends State<GraphChoices> {
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     alignment: Alignment.centerLeft,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment
-                          .start, // Center align the content in the row
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Image.asset(
                           'assets/Simulation.png',
-                          width: 40, // Adjust width as needed
-                          height: 40, // Adjust height as needed
+                          width: 40,
+                          height: 40,
                         ),
-                        SizedBox(width: 8), // Ad
+                        SizedBox(width: 8),
                         Text(
                           'Simulation',
                           style: TextStyle(fontSize: 30),
@@ -161,10 +151,9 @@ class _GraphChoices extends State<GraphChoices> {
                       ],
                     ),
                   ),
-                  // Text('START', style: TextStyle(fontSize: 30),),
-                  // donut
                 ),
-                SizedBox(height: 20), // Adds vertical space
+                // Game Button (Placeholder or Other Future Feature)
+                SizedBox(height: 20),
                 TextButton(
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(
@@ -172,22 +161,23 @@ class _GraphChoices extends State<GraphChoices> {
                     foregroundColor: MaterialStateProperty.all<Color>(
                         const Color.fromARGB(255, 255, 255, 255)),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    // Placeholder for future game functionality
+                  },
                   child: Container(
                     width: 230,
                     height: 90,
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     alignment: Alignment.centerLeft,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment
-                          .start, // Center align the content in the row
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Image.asset(
                           'assets/Game.png',
-                          width: 40, // Adjust width as needed
-                          height: 40, // Adjust height as needed
+                          width: 40,
+                          height: 40,
                         ),
-                        SizedBox(width: 8), // Ad
+                        SizedBox(width: 8),
                         Text(
                           'Game',
                           style: TextStyle(fontSize: 30),
@@ -195,8 +185,6 @@ class _GraphChoices extends State<GraphChoices> {
                       ],
                     ),
                   ),
-                  // Text('START', style: TextStyle(fontSize: 30),),
-                  // donut
                 ),
               ],
             ),
@@ -213,44 +201,35 @@ class _GraphChoices extends State<GraphChoices> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Set background to pure white
+      backgroundColor: Colors.white,
       floatingActionButton: _selectedIndex.isNotEmpty
           ? FloatingActionButton(
               onPressed: () => _openAnimationDialog(context),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.arrow_forward_ios),
-                ],
-              ),
+              child: Icon(Icons.arrow_forward_ios),
             )
           : null,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black), // Black arrow icon
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => MyApp()),
               (route) => false,
             );
-          }, // Navigate back
+          },
         ),
         title: Text(
-          'Sorting Algorithms',
-          style: TextStyle(
-            color: Colors.black,
-          ),
+          'Graph Algorithms',
+          style: TextStyle(color: Colors.black),
         ),
       ),
-
       body: Container(
         width: double.infinity,
         height: double.infinity,
         child: CarouselSlider.builder(
-          carouselController: CarouselSliderController(),
           options: CarouselOptions(
             height: 450.0,
             aspectRatio: 16 / 9,
@@ -265,31 +244,31 @@ class _GraphChoices extends State<GraphChoices> {
           ),
           itemCount: _products.length,
           itemBuilder: (BuildContext context, int index, int realIdx) {
-            var movie = _products[index];
+            var item = _products[index];
             return GestureDetector(
               onTap: () {
                 setState(() {
-                  if (_selectedIndex == movie) {
+                  if (_selectedIndex == item) {
                     _selectedIndex = {};
                   } else {
-                    _selectedIndex = movie;
+                    _selectedIndex = item;
                   }
-                  text = movie['title'];
+                  text = item['title'];
                 });
               },
               child: AnimatedContainer(
                 duration: Duration(milliseconds: 300),
-                width: MediaQuery.of(context).size.width,
+                margin: EdgeInsets.symmetric(vertical: 8.0),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  border: _selectedIndex == movie
+                  border: _selectedIndex == item
                       ? Border.all(
                           color: Color.fromARGB(255, 22, 207, 62),
                           width: 3,
                         )
                       : null,
-                  boxShadow: _selectedIndex == movie
+                  boxShadow: _selectedIndex == item
                       ? [
                           BoxShadow(
                             color: Color.fromARGB(255, 70, 155, 129),
@@ -305,39 +284,37 @@ class _GraphChoices extends State<GraphChoices> {
                           )
                         ],
                 ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 320,
-                        margin: EdgeInsets.only(top: 10),
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Image.network(
-                          movie['image'],
-                          fit: BoxFit.cover,
-                        ),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 250,
+                      margin: EdgeInsets.only(top: 10),
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      SizedBox(height: 20),
-                      Text(
-                        movie['title'],
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: Image.network(
+                        item['image'],
+                        fit: BoxFit.cover,
                       ),
-                      SizedBox(height: 20),
-                      Text(
-                        movie['description'],
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade600,
-                        ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      item['title'],
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      item['description'],
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
