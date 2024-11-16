@@ -1,13 +1,12 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterapp/Sorting_Simulators/Games/merge/Merge_Game.dart';
 import 'package:flutterapp/main.dart';
+import 'Games/merge/merge_mainmenu.dart';
 import 'radix.dart';
 import 'merge.dart';
 import 'insertion.dart';
 import 'Games/Menu_RadixGame.dart';
 import 'Games/Menu_InsertionGame.dart';
-import 'Games/merge/guessmerge.dart';
 
 class SortingChoices extends StatefulWidget {
   const SortingChoices({Key? key}) : super(key: key);
@@ -187,7 +186,8 @@ class _SortingChoices extends State<SortingChoices> {
                     } else if (text == "Merge Sort") {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Merge_Game()),
+                        MaterialPageRoute(
+                            builder: (context) => MergeMainMenu()),
                       );
                     } else if (text == "Insertion Sort") {
                       Navigator.push(

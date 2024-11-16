@@ -29,7 +29,7 @@ class _HangmanScreenState extends State<HangmanScreen> {
   late List<int> _hiddenNumbers;
   late List<List<int>> _allSteps;
   int _incorrectGuesses = 0;
-  int _maxGuesses = 6;
+  // int _maxGuesses = 6;
   late List<List<int>> _gridNumbers;
   int _currentRow = 0;
   int _currentColumn = 0;

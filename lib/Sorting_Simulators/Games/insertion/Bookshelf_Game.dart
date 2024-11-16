@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
+import '../Menu_InsertionGame.dart';
 
 void main() {
   runApp(BookshelfGame());
@@ -16,78 +17,204 @@ class BookshelfGame extends StatelessWidget {
   }
 }
 
-// Main Menu Screen
 class MainMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "BookSorting",
+              style: TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+            ),
+            Text(
+              "Main Menu",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+                letterSpacing: 1.5,
+              ),
+            ),
+            SizedBox(height: 50),
+            Text(
+              "By A L - G O",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+                letterSpacing: 2.5,
+              ),
+            ),
+            SizedBox(height: 33),
+            _buildMenuButton(context, "Single Player", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DifficultyScreen()),
+              );
+            }),
+            _buildMenuButton(context, "How to Play", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HowToPlayScreen()),
+              );
+            }),
+            _buildMenuButton(context, "Back", () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => GameSelectionInsertionScreen()),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuButton(
+      BuildContext context, String text, VoidCallback onPressed) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.black87,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(horizontal: 60, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 0,
+        ),
+        onPressed: onPressed,
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+        ),
+      ),
+    );
+  }
+}
+
+class DifficultyScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Number Organizer Game'),
+        title:
+            Text("Select Difficulty", style: TextStyle(color: Colors.black87)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => GameScreen()),
-                );
-              },
-              child: Text('Start Game'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HowToPlayScreen()),
-                );
-              },
-              child: Text('How to Play'),
-            ),
+            _buildDifficultyButton(
+                context, "Easy", 50, 5), // Easy mode: 50 seconds, 5 points
+            _buildDifficultyButton(context, "Medium", 20,
+                10), // Medium mode: 20 seconds, 10 points
+            _buildDifficultyButton(
+                context, "Hard", 15, 15), // Hard mode: 15 seconds, 15 points
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDifficultyButton(BuildContext context, String difficulty,
+      int timerSeconds, int scoreGoal) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.black87,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(horizontal: 60, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => GameScreen(
+                  singlePlayerTimeLimit: timerSeconds, scoreGoal: scoreGoal),
+            ),
+          );
+        },
+        child: Text(
+          difficulty,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
         ),
       ),
     );
   }
 }
 
-// How to Play Screen with Instructions
 class HowToPlayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('How to Play'),
+        title: Text('How to Play', style: TextStyle(color: Colors.black87)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'How to Play',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87),
             ),
             SizedBox(height: 20),
             Text(
-              '1. You are given a set of numbers that represent books.\n\n'
-              '2. Your objective is to drag and drop each number onto the shelf in the correct order.\n\n'
-              '3. The correct order can be ascending or descending, and it will be specified for each round.\n\n'
-              '4. You must complete the arrangement before the timer runs out.\n\n'
-              '5. Each round, the game becomes more challenging by increasing the number of books and reducing the time available.\n\n'
-              '6. If you arrange the books correctly, you proceed to the next round. If not, or if time runs out, the game is over.\n\n'
-              'Good luck and have fun!',
-              style: TextStyle(fontSize: 18),
-              textAlign: TextAlign.left,
+              'Single Player Mode:',
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87),
             ),
-            SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // Go back to Main Menu
-              },
-              child: Text('Back to Main Menu'),
+            SizedBox(height: 8),
+            Text(
+              '1. Choose a difficulty level (Easy, Medium, Hard) with different time limits.\n'
+              '2. Arrange the books in the correct order (ascending or descending) within the time limit.\n'
+              '3. Reach the score goal for your selected difficulty within 12 rounds to win.\n'
+              '4. If time runs out before reaching the score goal, it’s game over.\n',
+              style:
+                  TextStyle(fontSize: 16, height: 1.5, color: Colors.black54),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Enjoy the game and test your sorting skills!',
+              style: TextStyle(fontSize: 16, color: Colors.black87),
             ),
           ],
         ),
@@ -96,8 +223,12 @@ class HowToPlayScreen extends StatelessWidget {
   }
 }
 
-// Game Screen with Pause Menu
 class GameScreen extends StatefulWidget {
+  final int singlePlayerTimeLimit;
+  final int scoreGoal;
+
+  GameScreen({required this.singlePlayerTimeLimit, required this.scoreGoal});
+
   @override
   _GameScreenState createState() => _GameScreenState();
 }
@@ -105,106 +236,106 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   int currentRound = 1;
   int timerSeconds = 30;
+  int playerScore = 0;
   Timer? timer;
   List<int> numbers = [];
   List<int> targetOrder = [];
   List<int?> shelfOrder = [];
   bool ascendingOrder = true;
 
+  static const int maxItemsPerRound = 10;
+
   @override
   void initState() {
     super.initState();
+    timerSeconds = widget.singlePlayerTimeLimit;
     startNewRound();
   }
 
   void startNewRound() {
-    final itemCount = 3 + currentRound;
-    numbers = List.generate(itemCount, (_) => Random().nextInt(50));
-    ascendingOrder = Random().nextBool();
-    targetOrder = List.from(numbers)..sort();
-    if (!ascendingOrder) {
-      targetOrder = targetOrder.reversed.toList();
-    }
-    shelfOrder = List<int?>.filled(itemCount, null);
-    resetTimer();
+    setState(() {
+      int itemCount = min(3 + currentRound, maxItemsPerRound);
+      numbers = List.generate(itemCount, (_) => Random().nextInt(50));
 
-    setState(() {});
+      // Randomize ascending or descending order for each round
+      ascendingOrder = Random().nextBool();
+
+      // Sort targetOrder based on ascendingOrder
+      targetOrder = List.from(numbers)..sort();
+      if (!ascendingOrder) {
+        targetOrder = targetOrder.reversed.toList();
+      }
+
+      shelfOrder = List<int?>.filled(itemCount, null);
+      timerSeconds = widget.singlePlayerTimeLimit; // Set timer for new round
+      resetTimer();
+    });
   }
 
   void resetTimer() {
     timer?.cancel();
-    timerSeconds = 30;
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
         if (timerSeconds > 0) {
           timerSeconds--;
         } else {
           timer.cancel();
-          showGameOverDialog();
+          endTurn(false);
         }
       });
     });
   }
 
-  void showGameOverDialog() {
+  void endTurn(bool successful) {
     timer?.cancel();
+
+    if (successful) {
+      playerScore++;
+      currentRound++;
+      if (playerScore >= widget.scoreGoal) {
+        showWinnerDialog("You Win!");
+      } else if (currentRound > 12) {
+        showWinnerDialog("Game Over");
+      } else {
+        startNewRound();
+      }
+    } else {
+      showGameOverDialog();
+    }
+  }
+
+  void showWinnerDialog(String message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Game Over'),
-        content: Text('You sorted the books incorrectly or time ran out!'),
+        content: Text(message),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               resetGame();
             },
-            child: Text('Try Again'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            child: Text('Back to Main Menu'),
+            child: Text('Play Again', style: TextStyle(color: Colors.black87)),
           ),
         ],
       ),
     );
   }
 
-  void checkIfSorted() {
-    if (shelfOrder.contains(null)) return;
-
-    if (!_listsAreEqual(shelfOrder, targetOrder)) {
-      showGameOverDialog();
-    } else if (currentRound < 10) {
-      currentRound++;
-      startNewRound();
-    } else {
-      timer?.cancel();
-      showEndGameDialog();
-    }
-  }
-
-  void showEndGameDialog() {
+  void showGameOverDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Congratulations!'),
-        content: Text('You completed all rounds successfully!'),
+        title: Text('Game Over'),
+        content: Text("Time's up! You didn't reach the required score."),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               resetGame();
             },
-            child: Text('Play Again'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            child: Text('Back to Main Menu'),
+            child: Text('Try Again', style: TextStyle(color: Colors.black87)),
           ),
         ],
       ),
@@ -214,42 +345,27 @@ class _GameScreenState extends State<GameScreen> {
   void resetGame() {
     setState(() {
       currentRound = 1;
+      playerScore = 0;
+      timerSeconds = widget.singlePlayerTimeLimit;
       startNewRound();
     });
   }
 
-  void pauseGame() {
-    timer?.cancel();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Paused'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              resetTimer(); // Resume timer
-            },
-            child: Text('Resume'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HowToPlayScreen()),
-              );
-            },
-            child: Text('How to Play'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            child: Text('Back to Main Menu'),
-          ),
-        ],
-      ),
-    );
+  void checkIfSorted() {
+    if (shelfOrder.contains(null)) return;
+
+    if (_listsAreEqual(shelfOrder, targetOrder)) {
+      endTurn(true);
+    } else {
+      endTurn(false);
+    }
+  }
+
+  void clearShelf() {
+    setState(() {
+      shelfOrder = List<int?>.filled(shelfOrder.length, null);
+      numbers = List.from(targetOrder);
+    });
   }
 
   @override
@@ -260,15 +376,22 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+    final boxSize = isTablet ? 80.0 : 50.0;
+
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Bookshelf Organizer - Round $currentRound'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.pause),
-            onPressed: pauseGame,
-          ),
-        ],
+        title:
+            Text('Single Player Mode', style: TextStyle(color: Colors.black87)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -276,14 +399,19 @@ class _GameScreenState extends State<GameScreen> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'Arrange the books in ${ascendingOrder ? "ascending" : "descending"} order on the shelf.',
+              'Arrange the books in ${ascendingOrder ? "ascending" : "descending"} order.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 16, color: Colors.black54),
             ),
           ),
           Text(
             'Time Remaining: $timerSeconds seconds',
-            style: TextStyle(fontSize: 20, color: Colors.red),
+            style: TextStyle(fontSize: 18, color: Colors.redAccent),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Score: $playerScore / ${widget.scoreGoal}',
+            style: TextStyle(fontSize: 18, color: Colors.black87),
           ),
           SizedBox(height: 20),
           Row(
@@ -292,8 +420,9 @@ class _GameScreenState extends State<GameScreen> {
               for (int i = 0; i < shelfOrder.length; i++)
                 DragTarget<int>(
                   onWillAcceptWithDetails: (details) => true,
-                  onAccept: (data) {
+                  onAcceptWithDetails: (details) {
                     setState(() {
+                      int data = details.data;
                       if (shelfOrder[i] != null) {
                         numbers.add(shelfOrder[i]!);
                       }
@@ -304,21 +433,26 @@ class _GameScreenState extends State<GameScreen> {
                   },
                   builder: (context, candidateData, rejectedData) {
                     return Container(
-                      width: 60,
-                      height: 80,
+                      width: boxSize,
+                      height: boxSize,
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       decoration: BoxDecoration(
                         color: shelfOrder[i] != null
-                            ? Colors.orange
-                            : Colors.grey[300],
+                            ? Colors.black87
+                            : Colors.grey[200],
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.brown, width: 2),
+                        border: Border.all(
+                          color: candidateData.isNotEmpty
+                              ? Colors.blue
+                              : Colors.transparent,
+                          width: 3,
+                        ),
                       ),
                       child: Center(
                         child: Text(
                           shelfOrder[i]?.toString() ?? '',
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: isTablet ? 24 : 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -335,14 +469,27 @@ class _GameScreenState extends State<GameScreen> {
             children: numbers
                 .map((number) => Draggable<int>(
                       data: number,
-                      feedback: BookWidget(number: number, isDragging: true),
+                      feedback: BookWidget(
+                          number: number, isDragging: true, boxSize: boxSize),
                       childWhenDragging: Opacity(
                         opacity: 0.3,
-                        child: BookWidget(number: number),
+                        child: BookWidget(number: number, boxSize: boxSize),
                       ),
-                      child: BookWidget(number: number),
+                      child: BookWidget(number: number, boxSize: boxSize),
                     ))
                 .toList(),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: clearShelf,
+            child: Text("Clear"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black87,
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
           ),
         ],
       ),
@@ -358,36 +505,29 @@ class _GameScreenState extends State<GameScreen> {
   }
 }
 
-// Book Widget
 class BookWidget extends StatelessWidget {
   final int number;
   final bool isDragging;
+  final double boxSize;
 
-  const BookWidget({required this.number, this.isDragging = false});
+  const BookWidget(
+      {required this.number, this.isDragging = false, this.boxSize = 50.0});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 60,
-      height: 80,
+      width: boxSize,
+      height: boxSize,
       margin: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: isDragging ? Colors.orangeAccent : Colors.orange,
+        color: isDragging ? Colors.black87 : Colors.black54,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          if (!isDragging)
-            BoxShadow(
-              color: Colors.black26,
-              offset: Offset(2, 2),
-              blurRadius: 4,
-            ),
-        ],
       ),
       child: Center(
         child: Text(
           number.toString(),
           style: TextStyle(
-            fontSize: 24,
+            fontSize: boxSize * 0.35,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
