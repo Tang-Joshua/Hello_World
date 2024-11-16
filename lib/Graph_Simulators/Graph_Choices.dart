@@ -202,35 +202,44 @@ class _GraphChoices extends State<GraphChoices> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.white, // Set background to pure white
       floatingActionButton: _selectedIndex.isNotEmpty
           ? FloatingActionButton(
               onPressed: () => _openAnimationDialog(context),
-              child: Icon(Icons.arrow_forward_ios),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.arrow_forward_ios),
+                ],
+              ),
             )
           : null,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.black), // Black arrow icon
           onPressed: () {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => MyApp()),
               (route) => false,
             );
-          },
+          }, // Navigate back
         ),
         title: Text(
-          'Graph Algorithms',
-          style: TextStyle(color: Colors.black),
+          'Sorting Algorithms',
+          style: TextStyle(
+            color: Colors.black,
+          ),
         ),
       ),
+
       body: Container(
         width: double.infinity,
         height: double.infinity,
         child: CarouselSlider.builder(
+          carouselController: CarouselSliderController(),
           options: CarouselOptions(
             height: 450.0,
             aspectRatio: 16 / 9,
@@ -245,31 +254,31 @@ class _GraphChoices extends State<GraphChoices> {
           ),
           itemCount: _products.length,
           itemBuilder: (BuildContext context, int index, int realIdx) {
-            var item = _products[index];
+            var movie = _products[index];
             return GestureDetector(
               onTap: () {
                 setState(() {
-                  if (_selectedIndex == item) {
+                  if (_selectedIndex == movie) {
                     _selectedIndex = {};
                   } else {
-                    _selectedIndex = item;
+                    _selectedIndex = movie;
                   }
-                  text = item['title'];
+                  text = movie['title'];
                 });
               },
               child: AnimatedContainer(
                 duration: Duration(milliseconds: 300),
-                margin: EdgeInsets.symmetric(vertical: 8.0),
+                width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  border: _selectedIndex == item
+                  border: _selectedIndex == movie
                       ? Border.all(
                           color: Color.fromARGB(255, 22, 207, 62),
                           width: 3,
                         )
                       : null,
-                  boxShadow: _selectedIndex == item
+                  boxShadow: _selectedIndex == movie
                       ? [
                           BoxShadow(
                             color: Color.fromARGB(255, 70, 155, 129),
@@ -285,37 +294,39 @@ class _GraphChoices extends State<GraphChoices> {
                           )
                         ],
                 ),
-                child: Column(
-                  children: [
-                    Container(
-                      height: 250,
-                      margin: EdgeInsets.only(top: 10),
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 320,
+                        margin: EdgeInsets.only(top: 10),
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Image.network(
+                          movie['image'],
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                      child: Image.network(
-                        item['image'],
-                        fit: BoxFit.cover,
+                      SizedBox(height: 20),
+                      Text(
+                        movie['title'],
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      item['title'],
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                      SizedBox(height: 20),
+                      Text(
+                        movie['description'],
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      item['description'],
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );
