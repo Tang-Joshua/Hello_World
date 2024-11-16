@@ -163,6 +163,26 @@ class _GraphChoices extends State<GraphChoices> {
                         const Color.fromARGB(255, 255, 255, 255)),
                   ),
                   onPressed: () {
+                    if (text == "Binary Search Tree") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BinarySearchPage()),
+                      );
+                    } else if (text == "Breadth First") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BreadthFirstPage()),
+                      );
+                    } else if (text == "Depth First") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DepthGamePage()),
+                      );
+                    }
+
                     // Placeholder for future game functionality
                   },
                   child: Container(
