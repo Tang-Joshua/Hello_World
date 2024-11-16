@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import '../Menu_InsertionGame.dart';
+import '../../Sorting_Choices.dart';
 
 void main() {
   runApp(BookshelfGame());
@@ -67,8 +68,10 @@ class MainMenuScreen extends StatelessWidget {
             _buildMenuButton(context, "Back", () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => GameSelectionInsertionScreen()),
+
+                // MaterialPageRoute(
+                //     builder: (context) => GameSelectionInsertionScreen()),
+                MaterialPageRoute(builder: (context) => SortingChoices()),
               );
             }),
           ],

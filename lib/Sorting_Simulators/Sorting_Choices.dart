@@ -7,6 +7,8 @@ import 'merge.dart';
 import 'insertion.dart';
 import 'Games/Menu_RadixGame.dart';
 import 'Games/Menu_InsertionGame.dart';
+import 'Games/radix/hangman_play.dart';
+import 'Games/insertion/Bookshelf_Game.dart';
 
 class SortingChoices extends StatefulWidget {
   const SortingChoices({Key? key}) : super(key: key);
@@ -181,7 +183,9 @@ class _SortingChoices extends State<SortingChoices> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => GameSelectionScreen()),
+
+                            // builder: (context) => GameSelectionScreen()),
+                            builder: (context) => RadixSortHangmanGame()),
                       );
                     } else if (text == "Merge Sort") {
                       Navigator.push(
@@ -193,8 +197,9 @@ class _SortingChoices extends State<SortingChoices> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                GameSelectionInsertionScreen()),
+                            builder: (context) => BookshelfGame()),
+                        // builder: (context) =>
+                        //     GameSelectionInsertionScreen()),
                       );
                     }
                   },
