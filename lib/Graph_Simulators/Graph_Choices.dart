@@ -4,6 +4,7 @@ import 'package:flutterapp/Graph_Simulators/binary_search_tree.dart';
 import 'package:flutterapp/Graph_Simulators/breadth_first.dart';
 import 'package:flutterapp/Graph_Simulators/depth_first.dart';
 import 'package:flutterapp/main.dart';
+import 'Depth_game.dart';
 
 class GraphChoices extends StatefulWidget {
   const GraphChoices({Key? key}) : super(key: key);
@@ -172,7 +173,27 @@ class _GraphChoices extends State<GraphChoices> {
                     foregroundColor: MaterialStateProperty.all<Color>(
                         const Color.fromARGB(255, 255, 255, 255)),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    if (text == "Binary Search Tree") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BinarySearchPage()),
+                      );
+                    } else if (text == "Breadth First") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BreadthFirstPage()),
+                      );
+                    } else if (text == "Depth First") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DepthGamePage()),
+                      );
+                    }
+                  },
                   child: Container(
                     width: 230,
                     height: 90,
