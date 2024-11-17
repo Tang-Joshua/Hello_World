@@ -1,27 +1,22 @@
 import 'package:flutter/material.dart';
 
-class StackEducationalPage extends StatelessWidget {
+class StacksLearnPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.green,
-        scaffoldBackgroundColor: Colors.white, // Set background to white
+        scaffoldBackgroundColor: Colors.green[50],
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text(
-            'Learn About Stack',
-            style: TextStyle(color: Colors.green[900]), // Green title text
-          ),
-          backgroundColor: Colors.white, // White app bar
-          iconTheme: IconThemeData(color: Colors.green[900]), // Green back button
-          elevation: 1,
+          title: Text('Learn About Stacks'),
+          backgroundColor: Colors.green,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pop(context); // Navigate back
+              Navigator.pop(context);
             },
           ),
         ),
@@ -43,26 +38,28 @@ class StackEducationalPage extends StatelessWidget {
                 SizedBox(height: 12),
                 ExpandableCard(
                   title: 'Definition',
-                  content: 'A stack is a linear data structure that follows the Last In, First Out (LIFO) principle. '
+                  content:
+                      'A stack is a linear data structure that follows the Last In, First Out (LIFO) principle. '
                       'This means the last element added to the stack is the first one to be removed.',
                 ),
                 ExpandableCard(
-                  title: 'Common Stack Operations',
-                  content: '- Push: Add an element to the top of the stack.\n'
-                      '- Pop: Remove the top element of the stack.\n'
-                      '- Peek: View the top element without removing it.\n'
-                      '- IsEmpty: Check if the stack is empty.',
+                  title: 'Common Operations',
+                  content:
+                      '- **Push:** Add an element to the top of the stack.\n'
+                      '- **Pop:** Remove the top element of the stack.\n'
+                      '- **Peek:** View the top element without removing it.\n'
+                      '- **IsEmpty:** Check if the stack is empty.',
                 ),
                 ExpandableCard(
-                  title: 'Applications of Stack',
-                  content: '- Function call management in programming.\n'
-                      '- Undo functionality in text editors.\n'
-                      '- Balancing symbols (e.g., parentheses in expressions).\n'
-                      '- Navigation in browsers (back and forward operations).',
+                  title: 'Characteristics',
+                  content:
+                      '- Operates like a stack of plates where the last plate added is the first to be removed.\n'
+                      '- Uses a single end for both insertion and removal.',
                 ),
                 SizedBox(height: 24),
+                // History Section
                 Text(
-                  'History of the Stack',
+                  'History of Stacks',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -71,21 +68,41 @@ class StackEducationalPage extends StatelessWidget {
                 ),
                 SizedBox(height: 12),
                 ExpandableCard(
-                  title: 'Early Development',
-                  content: 'The concept of the stack was first introduced by Friedrich L. Bauer and Klaus Samelson in 1957. '
-                      'They developed the idea while working on the translation of mathematical formulae into machine language.',
+                  title: 'Origins',
+                  content:
+                      'The concept of the stack was first introduced in 1957 by Friedrich L. Bauer and Klaus Samelson '
+                      'to aid in the translation of mathematical formulae into machine language.',
                 ),
                 ExpandableCard(
-                  title: 'Key Contributions',
-                  content: '- In 1957, the stack was utilized in the implementation of recursive functions.\n'
-                      '- It was integral to the development of early compilers.\n'
-                      '- The stack is now a critical component in the design of many algorithms, '
-                      'including depth-first search and expression evaluation.',
+                  title: 'Significance',
+                  content:
+                      'Stacks are fundamental in computer science and are widely used in algorithms, compilers, and memory management.',
+                ),
+                SizedBox(height: 24),
+                // Applications Section
+                Text(
+                  'Applications of Stacks',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[900],
+                  ),
+                ),
+                SizedBox(height: 12),
+                ExpandableCard(
+                  title: 'Common Use Cases',
+                  content:
+                      '- **Function Call Management:** Tracks function calls in programming.\n'
+                      '- **Undo Functionality:** Supports undo operations in text editors.\n'
+                      '- **Expression Evaluation:** Evaluates expressions with parentheses.\n'
+                      '- **Browser Navigation:** Implements the back and forward buttons.',
                 ),
                 ExpandableCard(
-                  title: 'Modern Importance',
-                  content: 'Stacks play a key role in programming languages, operating systems, and computer architecture. '
-                      'For example, they are used in the management of function calls and local variables in program execution.',
+                  title: 'Advanced Applications',
+                  content:
+                      '- **Parsing Algorithms:** Used in syntax parsing for compilers.\n'
+                      '- **Recursive Algorithms:** Supports recursive function calls by storing return addresses.\n'
+                      '- **Memory Management:** Helps in managing program execution stack.',
                 ),
               ],
             ),
@@ -112,8 +129,11 @@ class _ExpandableCardState extends State<ExpandableCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.green[50], // Light green card background
-      elevation: 2,
+      color: Colors.green[100], // Matches the design
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: InkWell(
         onTap: () {
           setState(() {
@@ -121,7 +141,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
           });
         },
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -133,12 +153,12 @@ class _ExpandableCardState extends State<ExpandableCard> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green[900], // Dark green text
+                      color: Colors.green[900],
                     ),
                   ),
                   Icon(
                     _isExpanded ? Icons.expand_less : Icons.expand_more,
-                    color: Colors.green[700], // Medium green icon
+                    color: Colors.green[900],
                   ),
                 ],
               ),
@@ -146,7 +166,10 @@ class _ExpandableCardState extends State<ExpandableCard> {
                 SizedBox(height: 8),
                 Text(
                   widget.content,
-                  style: TextStyle(fontSize: 16, color: Colors.green[800]),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.green[800],
+                  ),
                 ),
               ],
             ],
@@ -158,5 +181,5 @@ class _ExpandableCardState extends State<ExpandableCard> {
 }
 
 void main() {
-  runApp(StackEducationalPage());
+  runApp(StacksLearnPage());
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class QueueLearnPage extends StatelessWidget {
+class RadixSortLearnPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -11,7 +11,7 @@ class QueueLearnPage extends StatelessWidget {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Learn About Queues'),
+          title: Text('Learn About Radix Sort'),
           backgroundColor: Colors.green,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
@@ -28,7 +28,7 @@ class QueueLearnPage extends StatelessWidget {
               children: [
                 // Section Header
                 Text(
-                  'What is a Queue?',
+                  'What is Radix Sort?',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -39,27 +39,30 @@ class QueueLearnPage extends StatelessWidget {
                 ExpandableCard(
                   title: 'Definition',
                   content:
-                      'A queue is a linear data structure that follows the First In, First Out (FIFO) principle. '
-                      'This means the first element added to the queue is the first one to be removed.',
+                      'Radix Sort is a non-comparative sorting algorithm that sorts numbers by processing their digits. '
+                      'It groups numbers based on their individual digit values, starting from the least significant digit '
+                      'to the most significant digit.',
                 ),
                 ExpandableCard(
-                  title: 'Common Operations',
+                  title: 'Key Properties',
                   content:
-                      '- **Enqueue:** Add an element to the back of the queue.\n'
-                      '- **Dequeue:** Remove the element at the front of the queue.\n'
-                      '- **Peek:** View the front element without removing it.\n'
-                      '- **IsEmpty:** Check if the queue is empty.',
+                      '- **Stable Sort:** Maintains the relative order of elements with equal keys.\n'
+                      '- **Non-Comparative:** Does not compare individual elements directly, unlike Quick Sort or Merge Sort.\n'
+                      '- **Requires Auxiliary Space:** Uses additional space to group elements by digit values.',
                 ),
                 ExpandableCard(
-                  title: 'Characteristics',
+                  title: 'Algorithm Steps',
                   content:
-                      '- Operates like a line of people waiting, where the first person in line is served first.\n'
-                      '- Uses two ends: one for insertion (rear) and one for removal (front).',
+                      '1. Find the maximum number in the list and determine the number of digits.\n'
+                      '2. Start from the least significant digit (LSD) and sort numbers into buckets (0-9).\n'
+                      '3. Combine the buckets in order and move to the next significant digit.\n'
+                      '4. Repeat steps 2-3 for all digits, from LSD to most significant digit (MSD).\n'
+                      '5. The list is now sorted.',
                 ),
                 SizedBox(height: 24),
                 // History Section
                 Text(
-                  'History of Queues',
+                  'History of Radix Sort',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -70,19 +73,20 @@ class QueueLearnPage extends StatelessWidget {
                 ExpandableCard(
                   title: 'Origins',
                   content:
-                      'Queues have been used in computing since the early days of computer science to manage tasks '
-                      'such as scheduling and buffering.',
+                      'Radix Sort was introduced by Herman Hollerith in 1887 for use in tabulating machines. '
+                      'It was later formalized as a sorting algorithm in the mid-20th century and remains '
+                      'a popular choice for sorting large datasets with numeric keys.',
                 ),
                 ExpandableCard(
                   title: 'Significance',
                   content:
-                      'Queues are essential in scenarios where data needs to be processed in the order it arrives, '
-                      'ensuring fairness and predictability.',
+                      'Radix Sort is especially efficient for sorting large datasets with a fixed range of numbers. '
+                      'Its non-comparative nature makes it ideal for certain applications like card sorting and phone directories.',
                 ),
                 SizedBox(height: 24),
                 // Applications Section
                 Text(
-                  'Applications of Queues',
+                  'Applications of Radix Sort',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -93,16 +97,17 @@ class QueueLearnPage extends StatelessWidget {
                 ExpandableCard(
                   title: 'Common Use Cases',
                   content:
-                      '- **Task Scheduling:** Used in CPU scheduling and print queues.\n'
-                      '- **Data Buffering:** Manages data streams in networked applications.\n'
-                      '- **Breadth-First Search:** Used in graph traversal algorithms.',
+                      '- **Sorting Numbers:** Used to sort large datasets of integers or floating-point numbers.\n'
+                      '- **Card Sorting:** Helps in sorting card decks in casino games.\n'
+                      '- **Phone Directories:** Efficiently organizes large lists of phone numbers.\n'
+                      '- **DNA Sequencing:** Sorting data with fixed-length keys.',
                 ),
                 ExpandableCard(
                   title: 'Advanced Applications',
                   content:
-                      '- **Messaging Systems:** Ensures messages are processed in the correct order.\n'
-                      '- **Simulation Systems:** Models real-world systems like customer service lines.\n'
-                      '- **Data Processing Pipelines:** Ensures orderly handling of data streams.',
+                      '- **Distributed Systems:** Works well with datasets distributed across multiple machines.\n'
+                      '- **Specialized Hardware:** Optimized for parallel processing in GPUs.\n'
+                      '- **Data Analysis:** Sorting fixed-length strings or categorical data in analytics pipelines.',
                 ),
               ],
             ),
@@ -129,7 +134,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.green[100], // Matches the design
+      color: Colors.green[100], // Same as the screenshot
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
@@ -153,7 +158,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green[900],
+                      color: Colors.green[900], // Same text color
                     ),
                   ),
                   Icon(
@@ -168,7 +173,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
                   widget.content,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.green[800],
+                    color: Colors.green[800], // Consistent with other pages
                   ),
                 ),
               ],
@@ -181,5 +186,5 @@ class _ExpandableCardState extends State<ExpandableCard> {
 }
 
 void main() {
-  runApp(QueueLearnPage());
+  runApp(RadixSortLearnPage());
 }

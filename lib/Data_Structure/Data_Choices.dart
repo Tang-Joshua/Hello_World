@@ -61,13 +61,13 @@ class _DataChoices extends State<DataChoices> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => StackEducationalPage()),
+                            builder: (context) => StacksLearnPage()),
                       );
                     } else if (text == "Queues") {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => QueueEducationalPage()),
+                            builder: (context) => QueueLearnPage()),
                       );
                     }
                   },

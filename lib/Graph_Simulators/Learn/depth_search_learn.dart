@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class QueueLearnPage extends StatelessWidget {
+class DepthFirstLearnPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -11,7 +11,7 @@ class QueueLearnPage extends StatelessWidget {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Learn About Queues'),
+          title: Text('Learn About Depth First Search'),
           backgroundColor: Colors.green,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
@@ -28,7 +28,7 @@ class QueueLearnPage extends StatelessWidget {
               children: [
                 // Section Header
                 Text(
-                  'What is a Queue?',
+                  'What is Depth First Search?',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -39,27 +39,29 @@ class QueueLearnPage extends StatelessWidget {
                 ExpandableCard(
                   title: 'Definition',
                   content:
-                      'A queue is a linear data structure that follows the First In, First Out (FIFO) principle. '
-                      'This means the first element added to the queue is the first one to be removed.',
+                      'Depth First Search (DFS) is an algorithm for traversing or searching tree or graph data structures. '
+                      'The algorithm starts at the root node and explores as far as possible along each branch before backtracking.',
                 ),
                 ExpandableCard(
-                  title: 'Common Operations',
+                  title: 'Key Properties',
                   content:
-                      '- **Enqueue:** Add an element to the back of the queue.\n'
-                      '- **Dequeue:** Remove the element at the front of the queue.\n'
-                      '- **Peek:** View the front element without removing it.\n'
-                      '- **IsEmpty:** Check if the queue is empty.',
+                      '- **Uses a stack (either explicit or via recursion):** Helps in backtracking.\n'
+                      '- **Explores deeper nodes first:** Prioritizes visiting the children before moving to siblings.\n'
+                      '- **Applications:** Cycle detection, pathfinding, topological sorting, and solving puzzles.',
                 ),
                 ExpandableCard(
-                  title: 'Characteristics',
+                  title: 'Algorithm Steps',
                   content:
-                      '- Operates like a line of people waiting, where the first person in line is served first.\n'
-                      '- Uses two ends: one for insertion (rear) and one for removal (front).',
+                      '1. Start at the root node (or any arbitrary node in a graph).\n'
+                      '2. Mark the current node as visited and push it onto the stack.\n'
+                      '3. Explore the unvisited neighbors of the current node.\n'
+                      '4. Repeat steps 2-3 until all nodes are visited.\n'
+                      '5. Backtrack when no unvisited neighbors are left.',
                 ),
                 SizedBox(height: 24),
                 // History Section
                 Text(
-                  'History of Queues',
+                  'History of Depth First Search',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -70,19 +72,19 @@ class QueueLearnPage extends StatelessWidget {
                 ExpandableCard(
                   title: 'Origins',
                   content:
-                      'Queues have been used in computing since the early days of computer science to manage tasks '
-                      'such as scheduling and buffering.',
+                      'The concept of Depth First Search was first introduced in the early 19th century in the context of mathematics and graph theory. '
+                      'It gained prominence in computer science as an efficient way to explore data structures.',
                 ),
                 ExpandableCard(
                   title: 'Significance',
                   content:
-                      'Queues are essential in scenarios where data needs to be processed in the order it arrives, '
-                      'ensuring fairness and predictability.',
+                      'Depth First Search laid the groundwork for many modern algorithms, including those for solving mazes, planning, and analyzing networks. '
+                      'It is one of the most fundamental algorithms in graph theory.',
                 ),
                 SizedBox(height: 24),
                 // Applications Section
                 Text(
-                  'Applications of Queues',
+                  'Applications of Depth First Search',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -93,16 +95,17 @@ class QueueLearnPage extends StatelessWidget {
                 ExpandableCard(
                   title: 'Common Use Cases',
                   content:
-                      '- **Task Scheduling:** Used in CPU scheduling and print queues.\n'
-                      '- **Data Buffering:** Manages data streams in networked applications.\n'
-                      '- **Breadth-First Search:** Used in graph traversal algorithms.',
+                      '- **Cycle Detection:** Identify cycles in directed and undirected graphs.\n'
+                      '- **Pathfinding:** Find paths between nodes in a graph.\n'
+                      '- **Topological Sorting:** Used in dependency resolution, like scheduling tasks.\n'
+                      '- **Maze Solving:** Explore all possible paths in a maze until the solution is found.',
                 ),
                 ExpandableCard(
                   title: 'Advanced Applications',
                   content:
-                      '- **Messaging Systems:** Ensures messages are processed in the correct order.\n'
-                      '- **Simulation Systems:** Models real-world systems like customer service lines.\n'
-                      '- **Data Processing Pipelines:** Ensures orderly handling of data streams.',
+                      '- **Strongly Connected Components:** Find SCCs in directed graphs using algorithms like Tarjan\'s.\n'
+                      '- **Artificial Intelligence:** Used in search algorithms for games and decision-making.\n'
+                      '- **Network Analysis:** Explore social networks, computer networks, or biological systems.',
                 ),
               ],
             ),
@@ -129,8 +132,8 @@ class _ExpandableCardState extends State<ExpandableCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.green[100], // Matches the design
-      elevation: 0,
+      color: Colors.green[100],
+      elevation: 0, // Flat design
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
@@ -181,5 +184,5 @@ class _ExpandableCardState extends State<ExpandableCard> {
 }
 
 void main() {
-  runApp(QueueLearnPage());
+  runApp(DepthFirstLearnPage());
 }

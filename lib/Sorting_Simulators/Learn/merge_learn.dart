@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class QueueLearnPage extends StatelessWidget {
+class MergeSortLearnPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -11,7 +11,7 @@ class QueueLearnPage extends StatelessWidget {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Learn About Queues'),
+          title: Text('Learn About Merge Sort'),
           backgroundColor: Colors.green,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
@@ -28,7 +28,7 @@ class QueueLearnPage extends StatelessWidget {
               children: [
                 // Section Header
                 Text(
-                  'What is a Queue?',
+                  'What is Merge Sort?',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -39,27 +39,28 @@ class QueueLearnPage extends StatelessWidget {
                 ExpandableCard(
                   title: 'Definition',
                   content:
-                      'A queue is a linear data structure that follows the First In, First Out (FIFO) principle. '
-                      'This means the first element added to the queue is the first one to be removed.',
+                      'Merge Sort is a divide-and-conquer algorithm that splits an array into smaller subarrays, '
+                      'sorts the subarrays, and then merges them back together to form a sorted array.',
                 ),
                 ExpandableCard(
-                  title: 'Common Operations',
+                  title: 'Key Properties',
                   content:
-                      '- **Enqueue:** Add an element to the back of the queue.\n'
-                      '- **Dequeue:** Remove the element at the front of the queue.\n'
-                      '- **Peek:** View the front element without removing it.\n'
-                      '- **IsEmpty:** Check if the queue is empty.',
+                      '- **Stable Sort:** Maintains the relative order of elements with equal keys.\n'
+                      '- **Time Complexity:** O(n log n) in all cases (best, worst, average).\n'
+                      '- **Space Complexity:** Requires extra space for merging.',
                 ),
                 ExpandableCard(
-                  title: 'Characteristics',
+                  title: 'Algorithm Steps',
                   content:
-                      '- Operates like a line of people waiting, where the first person in line is served first.\n'
-                      '- Uses two ends: one for insertion (rear) and one for removal (front).',
+                      '1. Divide the array into two halves.\n'
+                      '2. Recursively sort each half using Merge Sort.\n'
+                      '3. Merge the two sorted halves back together into one sorted array.\n'
+                      '4. Repeat until the entire array is sorted.',
                 ),
                 SizedBox(height: 24),
                 // History Section
                 Text(
-                  'History of Queues',
+                  'History of Merge Sort',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -70,19 +71,18 @@ class QueueLearnPage extends StatelessWidget {
                 ExpandableCard(
                   title: 'Origins',
                   content:
-                      'Queues have been used in computing since the early days of computer science to manage tasks '
-                      'such as scheduling and buffering.',
+                      'Merge Sort was developed by John von Neumann in 1945. '
+                      'It was one of the first sorting algorithms to be developed, and it laid the groundwork for many modern algorithms.',
                 ),
                 ExpandableCard(
                   title: 'Significance',
                   content:
-                      'Queues are essential in scenarios where data needs to be processed in the order it arrives, '
-                      'ensuring fairness and predictability.',
+                      'Merge Sort is especially useful for sorting large datasets or linked lists due to its stability and predictable time complexity.',
                 ),
                 SizedBox(height: 24),
                 // Applications Section
                 Text(
-                  'Applications of Queues',
+                  'Applications of Merge Sort',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -93,16 +93,16 @@ class QueueLearnPage extends StatelessWidget {
                 ExpandableCard(
                   title: 'Common Use Cases',
                   content:
-                      '- **Task Scheduling:** Used in CPU scheduling and print queues.\n'
-                      '- **Data Buffering:** Manages data streams in networked applications.\n'
-                      '- **Breadth-First Search:** Used in graph traversal algorithms.',
+                      '- **Sorting Large Datasets:** Ideal for datasets too large to fit in memory.\n'
+                      '- **Linked Lists:** Works efficiently due to its non-contiguous nature.\n'
+                      '- **External Sorting:** Used in scenarios where data resides on external storage devices like hard disks.',
                 ),
                 ExpandableCard(
                   title: 'Advanced Applications',
                   content:
-                      '- **Messaging Systems:** Ensures messages are processed in the correct order.\n'
-                      '- **Simulation Systems:** Models real-world systems like customer service lines.\n'
-                      '- **Data Processing Pipelines:** Ensures orderly handling of data streams.',
+                      '- **Multithreading:** Merge Sort can be implemented with multiple threads for parallel processing.\n'
+                      '- **Data Analysis:** Used in processing large amounts of structured data.\n'
+                      '- **File Systems:** Helps in merging sorted data across distributed systems.',
                 ),
               ],
             ),
@@ -129,7 +129,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.green[100], // Matches the design
+      color: Colors.green[100], // Matches the provided design
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
@@ -181,5 +181,5 @@ class _ExpandableCardState extends State<ExpandableCard> {
 }
 
 void main() {
-  runApp(QueueLearnPage());
+  runApp(MergeSortLearnPage());
 }
