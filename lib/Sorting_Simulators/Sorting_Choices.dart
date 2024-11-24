@@ -11,7 +11,7 @@ import 'Games/radix/hangman_play.dart';
 import 'Games/insertion/Bookshelf_Game.dart';
 import 'package:flutterapp/Sorting_Simulators/Learn/radix_learn.dart';
 import 'package:flutterapp/Sorting_Simulators/Learn/merge_learn.dart';
-import 'package:flutterapp/Sorting_Simulators/Learn/insertion_learn.dart';// Import the Radix Sort Learn Page
+import 'package:flutterapp/Sorting_Simulators/Learn/insertion_learn.dart'; // Import the Radix Sort Learn Page
 
 class SortingChoices extends StatefulWidget {
   const SortingChoices({Key? key}) : super(key: key);
@@ -35,7 +35,7 @@ class _SortingChoices extends State<SortingChoices> {
 
   var text = "??";
 
-  List<dynamic> _products = [
+  final List<dynamic> _products = [
     {'title': 'Radix Sort', 'image': 'assets/Algo_img.png', 'description': ''},
     {'title': 'Merge Sort', 'image': 'assets/Algo_img2.png', 'description': ''},
     {
@@ -75,21 +75,23 @@ class _SortingChoices extends State<SortingChoices> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => RadixSortLearnPage()), // Navigate to Radix Sort Learn Page
+                            builder: (context) =>
+                                RadixSortLearnPage()), // Navigate to Radix Sort Learn Page
                       );
                     } else if (text == "Merge Sort") {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => MergeSortLearnPage()),
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MergeSortLearnPage()),
+                      );
+                    } else if (text == "Insertion Sort") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => InsertionSortLearnPage()),
                       );
                     }
-                     else if (text == "Insertion Sort") {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => InsertionSortLearnPage()),
-                      );
-                    }},
-                    
+                  },
                   child: Container(
                     width: 230,
                     height: 90,
@@ -124,12 +126,14 @@ class _SortingChoices extends State<SortingChoices> {
                     if (text == "Radix Sort") {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => RadixSortPage()),
+                        MaterialPageRoute(
+                            builder: (context) => RadixSortPage()),
                       );
                     } else if (text == "Merge Sort") {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MergeSortPage()),
+                        MaterialPageRoute(
+                            builder: (context) => MergeSortPage()),
                       );
                     } else if (text == "Insertion Sort") {
                       Navigator.push(
@@ -155,7 +159,7 @@ class _SortingChoices extends State<SortingChoices> {
                         SizedBox(width: 8),
                         Text(
                           'Simulation',
-                          style: TextStyle(fontSize: 30),
+                          style: TextStyle(fontSize: 28),
                         ),
                       ],
                     ),
@@ -179,12 +183,14 @@ class _SortingChoices extends State<SortingChoices> {
                     } else if (text == "Merge Sort") {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MergeMainMenu()),
+                        MaterialPageRoute(
+                            builder: (context) => MergeMainMenu()),
                       );
                     } else if (text == "Insertion Sort") {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => BookshelfGame()),
+                        MaterialPageRoute(
+                            builder: (context) => BookshelfGame()),
                       );
                     }
                   },
@@ -261,98 +267,97 @@ class _SortingChoices extends State<SortingChoices> {
         width: double.infinity,
         height: double.infinity,
         child: CarouselSlider.builder(
-          options: CarouselOptions(
-            height: 450.0,
-            aspectRatio: 16 / 9,
-            viewportFraction: 0.70,
-            enlargeCenterPage: true,
-            pageSnapping: true,
-            onPageChanged: (index, reason) {
-              setState(() {
-                _current = index;
-              });
-            },
-          ),
-          itemCount: _products.length,
-          itemBuilder: (BuildContext context, int index, int realIdx) {
-            var movie = _products[index];
-            return GestureDetector(
-              onTap: () {
+            options: CarouselOptions(
+              height: 450.0,
+              aspectRatio: 16 / 9,
+              viewportFraction: 0.70,
+              enlargeCenterPage: true,
+              pageSnapping: true,
+              onPageChanged: (index, reason) {
                 setState(() {
-                  if (_selectedIndex == movie) {
-                    _selectedIndex = {};
-                  } else {
-                    _selectedIndex = movie;
-                  }
-                  text = movie['title'];
+                  _current = index;
                 });
               },
-              child: AnimatedContainer(
-                duration: Duration(milliseconds: 300),
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: _selectedIndex == movie
-                      ? Border.all(
-                          color: Color.fromARGB(255, 22, 207, 62),
-                          width: 3,
-                        )
-                      : null,
-                  boxShadow: _selectedIndex == movie
-                      ? [
-                          BoxShadow(
-                            color: Color.fromARGB(255, 70, 155, 129),
-                            blurRadius: 30,
-                            offset: Offset(0, 10),
+            ),
+            itemCount: _products.length,
+            itemBuilder: (BuildContext context, int index, int realIdx) {
+              var movie = _products[index];
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (_selectedIndex == movie) {
+                      _selectedIndex = {};
+                    } else {
+                      _selectedIndex = movie;
+                    }
+                    text = movie['title'];
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: _selectedIndex == movie
+                        ? Border.all(
+                            color: Color.fromARGB(255, 22, 207, 62),
+                            width: 3,
                           )
-                        ]
-                      : [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            blurRadius: 20,
-                            offset: Offset(0, 5),
-                          )
-                        ],
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 320,
-                        margin: EdgeInsets.only(top: 10),
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
+                        : null,
+                    boxShadow: _selectedIndex == movie
+                        ? [
+                            BoxShadow(
+                              color: Color.fromARGB(255, 70, 155, 129),
+                              blurRadius: 30,
+                              offset: Offset(0, 10),
+                            )
+                          ]
+                        : [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              blurRadius: 20,
+                              offset: Offset(0, 5),
+                            )
+                          ],
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 320,
+                          margin: EdgeInsets.only(top: 10),
+                          clipBehavior: Clip.hardEdge,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Image.asset(
+                            movie['image'],
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                        child: Image.network(
-                          movie['image'],
-                          fit: BoxFit.cover,
+                        SizedBox(height: 20),
+                        Text(
+                          movie['title'],
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        movie['title'],
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                        SizedBox(height: 20),
+                        Text(
+                          movie['description'],
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        movie['description'],
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-        ),
+              );
+            }),
       ),
     );
   }

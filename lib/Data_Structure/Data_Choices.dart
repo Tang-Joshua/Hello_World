@@ -130,7 +130,7 @@ class _DataChoices extends State<DataChoices> {
                         SizedBox(width: 8),
                         Text(
                           'Simulation',
-                          style: TextStyle(fontSize: 30),
+                          style: TextStyle(fontSize: 28),
                         ),
                       ],
                     ),
@@ -233,7 +233,7 @@ class _DataChoices extends State<DataChoices> {
         width: double.infinity,
         height: double.infinity,
         child: CarouselSlider.builder(
-          carouselController: CarouselSliderController(),
+          // Removed the typo in the controller
           options: CarouselOptions(
             height: 450.0,
             aspectRatio: 16 / 9,
@@ -298,8 +298,8 @@ class _DataChoices extends State<DataChoices> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: Image.network(
-                          movie['image'],
+                        child: Image.asset(
+                          movie['image'], // Use Image.asset for local images
                           fit: BoxFit.cover,
                         ),
                       ),

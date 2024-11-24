@@ -79,22 +79,19 @@ class _GraphChoices extends State<GraphChoices> {
                         MaterialPageRoute(
                             builder: (context) => BinarySearchLearnPage()),
                       );
-                    }
-
-                    else if (text == "Depth First") {
+                    } else if (text == "Depth First") {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => DepthFirstLearnPage()),
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DepthFirstLearnPage()),
+                      );
+                    } else if (text == "Breadth First") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BreadthFirstLearnPage()),
                       );
                     }
-
-                    else if (text == "Breadth First") {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => BreadthFirstLearnPage()),
-                      );
-                    }
-
                   },
                   child: Container(
                     width: 230,
@@ -164,7 +161,7 @@ class _GraphChoices extends State<GraphChoices> {
                         SizedBox(width: 8),
                         Text(
                           'Simulation',
-                          style: TextStyle(fontSize: 30),
+                          style: TextStyle(fontSize: 28),
                         ),
                       ],
                     ),
@@ -198,8 +195,7 @@ class _GraphChoices extends State<GraphChoices> {
                         MaterialPageRoute(
                             builder: (context) => DepthGamePage()),
                       );
-                    } 
-
+                    }
 
                     // Placeholder for future game functionality
                   },
@@ -277,99 +273,98 @@ class _GraphChoices extends State<GraphChoices> {
         width: double.infinity,
         height: double.infinity,
         child: CarouselSlider.builder(
-          carouselController: CarouselSliderController(),
-          options: CarouselOptions(
-            height: 450.0,
-            aspectRatio: 16 / 9,
-            viewportFraction: 0.70,
-            enlargeCenterPage: true,
-            pageSnapping: true,
-            onPageChanged: (index, reason) {
-              setState(() {
-                _current = index;
-              });
-            },
-          ),
-          itemCount: _products.length,
-          itemBuilder: (BuildContext context, int index, int realIdx) {
-            var movie = _products[index];
-            return GestureDetector(
-              onTap: () {
+            carouselController: CarouselSliderController(),
+            options: CarouselOptions(
+              height: 450.0,
+              aspectRatio: 16 / 9,
+              viewportFraction: 0.70,
+              enlargeCenterPage: true,
+              pageSnapping: true,
+              onPageChanged: (index, reason) {
                 setState(() {
-                  if (_selectedIndex == movie) {
-                    _selectedIndex = {};
-                  } else {
-                    _selectedIndex = movie;
-                  }
-                  text = movie['title'];
+                  _current = index;
                 });
               },
-              child: AnimatedContainer(
-                duration: Duration(milliseconds: 300),
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: _selectedIndex == movie
-                      ? Border.all(
-                          color: Color.fromARGB(255, 22, 207, 62),
-                          width: 3,
-                        )
-                      : null,
-                  boxShadow: _selectedIndex == movie
-                      ? [
-                          BoxShadow(
-                            color: Color.fromARGB(255, 70, 155, 129),
-                            blurRadius: 30,
-                            offset: Offset(0, 10),
+            ),
+            itemCount: _products.length,
+            itemBuilder: (BuildContext context, int index, int realIdx) {
+              var movie = _products[index];
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (_selectedIndex == movie) {
+                      _selectedIndex = {};
+                    } else {
+                      _selectedIndex = movie;
+                    }
+                    text = movie['title'];
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: _selectedIndex == movie
+                        ? Border.all(
+                            color: Color.fromARGB(255, 22, 207, 62),
+                            width: 3,
                           )
-                        ]
-                      : [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            blurRadius: 20,
-                            offset: Offset(0, 5),
-                          )
-                        ],
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 320,
-                        margin: EdgeInsets.only(top: 10),
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
+                        : null,
+                    boxShadow: _selectedIndex == movie
+                        ? [
+                            BoxShadow(
+                              color: Color.fromARGB(255, 70, 155, 129),
+                              blurRadius: 30,
+                              offset: Offset(0, 10),
+                            )
+                          ]
+                        : [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              blurRadius: 20,
+                              offset: Offset(0, 5),
+                            )
+                          ],
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 320,
+                          margin: EdgeInsets.only(top: 10),
+                          clipBehavior: Clip.hardEdge,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Image.asset(
+                            movie['image'],
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                        child: Image.network(
-                          movie['image'],
-                          fit: BoxFit.cover,
+                        SizedBox(height: 20),
+                        Text(
+                          movie['title'],
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        movie['title'],
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                        SizedBox(height: 20),
+                        Text(
+                          movie['description'],
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        movie['description'],
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-        ),
+              );
+            }),
       ),
     );
   }
