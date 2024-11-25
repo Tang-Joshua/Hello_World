@@ -8,6 +8,8 @@ import 'package:flutterapp/main.dart';
 import 'Depth_game.dart';
 import 'package:flutterapp/Graph_Simulators/learn/depth_search_learn.dart';
 import 'package:flutterapp/Graph_Simulators/learn/breadth_search_learn.dart';
+import 'Binary_Breadth_Game.dart';
+import 'Binary_Search_Tree_Game.dart';
 
 class GraphChoices extends StatefulWidget {
   const GraphChoices({Key? key}) : super(key: key);
@@ -181,13 +183,12 @@ class _GraphChoices extends State<GraphChoices> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => BinarySearchPage()),
+                            builder: (context) => BinarySearchTreeGameApp()),
                       );
                     } else if (text == "Breadth First") {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => BreadthFirstPage()),
+                        MaterialPageRoute(builder: (context) => StarGameApp()),
                       );
                     } else if (text == "Depth First") {
                       Navigator.push(
