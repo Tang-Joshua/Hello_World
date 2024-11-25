@@ -1,8 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterapp/Graph_Simulators/binary_search_tree.dart'; // Simulation Page
-import 'package:flutterapp/Graph_Simulators/breadth_first.dart';
-import 'package:flutterapp/Graph_Simulators/depth_first.dart';
+import 'package:flutterapp/Graph_Simulators/Simulator/binary_search_tree.dart'; // Simulation Page
+import 'package:flutterapp/Graph_Simulators/Simulator/breadth_first.dart';
+import 'package:flutterapp/Graph_Simulators/Simulator/depth_first.dart';
 import 'package:flutterapp/Graph_Simulators/learn/binary_search_learn.dart'; // Tutorial Page
 import 'package:flutterapp/main.dart';
 import 'Depth_game.dart';
