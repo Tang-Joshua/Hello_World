@@ -1,6 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
-class RadixSortLearnPage extends StatelessWidget {
+class RadixSortLearnPage extends StatefulWidget {
+  @override
+  _RadixSortLearnPageState createState() => _RadixSortLearnPageState();
+}
+
+class _RadixSortLearnPageState extends State<RadixSortLearnPage> {
+  late VideoPlayerController _controller;
+  bool _isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize the video player with an asset or network video
+    _controller = VideoPlayerController.asset('assets/RadixSortTutorial.mp4')
+      ..initialize().then((_) {
+        setState(() {}); // Update UI after initialization
+        _isPlaying = _controller.value.isPlaying;
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Dispose of the video controller
+    super.dispose();
+  }
+
+  void _togglePlayPause() {
+    setState(() {
+      if (_controller.value.isPlaying) {
+        _controller.pause();
+        _isPlaying = false;
+      } else {
+        _controller.play();
+        _isPlaying = true;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,6 +65,53 @@ class RadixSortLearnPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Video Player Section
+                if (_controller.value.isInitialized)
+                  Column(
+                    children: [
+                      AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: VideoPlayer(_controller),
+                      ),
+                      SizedBox(height: 8),
+
+                      // Video Progress Indicator with drag support
+                      VideoProgressIndicator(
+                        _controller,
+                        allowScrubbing: true, // Enable dragging
+                        colors: VideoProgressColors(
+                          playedColor: Colors.green,
+                          backgroundColor: Colors.grey.shade300,
+                          bufferedColor: Colors.green.shade200,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+
+                      // Play/Pause Button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: _togglePlayPause,
+                            icon: Icon(
+                              _isPlaying ? Icons.pause : Icons.play_arrow,
+                              size: 30,
+                              color: Colors.green,
+                            ),
+                          ),
+                          Text(
+                            _isPlaying ? "Playing" : "Paused",
+                            style: TextStyle(fontSize: 16, color: Colors.green),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                else
+                  Center(child: CircularProgressIndicator()),
+
+                SizedBox(height: 16),
+
                 // Section Header
                 Text(
                   'What is Radix Sort?',
@@ -60,6 +146,7 @@ class RadixSortLearnPage extends StatelessWidget {
                       '5. The list is now sorted.',
                 ),
                 SizedBox(height: 24),
+
                 // History Section
                 Text(
                   'History of Radix Sort',
@@ -84,6 +171,7 @@ class RadixSortLearnPage extends StatelessWidget {
                       'Its non-comparative nature makes it ideal for certain applications like card sorting and phone directories.',
                 ),
                 SizedBox(height: 24),
+
                 // Applications Section
                 Text(
                   'Applications of Radix Sort',
@@ -134,7 +222,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.green[100], // Same as the screenshot
+      color: Colors.green[100],
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
@@ -158,7 +246,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green[900], // Same text color
+                      color: Colors.green[900],
                     ),
                   ),
                   Icon(
@@ -173,7 +261,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
                   widget.content,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.green[800], // Consistent with other pages
+                    color: Colors.green[800],
                   ),
                 ),
               ],

@@ -1,6 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
-class BinarySearchLearnPage extends StatelessWidget {
+class BinarySearchLearnPage extends StatefulWidget {
+  @override
+  _BinarySearchLearnPageState createState() => _BinarySearchLearnPageState();
+}
+
+class _BinarySearchLearnPageState extends State<BinarySearchLearnPage> {
+  late VideoPlayerController _controller;
+  bool _isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize the video player with an asset video
+    _controller = VideoPlayerController.asset('assets/Binary_Search_Tree.mp4')
+      ..initialize().then((_) {
+        setState(() {}); // Update UI after video initialization
+        _isPlaying = _controller.value.isPlaying;
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Dispose the video controller
+    super.dispose();
+  }
+
+  void _togglePlayPause() {
+    setState(() {
+      if (_controller.value.isPlaying) {
+        _controller.pause();
+        _isPlaying = false;
+      } else {
+        _controller.play();
+        _isPlaying = true;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,6 +65,53 @@ class BinarySearchLearnPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Video Player Section
+                if (_controller.value.isInitialized)
+                  Column(
+                    children: [
+                      AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: VideoPlayer(_controller),
+                      ),
+                      SizedBox(height: 8),
+
+                      // Video Progress Indicator with drag support
+                      VideoProgressIndicator(
+                        _controller,
+                        allowScrubbing: true, // Enable dragging
+                        colors: VideoProgressColors(
+                          playedColor: Colors.green,
+                          backgroundColor: Colors.grey.shade300,
+                          bufferedColor: Colors.green.shade200,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+
+                      // Play/Pause Button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: _togglePlayPause,
+                            icon: Icon(
+                              _isPlaying ? Icons.pause : Icons.play_arrow,
+                              size: 30,
+                              color: Colors.green,
+                            ),
+                          ),
+                          Text(
+                            _isPlaying ? "Playing" : "Paused",
+                            style: TextStyle(fontSize: 16, color: Colors.green),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                else
+                  Center(child: CircularProgressIndicator()),
+
+                SizedBox(height: 16),
+
                 // Section Header
                 Text(
                   'What is a Binary Search Tree?',
@@ -46,16 +132,14 @@ class BinarySearchLearnPage extends StatelessWidget {
                 ),
                 ExpandableCard(
                   title: 'Properties',
-                  content:
-                      '- Each node has at most two children.\n'
+                  content: '- Each node has at most two children.\n'
                       '- The left subtree contains values smaller than the root.\n'
                       '- The right subtree contains values greater than the root.\n'
                       '- No duplicate values are allowed.',
                 ),
                 ExpandableCard(
                   title: 'Operations',
-                  content:
-                      '- Search: Find if a value exists in the tree.\n'
+                  content: '- Search: Find if a value exists in the tree.\n'
                       '- Insertion: Add a new value to the tree while maintaining the BST property.\n'
                       '- Deletion: Remove a value while reorganizing the tree to maintain its properties.\n'
                       '- Traversal: Visit all nodes in a specific order (e.g., Inorder, Preorder, Postorder).',

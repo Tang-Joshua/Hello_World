@@ -12,7 +12,7 @@ dependencies:
   google_mlkit_text_recognition: ^0.14.0
   permission_handler: ^11.3.1
   google_ml_kit: ^0.19.0
-  video_player: ^2.4.5 
+  video_player: ^2.5.0 
   flick_video_player: ^0.9.0 
   cupertino_icons: ^1.0.2
   csslib: ^1.0.0
@@ -26,6 +26,12 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: 4.0.0
+  flutter_launcher_icons: ^0.9.2
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/AL-GO.png"
 
 flutter:
   uses-material-design: true
@@ -50,3 +56,11 @@ flutter:
     - assets/Tree_img.png
     - assets/Tree_img2.png
     - assets/Tree_img3.png
+    - assets/RadixSortTutorial.mp4
+    - assets/Insertion_Sort.mp4
+    - assets/Depth_First_Search_Tree.mp4
+    - assets/Binary_Search_Tree.mp4
+    - assets/Breadth_First_Search_Tree.mp4
+    - assets/Queue.mp4
+    - assets/Merge_Sort.mp4
+    - assets/Stacks.mp4

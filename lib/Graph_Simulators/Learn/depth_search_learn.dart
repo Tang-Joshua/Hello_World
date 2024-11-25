@@ -1,6 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
-class DepthFirstLearnPage extends StatelessWidget {
+class DepthFirstLearnPage extends StatefulWidget {
+  @override
+  _DepthFirstLearnPageState createState() => _DepthFirstLearnPageState();
+}
+
+class _DepthFirstLearnPageState extends State<DepthFirstLearnPage> {
+  late VideoPlayerController _controller;
+  bool _isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize the video player with an asset video
+    _controller =
+        VideoPlayerController.asset('assets/Depth_First_Search_Tree.mp4')
+          ..initialize().then((_) {
+            setState(() {}); // Update UI after video initialization
+            _isPlaying = _controller.value.isPlaying;
+          });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Dispose the video controller
+    super.dispose();
+  }
+
+  void _togglePlayPause() {
+    setState(() {
+      if (_controller.value.isPlaying) {
+        _controller.pause();
+        _isPlaying = false;
+      } else {
+        _controller.play();
+        _isPlaying = true;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,6 +66,53 @@ class DepthFirstLearnPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Video Player Section
+                if (_controller.value.isInitialized)
+                  Column(
+                    children: [
+                      AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: VideoPlayer(_controller),
+                      ),
+                      SizedBox(height: 8),
+
+                      // Video Progress Indicator with drag support
+                      VideoProgressIndicator(
+                        _controller,
+                        allowScrubbing: true, // Enable dragging
+                        colors: VideoProgressColors(
+                          playedColor: Colors.green,
+                          backgroundColor: Colors.grey.shade300,
+                          bufferedColor: Colors.green.shade200,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+
+                      // Play/Pause Button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: _togglePlayPause,
+                            icon: Icon(
+                              _isPlaying ? Icons.pause : Icons.play_arrow,
+                              size: 30,
+                              color: Colors.green,
+                            ),
+                          ),
+                          Text(
+                            _isPlaying ? "Playing" : "Paused",
+                            style: TextStyle(fontSize: 16, color: Colors.green),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                else
+                  Center(child: CircularProgressIndicator()),
+
+                SizedBox(height: 16),
+
                 // Section Header
                 Text(
                   'What is Depth First Search?',
@@ -59,6 +146,7 @@ class DepthFirstLearnPage extends StatelessWidget {
                       '5. Backtrack when no unvisited neighbors are left.',
                 ),
                 SizedBox(height: 24),
+
                 // History Section
                 Text(
                   'History of Depth First Search',
@@ -80,32 +168,6 @@ class DepthFirstLearnPage extends StatelessWidget {
                   content:
                       'Depth First Search laid the groundwork for many modern algorithms, including those for solving mazes, planning, and analyzing networks. '
                       'It is one of the most fundamental algorithms in graph theory.',
-                ),
-                SizedBox(height: 24),
-                // Applications Section
-                Text(
-                  'Applications of Depth First Search',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green[900],
-                  ),
-                ),
-                SizedBox(height: 12),
-                ExpandableCard(
-                  title: 'Common Use Cases',
-                  content:
-                      '- **Cycle Detection:** Identify cycles in directed and undirected graphs.\n'
-                      '- **Pathfinding:** Find paths between nodes in a graph.\n'
-                      '- **Topological Sorting:** Used in dependency resolution, like scheduling tasks.\n'
-                      '- **Maze Solving:** Explore all possible paths in a maze until the solution is found.',
-                ),
-                ExpandableCard(
-                  title: 'Advanced Applications',
-                  content:
-                      '- **Strongly Connected Components:** Find SCCs in directed graphs using algorithms like Tarjan\'s.\n'
-                      '- **Artificial Intelligence:** Used in search algorithms for games and decision-making.\n'
-                      '- **Network Analysis:** Explore social networks, computer networks, or biological systems.',
                 ),
               ],
             ),
