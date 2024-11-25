@@ -93,7 +93,7 @@ class _SortingChoices extends State<SortingChoices> {
                     }
                   },
                   child: Container(
-                    width: 230,
+                    width: 250,
                     height: 90,
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     alignment: Alignment.centerLeft,
@@ -144,7 +144,7 @@ class _SortingChoices extends State<SortingChoices> {
                     }
                   },
                   child: Container(
-                    width: 230,
+                    width: 250,
                     height: 90,
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     alignment: Alignment.centerLeft,
@@ -159,7 +159,7 @@ class _SortingChoices extends State<SortingChoices> {
                         SizedBox(width: 8),
                         Text(
                           'Simulation',
-                          style: TextStyle(fontSize: 28),
+                          style: TextStyle(fontSize: 30),
                         ),
                       ],
                     ),
@@ -195,7 +195,7 @@ class _SortingChoices extends State<SortingChoices> {
                     }
                   },
                   child: Container(
-                    width: 230,
+                    width: 250,
                     height: 90,
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     alignment: Alignment.centerLeft,
@@ -270,7 +270,7 @@ class _SortingChoices extends State<SortingChoices> {
             options: CarouselOptions(
               height: 450.0,
               aspectRatio: 16 / 9,
-              viewportFraction: 0.70,
+              viewportFraction: 0.85,
               enlargeCenterPage: true,
               pageSnapping: true,
               onPageChanged: (index, reason) {

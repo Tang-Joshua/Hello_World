@@ -7,7 +7,8 @@ class QueuesPage extends StatefulWidget {
   State<QueuesPage> createState() => _QueuesPageState();
 }
 
-class _QueuesPageState extends State<QueuesPage> with SingleTickerProviderStateMixin {
+class _QueuesPageState extends State<QueuesPage>
+    with SingleTickerProviderStateMixin {
   List<int> queue = [];
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   final TextEditingController _inputController = TextEditingController();
@@ -99,7 +100,8 @@ class _QueuesPageState extends State<QueuesPage> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildItem(int number, Animation<double> animation, {bool dequeuing = false}) {
+  Widget _buildItem(int number, Animation<double> animation,
+      {bool dequeuing = false}) {
     return FadeTransition(
       opacity: animation,
       child: SizeTransition(
@@ -148,13 +150,17 @@ class _QueuesPageState extends State<QueuesPage> with SingleTickerProviderStateM
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60.0),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
-                  BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+                  BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 6,
+                      offset: Offset(0, 3)),
                 ],
               ),
               child: TabBar(
@@ -163,16 +169,21 @@ class _QueuesPageState extends State<QueuesPage> with SingleTickerProviderStateM
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: const [
-                    BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 2)),
+                    BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 2,
+                        offset: Offset(0, 2)),
                   ],
                 ),
                 labelPadding: const EdgeInsets.symmetric(horizontal: 20.0),
                 tabs: const [
                   Tab(
-                    child: Text('Simulate', style: TextStyle(color: Colors.blue, fontSize: 16)),
+                    child: Text('Simulate',
+                        style: TextStyle(color: Colors.blue, fontSize: 16)),
                   ),
                   Tab(
-                    child: Text('I\'ll Take a Shot', style: TextStyle(color: Colors.grey, fontSize: 16)),
+                    child: Text('I\'ll Take a Shot',
+                        style: TextStyle(color: Colors.grey, fontSize: 16)),
                   ),
                 ],
               ),
@@ -195,86 +206,92 @@ class _QueuesPageState extends State<QueuesPage> with SingleTickerProviderStateM
     );
   }
 
-   Widget _buildSimulateTab() {
-  return Padding(
-    padding: const EdgeInsets.all(16.0),
-    child: Column(
-      children: [
-        const SizedBox(height: 20),
-        TextField(
-          controller: _inputController,
-          decoration: InputDecoration(
-            labelText: 'Input',
-            labelStyle: const TextStyle(fontSize: 18, color: Colors.grey),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.blue, width: 2),
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            border: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
+  Widget _buildSimulateTab() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          TextField(
+            controller: _inputController,
+            decoration: InputDecoration(
+              labelText: 'Input',
+              labelStyle: const TextStyle(fontSize: 18, color: Colors.grey),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue, width: 2),
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Queue Visualization:',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-        Expanded(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              border: Border.all(color: _visualizationBorderColor, width: 2),
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.white,
-              boxShadow: const [
-                BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(2, 2)),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(top: 60.0), // Add space above the items
-              child: Center(
-                child: AnimatedList(
-                  key: _listKey,
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  initialItemCount: queue.length,
-                  itemBuilder: (context, index, animation) {
-                    return _buildItem(queue[index], animation);
-                  },
+          const SizedBox(height: 20),
+          const Text(
+            'Queue Visualization:',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border.all(color: _visualizationBorderColor, width: 2),
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+                boxShadow: const [
+                  BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(2, 2)),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    top: 60.0), // Add space above the items
+                child: Center(
+                  child: AnimatedList(
+                    key: _listKey,
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    initialItemCount: queue.length,
+                    itemBuilder: (context, index, animation) {
+                      return _buildItem(queue[index], animation);
+                    },
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton.icon(
-              onPressed: enqueue,
-              icon: const Icon(Icons.add, color: Colors.white),
-              label: const Text('Enqueue', style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-            ),
-            ElevatedButton.icon(
-              onPressed: dequeue,
-              icon: const Icon(Icons.remove, color: Colors.white),
-              label: const Text('Dequeue', style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
-
-
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton.icon(
+                onPressed: enqueue,
+                icon: const Icon(Icons.add, color: Colors.white),
+                label: const Text('Enqueue',
+                    style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              ),
+              ElevatedButton.icon(
+                onPressed: dequeue,
+                icon: const Icon(Icons.remove, color: Colors.white),
+                label: const Text('Dequeue',
+                    style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 void main() {
-  runApp(const MaterialApp(home: QueuesPage(), debugShowCheckedModeBanner: false));
+  runApp(
+      const MaterialApp(home: QueuesPage(), debugShowCheckedModeBanner: false));
 }
+// Good

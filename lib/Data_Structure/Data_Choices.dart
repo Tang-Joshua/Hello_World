@@ -237,7 +237,7 @@ class _DataChoices extends State<DataChoices> {
           options: CarouselOptions(
             height: 450.0,
             aspectRatio: 16 / 9,
-            viewportFraction: 0.70,
+            viewportFraction: 0.85,
             enlargeCenterPage: true,
             pageSnapping: true,
             onPageChanged: (index, reason) {
