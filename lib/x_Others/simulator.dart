@@ -8,8 +8,8 @@ import 'package:flutterapp/Graph_Simulators/breadth_first.dart';
 import 'package:flutterapp/Graph_Simulators/depth_first.dart';
 import 'package:flutterapp/Graph_Simulators/binary_search_tree.dart';
 
-import 'package:flutterapp/Data_Structure/stacks.dart';
-import 'package:flutterapp/Data_Structure/Queues.dart';
+import 'package:flutterapp/Data_Structure/Simulator/stacks.dart';
+import 'package:flutterapp/Data_Structure/Simulator/Queues.dart';
 
 // import 'package:flutterapp/image.dart';
 

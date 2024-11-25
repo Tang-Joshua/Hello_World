@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 class StacksPage extends StatefulWidget {
@@ -10,6 +11,7 @@ class StacksPage extends StatefulWidget {
 class _StacksPageState extends State<StacksPage>
     with SingleTickerProviderStateMixin {
   List<int> stack = [];
+  List<int> poppedItems = [];
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   final TextEditingController _inputController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -30,6 +32,35 @@ class _StacksPageState extends State<StacksPage>
     super.dispose();
   }
 
+  void _autoGenerateInput() {
+    final random = Random();
+    final randomValues = List.generate(5, (_) => random.nextInt(100));
+    _inputController.text = randomValues.join(', ');
+  }
+
+  void _showInstructions() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Instructions'),
+          content: const Text(
+            '1. Use the input field to enter numbers (comma or space-separated).\n'
+            '2. Press "Push" to add the numbers to the stack.\n'
+            '3. Press "Pop" to remove the top number from the stack.\n'
+            '4. The auto-generate button creates random input values.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void push() {
     String inputText = _inputController.text.trim();
     if (inputText.isEmpty) {
@@ -40,28 +71,36 @@ class _StacksPageState extends State<StacksPage>
       return;
     }
 
-    int? number = int.tryParse(inputText);
-    if (number == null) {
+    final numbers = inputText
+        .split(RegExp(r'[,\s]+'))
+        .where((value) => value.isNotEmpty)
+        .map((e) => int.tryParse(e))
+        .where((e) => e != null)
+        .cast<int>()
+        .toList();
+
+    if (numbers.isEmpty) {
       setState(() => _visualizationBorderColor = Colors.black);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Invalid input! Please enter a valid number.')),
+            content: Text('Invalid input! Please enter valid numbers.')),
       );
       return;
     }
 
     setState(() {
-      stack.add(number);
-      _listKey.currentState?.insertItem(
-        stack.length - 1,
-        duration: const Duration(milliseconds: 500),
-      );
+      for (final number in numbers) {
+        stack.add(number);
+        _listKey.currentState?.insertItem(
+          stack.length - 1,
+          duration: const Duration(milliseconds: 500),
+        );
+      }
       _visualizationBorderColor = Colors.blueAccent;
     });
 
     _inputController.clear();
 
-    // Add a slight delay to allow insertion animation to complete before scrolling.
     Future.delayed(const Duration(milliseconds: 500), () {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
@@ -81,6 +120,8 @@ class _StacksPageState extends State<StacksPage>
     }
 
     int poppedNumber = stack.removeLast();
+    poppedItems.add(poppedNumber);
+
     _listKey.currentState?.removeItem(
       stack.length,
       (context, animation) =>
@@ -89,15 +130,6 @@ class _StacksPageState extends State<StacksPage>
     );
 
     setState(() => _visualizationBorderColor = Colors.redAccent);
-
-    // Scroll to the latest remaining item.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeOut,
-      );
-    });
   }
 
   Widget _buildItem(int number, Animation<double> animation,
@@ -109,7 +141,7 @@ class _StacksPageState extends State<StacksPage>
         opacity: animation,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
-              150.0, 8.0, 0.0, 8.0), // 150px left padding
+              190.0, 8.0, 0.0, 8.0), //adjust spacing of the box here
           child: Container(
             width: 80,
             height: 80,
@@ -148,6 +180,12 @@ class _StacksPageState extends State<StacksPage>
           style: TextStyle(color: Colors.black),
         ),
         iconTheme: const IconThemeData(color: Colors.black),
+        actions: [
+          IconButton(
+            onPressed: _showInstructions,
+            icon: const Icon(Icons.help_outline),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60.0),
           child: Padding(
@@ -190,15 +228,6 @@ class _StacksPageState extends State<StacksPage>
                       ),
                     ),
                   ),
-                  Tab(
-                    child: Text(
-                      'I\'ll Take a Shot',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -225,23 +254,22 @@ class _StacksPageState extends State<StacksPage>
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          const SizedBox(height: 20),
-          TextField(
-            controller: _inputController,
-            decoration: InputDecoration(
-              labelText: 'Input',
-              labelStyle: const TextStyle(
-                fontSize: 18,
-                color: Colors.grey,
+          Row(
+            children: [
+              IconButton(
+                onPressed: _autoGenerateInput,
+                icon: const Icon(Icons.auto_awesome, color: Colors.blue),
               ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.blue, width: 2),
-                borderRadius: BorderRadius.all(Radius.circular(8)),
+              Expanded(
+                child: TextField(
+                  controller: _inputController,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter numbers (comma or space-separated)',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
               ),
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-            ),
+            ],
           ),
           const SizedBox(height: 20),
           const Text(

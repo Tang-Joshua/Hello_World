@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 class QueuesPage extends StatefulWidget {
@@ -31,6 +32,35 @@ class _QueuesPageState extends State<QueuesPage>
     super.dispose();
   }
 
+  void _autoGenerateInput() {
+    final random = Random();
+    final randomValues = List.generate(5, (_) => random.nextInt(100));
+    _inputController.text = randomValues.join(', ');
+  }
+
+  void _showInstructions() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Instructions'),
+          content: const Text(
+            '1. Use the input field to enter numbers (comma or space-separated).\n'
+            '2. Press "Enqueue" to add the numbers to the queue.\n'
+            '3. Press "Dequeue" to remove the front number from the queue.\n'
+            '4. The auto-generate button creates random input values.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void enqueue() {
     String inputText = _inputController.text.trim();
     if (inputText.isEmpty) {
@@ -38,18 +68,27 @@ class _QueuesPageState extends State<QueuesPage>
       return;
     }
 
-    int? number = int.tryParse(inputText);
-    if (number == null) {
-      _showSnackbar('Invalid input! Please enter a valid number.');
+    final numbers = inputText
+        .split(RegExp(r'[,\s]+'))
+        .where((value) => value.isNotEmpty)
+        .map((e) => int.tryParse(e))
+        .where((e) => e != null)
+        .cast<int>()
+        .toList();
+
+    if (numbers.isEmpty) {
+      _showSnackbar('Invalid input! Please enter valid numbers.');
       return;
     }
 
     setState(() {
-      queue.add(number);
-      _listKey.currentState?.insertItem(
-        queue.length - 1,
-        duration: const Duration(milliseconds: 500),
-      );
+      for (final number in numbers) {
+        queue.add(number);
+        _listKey.currentState?.insertItem(
+          queue.length - 1,
+          duration: const Duration(milliseconds: 500),
+        );
+      }
       _visualizationBorderColor = Colors.blueAccent;
     });
 
@@ -147,6 +186,12 @@ class _QueuesPageState extends State<QueuesPage>
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          IconButton(
+            onPressed: _showInstructions,
+            icon: const Icon(Icons.help_outline, color: Colors.black),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60.0),
           child: Padding(
@@ -181,10 +226,6 @@ class _QueuesPageState extends State<QueuesPage>
                     child: Text('Simulate',
                         style: TextStyle(color: Colors.blue, fontSize: 16)),
                   ),
-                  Tab(
-                    child: Text('I\'ll Take a Shot',
-                        style: TextStyle(color: Colors.grey, fontSize: 16)),
-                  ),
                 ],
               ),
             ),
@@ -195,12 +236,6 @@ class _QueuesPageState extends State<QueuesPage>
         controller: _tabController,
         children: [
           _buildSimulateTab(),
-          const Center(
-            child: Text(
-              'This feature is under construction.',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
-            ),
-          ),
         ],
       ),
     );
@@ -211,20 +246,22 @@ class _QueuesPageState extends State<QueuesPage>
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          const SizedBox(height: 20),
-          TextField(
-            controller: _inputController,
-            decoration: InputDecoration(
-              labelText: 'Input',
-              labelStyle: const TextStyle(fontSize: 18, color: Colors.grey),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.blue, width: 2),
-                borderRadius: BorderRadius.all(Radius.circular(8)),
+          Row(
+            children: [
+              IconButton(
+                onPressed: _autoGenerateInput,
+                icon: const Icon(Icons.auto_awesome, color: Colors.blue),
               ),
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
+              Expanded(
+                child: TextField(
+                  controller: _inputController,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter numbers (comma or space-separated)',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
           const SizedBox(height: 20),
           const Text(
@@ -247,19 +284,15 @@ class _QueuesPageState extends State<QueuesPage>
                       offset: Offset(2, 2)),
                 ],
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 60.0), // Add space above the items
-                child: Center(
-                  child: AnimatedList(
-                    key: _listKey,
-                    controller: _scrollController,
-                    scrollDirection: Axis.horizontal,
-                    initialItemCount: queue.length,
-                    itemBuilder: (context, index, animation) {
-                      return _buildItem(queue[index], animation);
-                    },
-                  ),
+              child: Center(
+                child: AnimatedList(
+                  key: _listKey,
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  initialItemCount: queue.length,
+                  itemBuilder: (context, index, animation) {
+                    return _buildItem(queue[index], animation);
+                  },
                 ),
               ),
             ),
@@ -294,4 +327,3 @@ void main() {
   runApp(
       const MaterialApp(home: QueuesPage(), debugShowCheckedModeBanner: false));
 }
-// Good
