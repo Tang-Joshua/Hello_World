@@ -46,6 +46,9 @@ class _DepthFirstPageState extends State<DepthFirstPage>
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showInstructions();
+    });
   }
 
   @override
@@ -118,6 +121,29 @@ class _DepthFirstPageState extends State<DepthFirstPage>
     setState(() {
       _isConverted = true;
     });
+  }
+
+  void _showInstructions() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Instructions'),
+        content: const Text(
+          '1. Use the text boxes to edit node values directly.\n'
+          '2. Click the + icons to add nodes.\n'
+          '3. Click the - icons to delete nodes.\n'
+          '4. Use the "Convert" button to lock in values and create the tree.\n'
+          '5. Use "DFS Traversal" to perform a depth-first traversal.\n'
+          '6. Use "Clear" to reset and start again.\n',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   void depthFirstTraversal() async {
@@ -283,6 +309,13 @@ class _DepthFirstPageState extends State<DepthFirstPage>
           preferredSize: const Size.fromHeight(60.0),
           child: _buildTabBar(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline, color: Colors.black),
+            onPressed:
+                _showInstructions, // Call the method to show instructions
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -336,9 +369,6 @@ class _DepthFirstPageState extends State<DepthFirstPage>
           ),
           tabs: const [
             Tab(child: Text('Simulate', style: TextStyle(color: Colors.blue))),
-            Tab(
-                child:
-                    Text('Instructions', style: TextStyle(color: Colors.grey))),
           ],
         ),
       ),

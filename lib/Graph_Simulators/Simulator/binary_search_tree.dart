@@ -40,6 +40,10 @@ class _BinarySearchPageState extends State<BinarySearchPage>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _initializeRootNode();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showInstructions();
+    });
   }
 
   @override
@@ -127,6 +131,30 @@ class _BinarySearchPageState extends State<BinarySearchPage>
     node.isCorrectPosition = true;
     _resetCorrectness(node.left);
     _resetCorrectness(node.right);
+  }
+
+  void _showInstructions() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Instructions'),
+        content: const Text(
+          '1. Use the text boxes to edit node values directly.\n'
+          '2. Click the + icons to add nodes.\n'
+          '3. Click the - icons to delete nodes.\n'
+          '4. Use the "Convert" button to lock in values and create the tree.\n'
+          '5. Use "Check" to highlight incorrect nodes based on BST rules.\n'
+          '6. Use "Sort" to organize the tree in order after checking.\n'
+          '7. Use "Clear" to reset and start again.\n',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   bool _validateBST(TreeNode? node, int? min, int? max) {
@@ -360,6 +388,13 @@ class _BinarySearchPageState extends State<BinarySearchPage>
           preferredSize: const Size.fromHeight(60.0),
           child: _buildTabBar(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline, color: Colors.black),
+            onPressed:
+                _showInstructions, // Call the method to show instructions
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -412,9 +447,6 @@ class _BinarySearchPageState extends State<BinarySearchPage>
           ),
           tabs: const [
             Tab(child: Text('Simulate', style: TextStyle(color: Colors.blue))),
-            Tab(
-                child:
-                    Text('Instructions', style: TextStyle(color: Colors.grey))),
           ],
         ),
       ),
