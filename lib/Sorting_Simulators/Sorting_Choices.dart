@@ -1,5 +1,5 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutterapp/main.dart';
 import 'Games/merge/merge_mainmenu.dart';
 import 'Simulator/radix.dart';
@@ -11,7 +11,7 @@ import 'Games/radix/hangman_play.dart';
 import 'Games/insertion/Bookshelf_Game.dart';
 import 'package:flutterapp/Sorting_Simulators/Learn/radix_learn.dart';
 import 'package:flutterapp/Sorting_Simulators/Learn/merge_learn.dart';
-import 'package:flutterapp/Sorting_Simulators/Learn/insertion_learn.dart'; // Import the Radix Sort Learn Page
+import 'package:flutterapp/Sorting_Simulators/Learn/insertion_learn.dart';
 
 class SortingChoices extends StatefulWidget {
   const SortingChoices({Key? key}) : super(key: key);
@@ -21,19 +21,9 @@ class SortingChoices extends StatefulWidget {
 }
 
 class _SortingChoices extends State<SortingChoices> {
-  int _current = 0;
-  dynamic _selectedIndex = {};
-
-  // Define the background colors for each page
-  final List<Color> _backgroundColors = [
-    const Color.fromARGB(
-        255, 255, 205, 202), // Background color for the first page
-    const Color.fromARGB(
-        255, 193, 255, 195), // Background color for the second page
-    Color.fromARGB(255, 152, 240, 255), // Background color for the third page
-  ];
-
-  var text = "??";
+  int _current = 0; // Current carousel page index
+  dynamic _selectedIndex = {}; // Selected card state
+  var text = "??"; // Current text based on selection
 
   final List<dynamic> _products = [
     {'title': 'Radix Sort', 'image': 'assets/Algo_img.png', 'description': ''},
@@ -75,8 +65,7 @@ class _SortingChoices extends State<SortingChoices> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                RadixSortLearnPage()), // Navigate to Radix Sort Learn Page
+                            builder: (context) => RadixSortLearnPage()),
                       );
                     } else if (text == "Merge Sort") {
                       Navigator.push(
@@ -232,17 +221,6 @@ class _SortingChoices extends State<SortingChoices> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      floatingActionButton: _selectedIndex.isNotEmpty
-          ? FloatingActionButton(
-              onPressed: () => _openAnimationDialog(context),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.arrow_forward_ios),
-                ],
-              ),
-            )
-          : null,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -257,22 +235,20 @@ class _SortingChoices extends State<SortingChoices> {
           },
         ),
         title: Text(
-          'Sorting Algorithms',
-          style: TextStyle(
-            color: Colors.black,
-          ),
+          'Data Structures',
+          style: TextStyle(color: Colors.black),
         ),
       ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        child: CarouselSlider.builder(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Carousel Slider
+          CarouselSlider.builder(
             options: CarouselOptions(
               height: 450.0,
               aspectRatio: 16 / 9,
-              viewportFraction: 0.85,
+              viewportFraction: 0.75,
               enlargeCenterPage: true,
-              pageSnapping: true,
               onPageChanged: (index, reason) {
                 setState(() {
                   _current = index;
@@ -292,10 +268,10 @@ class _SortingChoices extends State<SortingChoices> {
                     }
                     text = movie['title'];
                   });
+                  _openAnimationDialog(context);
                 },
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 300),
-                  width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -321,43 +297,61 @@ class _SortingChoices extends State<SortingChoices> {
                             )
                           ],
                   ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 320,
-                          margin: EdgeInsets.only(top: 10),
-                          clipBehavior: Clip.hardEdge,
-                          decoration: BoxDecoration(
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 320,
+                        margin: EdgeInsets.only(top: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: ClipRRect(
                             borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Image.asset(
-                            movie['image'],
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          movie['title'],
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            child: Image.asset(
+                              movie['image'],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            ),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          movie['description'],
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        movie['title'],
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               );
-            }),
+            },
+          ),
+          SizedBox(height: 16),
+
+          // Centered Page Indicator Dots
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                _products.length,
+                (index) => Container(
+                  width: 8.0,
+                  height: 8.0,
+                  margin: EdgeInsets.symmetric(horizontal: 4.0),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _current == index ? Colors.green : Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
