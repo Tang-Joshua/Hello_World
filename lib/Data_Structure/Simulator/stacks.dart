@@ -258,7 +258,7 @@ class _StacksPageState extends State<StacksPage>
             children: [
               IconButton(
                 onPressed: _autoGenerateInput,
-                icon: const Icon(Icons.auto_awesome, color: Colors.blue),
+                icon: const Icon(Icons.casino, color: Colors.blue),
               ),
               Expanded(
                 child: TextField(

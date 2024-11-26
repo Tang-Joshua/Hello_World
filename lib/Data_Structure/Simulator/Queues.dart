@@ -119,7 +119,7 @@ class _QueuesPageState extends State<QueuesPage>
       );
     });
 
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 0), () {
       _listKey.currentState?.removeItem(
         0,
         (context, animation) =>
@@ -250,7 +250,7 @@ class _QueuesPageState extends State<QueuesPage>
             children: [
               IconButton(
                 onPressed: _autoGenerateInput,
-                icon: const Icon(Icons.auto_awesome, color: Colors.blue),
+                icon: const Icon(Icons.casino, color: Colors.blue),
               ),
               Expanded(
                 child: TextField(
