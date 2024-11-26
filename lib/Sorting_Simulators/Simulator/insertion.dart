@@ -28,6 +28,10 @@ class _InsertionSortPageState extends State<InsertionSortPage>
     inputController.addListener(() {
       setState(() {}); // Rebuild the UI whenever input changes.
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showInstructions();
+    });
   }
 
   @override
@@ -82,6 +86,193 @@ class _InsertionSortPageState extends State<InsertionSortPage>
     setState(() => isSorting = false); // Mark sorting as complete.
   }
 
+  void _showInstructions() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text(
+          'Instructions',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.orangeAccent,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Section Title
+              Row(
+                children: [
+                  Icon(Icons.info, color: Colors.orange, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'How to Use Insertion Sort Visualization:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Step-by-step Instructions
+              _buildSteps(
+                icon: Icons.casino,
+                text:
+                    'Randomize Input: Click the dice icon to generate random numbers.',
+                iconColor: Colors.purple,
+              ),
+              _buildSteps(
+                icon: Icons.check_circle,
+                text:
+                    'Enter Input: Type numbers separated by commas (e.g., "10, 20") and click the check button to add them.',
+                iconColor: Colors.green,
+              ),
+              _buildSteps(
+                icon: Icons.play_arrow,
+                text:
+                    'Start Sorting: Click the play button to begin the Insertion Sort visualization.',
+                iconColor: Colors.orange,
+              ),
+              _buildSteps(
+                icon: Icons.refresh,
+                text:
+                    'Clear Visualization: Resets the visualization after sorting is complete.',
+                iconColor: Colors.red,
+              ),
+              const SizedBox(height: 16),
+
+              // Button Guide
+              Row(
+                children: [
+                  Icon(Icons.help_outline, color: Colors.orange, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Button Guide:',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _buildButtonGuide(
+                icon: Icons.casino,
+                label: 'Randomize Input',
+                description: 'Generates random numbers to use as input.',
+                backgroundColor: Colors.purple[100]!,
+                iconColor: Colors.purple,
+              ),
+              _buildButtonGuide(
+                icon: Icons.check_circle,
+                label: 'Insert Input',
+                description: 'Adds your entered numbers to the visualization.',
+                backgroundColor: Colors.green[100]!,
+                iconColor: Colors.green,
+              ),
+              _buildButtonGuide(
+                icon: Icons.play_arrow,
+                label: 'Start Sorting',
+                description: 'Begins the Insertion Sort visualization.',
+                backgroundColor: Colors.orange[100]!,
+                iconColor: Colors.orange,
+              ),
+              _buildButtonGuide(
+                icon: Icons.refresh,
+                label: 'Clear Visualization',
+                description: 'Resets the sorting process and clears the steps.',
+                backgroundColor: Colors.red[100]!,
+                iconColor: Colors.red,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              'Close',
+              style: TextStyle(color: Colors.orangeAccent),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSteps(
+      {required IconData icon,
+      required String text,
+      required Color iconColor}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+// Helper to build the button guide with colored background
+  Widget _buildButtonGuide({
+    required IconData icon,
+    required String label,
+    required String description,
+    required Color backgroundColor,
+    required Color iconColor,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Scrolls the highlighted element to the center.
   void _scrollToIndex(int index) {
     final position =
@@ -94,7 +285,7 @@ class _InsertionSortPageState extends State<InsertionSortPage>
   }
 
   void insertNumbers() {
-    List<String> inputNumbers = inputController.text.split(',');
+    List<String> inputNumbers = inputController.text.split(RegExp(r'[,\s]+'));
     for (String numStr in inputNumbers) {
       int? number = int.tryParse(numStr.trim());
       if (number != null) {
@@ -130,6 +321,12 @@ class _InsertionSortPageState extends State<InsertionSortPage>
           preferredSize: const Size.fromHeight(60.0),
           child: _buildTabBar(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline, color: Colors.black),
+            onPressed: _showInstructions,
+          ),
+        ],
       ),
       body: TabBarView(
         controller: _tabController,
@@ -219,7 +416,7 @@ class _InsertionSortPageState extends State<InsertionSortPage>
           child: TextField(
             controller: inputController,
             decoration: const InputDecoration(
-              labelText: 'Enter numbers (comma-separated)',
+              labelText: 'Enter numbers (comma or space-separated only)',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
               ),
@@ -235,21 +432,46 @@ class _InsertionSortPageState extends State<InsertionSortPage>
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         if (inputController.text.isNotEmpty)
-          _buildIconButton(Icons.check, Colors.green, insertNumbers),
+          ElevatedButton(
+            onPressed:
+                !isSorting ? insertNumbers : null, // Disable while sorting
+            style: ElevatedButton.styleFrom(
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(12),
+              backgroundColor: Colors.green,
+            ),
+            child: const Icon(Icons.check, color: Colors.white),
+          ),
         const SizedBox(width: 8),
-        _buildIconButton(
-          Icons.play_arrow,
-          isSortEnabled ? Colors.blue : Colors.grey,
-          isSortEnabled ? sort : null,
+        ElevatedButton(
+          onPressed: !isSorting && isSortEnabled
+              ? sort
+              : null, // Disable sort button while sorting
+          style: ElevatedButton.styleFrom(
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(12),
+            backgroundColor: Colors.blue,
+          ),
+          child: const Icon(Icons.play_arrow, color: Colors.white),
         ),
         const SizedBox(width: 8),
-        _buildIconButton(Icons.refresh, Colors.red, () {
-          setState(() {
-            stack.clear();
-            inputController.clear();
-            isSortEnabled = false;
-          });
-        }),
+        ElevatedButton(
+          onPressed: !isSorting
+              ? () {
+                  setState(() {
+                    stack.clear();
+                    inputController.clear();
+                    isSortEnabled = false;
+                  });
+                }
+              : null, // Disable clear button while sorting
+          style: ElevatedButton.styleFrom(
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(12),
+            backgroundColor: Colors.red,
+          ),
+          child: const Icon(Icons.refresh, color: Colors.white),
+        ),
       ],
     );
   }

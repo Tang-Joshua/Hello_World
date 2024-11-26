@@ -32,6 +32,10 @@ class _MergeSortPageState extends State<MergeSortPage>
     inputController.addListener(() {
       setState(() {});
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showInstructions();
+    });
   }
 
   @override
@@ -130,8 +134,197 @@ class _MergeSortPageState extends State<MergeSortPage>
     }
   }
 
+  void _showInstructions() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text(
+          'Instructions',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.blueAccent,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Section Title
+              Row(
+                children: [
+                  Icon(Icons.info, color: Colors.blue, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'How to Use Merge Sort Visualization:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Step-by-step Instructions
+              _buildStep(
+                icon: Icons.casino,
+                text:
+                    'Randomize Input: Click the dice icon to auto-generate random numbers.',
+                iconColor: Colors.purple,
+              ),
+              _buildStep(
+                icon: Icons.check_circle,
+                text:
+                    'Enter Input: Type comma-separated numbers (e.g., "10, 20, 30") and click the check button to add them.',
+                iconColor: Colors.green,
+              ),
+              _buildStep(
+                icon: Icons.play_arrow,
+                text:
+                    'Start Sorting: Click the play button to visualize the sorting process step by step.',
+                iconColor: Colors.blue,
+              ),
+              _buildStep(
+                icon: Icons.refresh,
+                text:
+                    'Clear Visualization: Resets the visualization after sorting is complete. This button will be disabled during sorting.',
+                iconColor: Colors.red,
+              ),
+              const SizedBox(height: 16),
+
+              // Button Guide
+              Row(
+                children: [
+                  Icon(Icons.help_outline, color: Colors.blue, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Button Guide:',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _buildButtonGuide(
+                icon: Icons.casino,
+                label: 'Randomize Input',
+                description:
+                    'Automatically fills the input field with random numbers.',
+                backgroundColor: Colors.purple[100]!,
+                iconColor: Colors.purple,
+              ),
+              _buildButtonGuide(
+                icon: Icons.check_circle,
+                label: 'Insert Input',
+                description: 'Adds your entered numbers to the visualization.',
+                backgroundColor: Colors.green[100]!,
+                iconColor: Colors.green,
+              ),
+              _buildButtonGuide(
+                icon: Icons.play_arrow,
+                label: 'Start Sorting',
+                description: 'Begins sorting the numbers using Merge Sort.',
+                backgroundColor: Colors.blue[100]!,
+                iconColor: Colors.blue,
+              ),
+              _buildButtonGuide(
+                icon: Icons.refresh,
+                label: 'Clear Visualization',
+                description: 'Resets the visualization and clears all steps.',
+                backgroundColor: Colors.red[100]!,
+                iconColor: Colors.red,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              'Close',
+              style: TextStyle(color: Colors.blueAccent),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+// Helper to build each step with an icon
+  Widget _buildStep(
+      {required IconData icon,
+      required String text,
+      required Color iconColor}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+// Helper to build the button guide with colored background
+  Widget _buildButtonGuide({
+    required IconData icon,
+    required String label,
+    required String description,
+    required Color backgroundColor,
+    required Color iconColor,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void insertNumbers() {
-    List<String> inputNumbers = inputController.text.split(',');
+    List<String> inputNumbers = inputController.text.split(RegExp(r'[,\s]+'));
     stack.clear();
     for (String numStr in inputNumbers) {
       int? number = int.tryParse(numStr.trim());
@@ -184,6 +377,12 @@ class _MergeSortPageState extends State<MergeSortPage>
           preferredSize: const Size.fromHeight(60.0),
           child: _buildTabBar(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline, color: Colors.black),
+            onPressed: _showInstructions,
+          ),
+        ],
       ),
       body: TabBarView(
         controller: _tabController,
@@ -290,7 +489,7 @@ class _MergeSortPageState extends State<MergeSortPage>
           child: TextField(
             controller: inputController,
             decoration: const InputDecoration(
-              labelText: 'Enter numbers (comma-separated)',
+              labelText: 'Enter numbers (comma or space-separated only)',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
               ),
@@ -317,7 +516,8 @@ class _MergeSortPageState extends State<MergeSortPage>
           ),
         const SizedBox(width: 8),
         ElevatedButton(
-          onPressed: isInsertClicked && stack.isNotEmpty ? sort : null,
+          onPressed:
+              !isSorting && isInsertClicked && stack.isNotEmpty ? sort : null,
           style: ElevatedButton.styleFrom(
             shape: const CircleBorder(),
             padding: const EdgeInsets.all(12),
@@ -327,7 +527,7 @@ class _MergeSortPageState extends State<MergeSortPage>
         ),
         const SizedBox(width: 8),
         ElevatedButton(
-          onPressed: clearVisualization,
+          onPressed: !isSorting ? clearVisualization : null,
           style: ElevatedButton.styleFrom(
             shape: const CircleBorder(),
             padding: const EdgeInsets.all(12),

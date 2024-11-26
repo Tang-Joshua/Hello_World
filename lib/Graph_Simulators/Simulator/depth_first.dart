@@ -127,19 +127,196 @@ class _DepthFirstPageState extends State<DepthFirstPage>
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Instructions'),
-        content: const Text(
-          '1. Use the text boxes to edit node values directly.\n'
-          '2. Click the + icons to add nodes.\n'
-          '3. Click the - icons to delete nodes.\n'
-          '4. Use the "Convert" button to lock in values and create the tree.\n'
-          '5. Use "DFS Traversal" to perform a depth-first traversal.\n'
-          '6. Use "Clear" to reset and start again.\n',
+        title: const Text(
+          'Instructions',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.purpleAccent,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Section Title
+              Row(
+                children: [
+                  Icon(Icons.info, color: Colors.purple, size: 24),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'How to Use Depth-First Search Visualization:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      softWrap: true,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Step-by-step Instructions
+              _buildSteps(
+                icon: Icons.add_circle_outline,
+                text: 'Add Node: Use the "+" button to insert new nodes.',
+                iconColor: Colors.blue,
+              ),
+              _buildSteps(
+                icon: Icons.remove_circle_outline,
+                text: 'Delete Node: Use the "-" button to remove nodes.',
+                iconColor: Colors.red,
+              ),
+              _buildSteps(
+                icon: Icons.transform,
+                text: 'Convert Tree: Finalize the tree structure before DFS.',
+                iconColor: Colors.green,
+              ),
+              _buildSteps(
+                icon: Icons.trending_flat,
+                text:
+                    'Perform DFS: Click the "Play" button to visualize the traversal.',
+                iconColor: Colors.purple,
+              ),
+              _buildSteps(
+                icon: Icons.clear,
+                text:
+                    'Clear Tree: Resets the tree visualization for a fresh start.',
+                iconColor: Colors.red,
+              ),
+              const SizedBox(height: 16),
+
+              // Button Guide
+              Row(
+                children: [
+                  Icon(Icons.help_outline, color: Colors.purple, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Button Guide:',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _buildButtonGuide(
+                icon: Icons.add_circle_outline,
+                label: 'Add Node',
+                description: 'Inserts a node into the tree.',
+                backgroundColor: Colors.blue[100]!,
+                iconColor: Colors.blue,
+              ),
+              _buildButtonGuide(
+                icon: Icons.remove_circle_outline,
+                label: 'Delete Node',
+                description: 'Removes a selected node from the tree.',
+                backgroundColor: Colors.red[100]!,
+                iconColor: Colors.red,
+              ),
+              _buildButtonGuide(
+                icon: Icons.transform,
+                label: 'Convert Tree',
+                description: 'Locks the structure for DFS traversal.',
+                backgroundColor: Colors.green[100]!,
+                iconColor: Colors.green,
+              ),
+              _buildButtonGuide(
+                icon: Icons.trending_flat,
+                label: 'Perform DFS',
+                description: 'Executes Depth-First Search traversal.',
+                backgroundColor: Colors.purple[100]!,
+                iconColor: Colors.purple,
+              ),
+              _buildButtonGuide(
+                icon: Icons.clear,
+                label: 'Clear Tree',
+                description: 'Clears the visualization.',
+                backgroundColor: Colors.red[100]!,
+                iconColor: Colors.red,
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: const Text(
+              'Close',
+              style: TextStyle(color: Colors.purpleAccent),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSteps(
+      {required IconData icon,
+      required String text,
+      required Color iconColor}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+// Helper to build the button guide with colored background
+  Widget _buildButtonGuide({
+    required IconData icon,
+    required String label,
+    required String description,
+    required Color backgroundColor,
+    required Color iconColor,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+              ],
+            ),
           ),
         ],
       ),

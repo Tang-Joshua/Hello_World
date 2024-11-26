@@ -22,6 +22,10 @@ class _StacksPageState extends State<StacksPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showInstructions();
+    });
   }
 
   @override
@@ -41,23 +45,172 @@ class _StacksPageState extends State<StacksPage>
   void _showInstructions() {
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Instructions'),
-          content: const Text(
-            '1. Use the input field to enter numbers (comma or space-separated).\n'
-            '2. Press "Push" to add the numbers to the stack.\n'
-            '3. Press "Pop" to remove the top number from the stack.\n'
-            '4. The auto-generate button creates random input values.',
+      builder: (_) => AlertDialog(
+        title: const Text(
+          'Instructions',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.teal,
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Section Title
+              Row(
+                children: [
+                  Icon(Icons.info, color: Colors.teal, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'How to Use Stacks Visualization:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Step-by-step Instructions
+              _buildSteps(
+                icon: Icons.add_box,
+                text: 'Push: Adds a new item to the top of the stack.',
+                iconColor: Colors.blue,
+              ),
+              _buildSteps(
+                icon: Icons.remove_circle,
+                text: 'Pop: Removes the topmost item from the stack.',
+                iconColor: Colors.red,
+              ),
+              _buildSteps(
+                icon: Icons.casino,
+                text:
+                    'Randomize Input: Automatically fills the stack with random numbers.',
+                iconColor: Colors.purple,
+              ),
+              const SizedBox(height: 16),
+
+              // Button Guide
+              Row(
+                children: [
+                  Icon(Icons.help_outline, color: Colors.teal, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Button Guide:',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _buildButtonGuide(
+                icon: Icons.add_box,
+                label: 'Push',
+                description: 'Pushes a new item onto the stack.',
+                backgroundColor: Colors.blue[100]!,
+                iconColor: Colors.blue,
+              ),
+              _buildButtonGuide(
+                icon: Icons.remove_circle,
+                label: 'Pop',
+                description: 'Removes the top item from the stack.',
+                backgroundColor: Colors.red[100]!,
+                iconColor: Colors.red,
+              ),
+              _buildButtonGuide(
+                icon: Icons.casino,
+                label: 'Randomize Input',
+                description: 'Fills the stack with random items.',
+                backgroundColor: Colors.purple[100]!,
+                iconColor: Colors.purple,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              'Close',
+              style: TextStyle(color: Colors.teal),
             ),
-          ],
-        );
-      },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSteps(
+      {required IconData icon,
+      required String text,
+      required Color iconColor}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+// Helper to build the button guide with colored background
+  Widget _buildButtonGuide({
+    required IconData icon,
+    required String label,
+    required String description,
+    required Color backgroundColor,
+    required Color iconColor,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
