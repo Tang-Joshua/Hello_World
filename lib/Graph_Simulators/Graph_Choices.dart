@@ -224,140 +224,150 @@ class _GraphChoices extends State<GraphChoices> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => MyApp()),
-              (route) => false,
-            );
-          },
+    return MaterialApp(
+        debugShowCheckedModeBanner: false, // Disable the debug banner
+        theme: ThemeData(
+          brightness: Brightness.light, // Set to light mode
+          scaffoldBackgroundColor: Colors.white, // White background
+          fontFamily: 'Default', // Default font
+          primaryColor: Colors.blue,
+          useMaterial3: false, // Default primary color
         ),
-        title: Text(
-          'Data Structures',
-          style: TextStyle(color: Colors.black),
-        ),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Carousel Slider
-          CarouselSlider.builder(
-            options: CarouselOptions(
-              height: 450.0,
-              aspectRatio: 16 / 9,
-              viewportFraction: 0.75,
-              enlargeCenterPage: true,
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _current = index;
-                });
+        home: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyApp()),
+                  (route) => false,
+                );
               },
             ),
-            itemCount: _products.length,
-            itemBuilder: (BuildContext context, int index, int realIdx) {
-              var movie = _products[index];
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (_selectedIndex == movie) {
-                      _selectedIndex = {};
-                    } else {
-                      _selectedIndex = movie;
-                    }
-                    text = movie['title'];
-                  });
-                  _openAnimationDialog(context);
-                },
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: _selectedIndex == movie
-                        ? Border.all(
-                            color: Color.fromARGB(255, 22, 207, 62),
-                            width: 3,
-                          )
-                        : null,
-                    boxShadow: _selectedIndex == movie
-                        ? [
-                            BoxShadow(
-                              color: Color.fromARGB(255, 70, 155, 129),
-                              blurRadius: 30,
-                              offset: Offset(0, 10),
-                            )
-                          ]
-                        : [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              blurRadius: 20,
-                              offset: Offset(0, 5),
-                            )
-                          ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 320,
-                        margin: EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.asset(
-                              movie['image'],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
+            title: Text(
+              'Data Structures',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Carousel Slider
+              CarouselSlider.builder(
+                options: CarouselOptions(
+                  height: 450.0,
+                  aspectRatio: 16 / 9,
+                  viewportFraction: 0.75,
+                  enlargeCenterPage: true,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _current = index;
+                    });
+                  },
+                ),
+                itemCount: _products.length,
+                itemBuilder: (BuildContext context, int index, int realIdx) {
+                  var movie = _products[index];
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (_selectedIndex == movie) {
+                          _selectedIndex = {};
+                        } else {
+                          _selectedIndex = movie;
+                        }
+                        text = movie['title'];
+                      });
+                      _openAnimationDialog(context);
+                    },
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: _selectedIndex == movie
+                            ? Border.all(
+                                color: Color.fromARGB(255, 22, 207, 62),
+                                width: 3,
+                              )
+                            : null,
+                        boxShadow: _selectedIndex == movie
+                            ? [
+                                BoxShadow(
+                                  color: Color.fromARGB(255, 70, 155, 129),
+                                  blurRadius: 30,
+                                  offset: Offset(0, 10),
+                                )
+                              ]
+                            : [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  blurRadius: 20,
+                                  offset: Offset(0, 5),
+                                )
+                              ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 320,
+                            margin: EdgeInsets.only(top: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.asset(
+                                  movie['image'],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          SizedBox(height: 20),
+                          Text(
+                            movie['title'],
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 20),
-                      Text(
-                        movie['title'],
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-          SizedBox(height: 16),
+                    ),
+                  );
+                },
+              ),
+              SizedBox(height: 16),
 
-          // Centered Page Indicator Dots
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                _products.length,
-                (index) => Container(
-                  width: 8.0,
-                  height: 8.0,
-                  margin: EdgeInsets.symmetric(horizontal: 4.0),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _current == index ? Colors.green : Colors.grey,
+              // Centered Page Indicator Dots
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _products.length,
+                    (index) => Container(
+                      width: 8.0,
+                      height: 8.0,
+                      margin: EdgeInsets.symmetric(horizontal: 4.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _current == index ? Colors.green : Colors.grey,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 }

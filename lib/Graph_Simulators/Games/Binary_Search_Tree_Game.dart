@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutterapp/Graph_Simulators/Graph_Choices.dart';
 
 void main() {
   runApp(BinarySearchTreeGameApp());
@@ -10,10 +11,10 @@ class BinarySearchTreeGameApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Binary Search Tree Game',
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: Colors.black,
         fontFamily: 'CrimsonPro',
       ),
       home: MainMenuScreen(),
@@ -33,8 +34,10 @@ class MainMenuScreen extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(
-                context); // Goes back to the previous screen or exits if no previous screen exists
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => GraphChoices()),
+            );
           },
         ),
         elevation: 0,
@@ -156,30 +159,164 @@ class HowToPlayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('How to Play',
-            style: TextStyle(fontSize: 24, fontStyle: FontStyle.italic)),
+        title: Text(
+          'How to Play',
+          style: TextStyle(fontSize: 24, fontStyle: FontStyle.italic),
+        ),
         backgroundColor: Colors.black,
+        elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Text(
-          'The goal is to build a binary search tree by selecting numbers from the deck.\n\n'
-          '1. Choose a direction ("Left" or "Right") before picking a number.\n'
-          '2. "Left" means pick a number smaller than the previous one.\n'
-          '3. "Right" means pick a number larger than the previous one.\n'
-          '4. Incorrect selections will end the game.\n'
-          '5. Completing 7 nodes following the rules will win the game.\n\n'
-          'Good luck!',
-          style: TextStyle(
-              fontSize: 18, color: Colors.white, fontStyle: FontStyle.italic),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'How to Play',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Icon(Icons.play_circle_outline,
+                      color: Colors.green, size: 28),
+                  SizedBox(width: 10),
+                  Text(
+                    'Game Objective',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Build a Binary Search Tree (BST) by selecting numbers from the deck. Your goal is to follow BST rules and complete the tree with at least 7 nodes per round.',
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 1.5,
+                  color: Colors.grey[300],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Icon(Icons.rule, color: Colors.blue, size: 28),
+                  SizedBox(width: 10),
+                  Text(
+                    'Rules',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Text(
+                '1. Choose "Left" or "Right" before selecting a number.\n'
+                '2. Numbers on the "Left" must be smaller than the parent node.\n'
+                '3. Numbers on the "Right" must be larger than the parent node.\n'
+                '4. Incorrect selections or running out of time ends the game.\n'
+                '5. Complete 7 nodes to win the round.',
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 1.5,
+                  color: Colors.grey[300],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Icon(Icons.timer, color: Colors.red, size: 28),
+                  SizedBox(width: 10),
+                  Text(
+                    'Time Limit',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Text(
+                'You have a limited time based on the difficulty level:\n'
+                '- Easy: 50 seconds\n'
+                '- Medium: 30 seconds\n'
+                '- Hard: 25 seconds',
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 1.5,
+                  color: Colors.grey[300],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Icon(Icons.lightbulb_outline, color: Colors.yellow, size: 28),
+                  SizedBox(width: 10),
+                  Text(
+                    'Tips',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Text(
+                '1. Think carefully before selecting a number.\n'
+                '2. Use the rules of BST to guide your decisions.\n'
+                '3. Complete as many rounds as possible!',
+                style: TextStyle(
+                  fontSize: 16,
+                  height: 1.5,
+                  color: Colors.grey[300],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              SizedBox(height: 30),
+              Center(
+                child: Text(
+                  'Good luck!',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.green,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
