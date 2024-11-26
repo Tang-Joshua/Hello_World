@@ -3,6 +3,8 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:collection';
 
+import '../Graph_Choices.dart';
+
 class Node {
   int value;
   Node? left;
@@ -66,6 +68,7 @@ class StarGameApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Space Constellation Game',
       theme: ThemeData(
         brightness: Brightness.dark,
@@ -133,8 +136,10 @@ class MainMenuScreen extends StatelessWidget {
                 _buildMenuButton(
                   text: "Exit",
                   onTap: () {
-                    Navigator.pop(
-                        context); // Exit the app (or close the screen).
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => GraphChoices()),
+                    ); // Exit the app (or close the screen).
                   },
                 ),
               ],
@@ -268,35 +273,135 @@ class HowToPlayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("How to Play")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "How to Play:",
-              style: TextStyle(
-                  fontSize: 24,
+      appBar: AppBar(
+        title: Text(
+          'How to Play',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.black,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Section Title
+              Text(
+                'How to Play',
+                style: TextStyle(
+                  fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white),
-            ),
-            SizedBox(height: 10),
-            Text(
-              "1. Select the correct nodes in the order of breadth-first traversal.\n"
-              "2. The game ends if you make a mistake or time runs out.\n"
-              "3. Have fun!",
+                  color: Colors.deepPurpleAccent,
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // Gameplay Explanation
+              Text(
+                'The Space Constellation Game challenges you to build a binary tree by selecting nodes in the correct order of breadth-first traversal.',
+                style: TextStyle(fontSize: 16, color: Colors.white70),
+              ),
+              SizedBox(height: 20),
+
+              // Instructions List
+              Text(
+                'Instructions:',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 10),
+              _buildInstructionItem(
+                context,
+                'Start the game by selecting your preferred difficulty level: Easy, Medium, or Hard.',
+              ),
+              _buildInstructionItem(
+                context,
+                'Nodes will appear on the screen. Select them in the correct order according to breadth-first traversal.',
+              ),
+              _buildInstructionItem(
+                context,
+                'If you select a node in the wrong order or time runs out, the game will end.',
+              ),
+              _buildInstructionItem(
+                context,
+                'Successfully select all nodes in the correct order to advance to the next round.',
+              ),
+              _buildInstructionItem(
+                context,
+                'Complete all 5 rounds to win the game!',
+              ),
+
+              SizedBox(height: 30),
+
+              // Note or Tips
+              Text(
+                'Tips:',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Keep an eye on the timer! Plan your moves carefully to complete each round before time runs out.',
+                style: TextStyle(fontSize: 16, color: Colors.white70),
+              ),
+              SizedBox(height: 30),
+
+              // Back Button
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    backgroundColor: Colors.deepPurpleAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Back',
+                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper Widget for Instruction Items
+  Widget _buildInstructionItem(BuildContext context, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.star, color: Colors.deepPurpleAccent, size: 20),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
               style: TextStyle(fontSize: 16, color: Colors.white70),
             ),
-            Spacer(),
-            Center(
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text("Back"),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
