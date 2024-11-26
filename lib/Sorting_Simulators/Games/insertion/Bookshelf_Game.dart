@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
-import '../Menu_InsertionGame.dart';
+
 import '../../Sorting_Choices.dart';
 
 void main() {
@@ -187,39 +187,110 @@ class HowToPlayScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'How to Play',
-              style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Single Player Mode:',
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87),
-            ),
-            SizedBox(height: 8),
-            Text(
-              '1. Choose a difficulty level (Easy, Medium, Hard) with different time limits.\n'
-              '2. Arrange the books in the correct order (ascending or descending) within the time limit.\n'
-              '3. Reach the score goal for your selected difficulty within 12 rounds to win.\n'
-              '4. If time runs out before reaching the score goal, it’s game over.\n',
-              style:
-                  TextStyle(fontSize: 16, height: 1.5, color: Colors.black54),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Enjoy the game and test your sorting skills!',
-              style: TextStyle(fontSize: 16, color: Colors.black87),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'How to Play',
+                style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Icon(Icons.sort, color: Colors.blue, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Objective:',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Arrange the books in the correct order (Ascending or Descending) by dragging and dropping the numbers into the correct positions on the shelf.',
+                style:
+                    TextStyle(fontSize: 16, height: 1.5, color: Colors.black54),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Icon(Icons.timer, color: Colors.redAccent, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Time Limit:',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Each round has a set time limit. Finish arranging the books before the timer runs out!',
+                style:
+                    TextStyle(fontSize: 16, height: 1.5, color: Colors.black54),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Icon(Icons.score, color: Colors.green, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Scoring:',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Earn points for each correct arrangement. Reach the target score to win!',
+                style:
+                    TextStyle(fontSize: 16, height: 1.5, color: Colors.black54),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Icon(Icons.warning, color: Colors.orange, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Rules:',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                '1. You can only drag books onto empty or valid slots.\n'
+                '2. Clear the shelf to reset your arrangement if needed.\n'
+                '3. If you run out of time, the game ends.',
+                style:
+                    TextStyle(fontSize: 16, height: 1.5, color: Colors.black54),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Good luck and enjoy sorting!',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -401,10 +472,28 @@ class _GameScreenState extends State<GameScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Arrange the books in ${ascendingOrder ? "ascending" : "descending"} order.',
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Arrange the books in ',
+                    style: TextStyle(fontSize: 22, color: Colors.black54),
+                  ),
+                  TextSpan(
+                    text: ascendingOrder ? 'Ascending' : 'Descending',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: ascendingOrder ? Colors.green : Colors.red,
+                    ),
+                  ),
+                  TextSpan(
+                    text: ' order.',
+                    style: TextStyle(fontSize: 22, color: Colors.black54),
+                  ),
+                ],
+              ),
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Colors.black54),
             ),
           ),
           Text(
