@@ -14,6 +14,7 @@ class TowerOfHanoiApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       home: TowerOfHanoiScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -35,6 +36,9 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
   void initState() {
     super.initState();
     _initializeGame();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showInstructions(context); // Automatically show instructions on load
+    });
   }
 
   void _initializeGame() {
@@ -91,6 +95,109 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
           break;
       }
     });
+  }
+
+  void _showInstructions(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'How to Play Tower of Hanoi',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.blueAccent,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.swap_vert, color: Colors.green, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Game Instructions:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _buildInstructionStep(
+                icon: Icons.drag_handle,
+                text: 'Drag disks between towers following the rules.',
+                iconColor: Colors.purple,
+              ),
+              _buildInstructionStep(
+                icon: Icons.format_list_numbered,
+                text: 'Only one disk can be moved at a time.',
+                iconColor: Colors.blue,
+              ),
+              _buildInstructionStep(
+                icon: Icons.warning,
+                text:
+                    'A larger disk cannot be placed on top of a smaller disk.',
+                iconColor: Colors.red,
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Objective:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Move all disks from the first tower to the last tower, '
+                'using the middle tower as an intermediary, in as few moves as possible.',
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text(
+              'Close',
+              style: TextStyle(color: Colors.blueAccent),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInstructionStep({
+    required IconData icon,
+    required String text,
+    required Color iconColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showDifficultyDialog() {
@@ -367,25 +474,9 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
         title: Text('Tower of Hanoi'),
         actions: [
           IconButton(
-            icon: Icon(Icons.info_outline),
+            icon: Icon(Icons.help_outline),
             onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('How to Play'),
-                  content: Text(
-                    'Move all the disks from the first tower to the third tower, using the second tower as an intermediary.',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text('Close'),
-                    ),
-                  ],
-                ),
-              );
+              _showInstructions(context); // Show instructions when tapped
             },
           ),
           IconButton(
