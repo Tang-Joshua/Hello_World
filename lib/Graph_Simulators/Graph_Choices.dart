@@ -5,11 +5,11 @@ import 'package:flutterapp/Graph_Simulators/Simulator/breadth_first.dart';
 import 'package:flutterapp/Graph_Simulators/Simulator/depth_first.dart';
 import 'package:flutterapp/Graph_Simulators/learn/binary_search_learn.dart'; // Tutorial Page
 import 'package:flutterapp/main.dart';
-import 'Depth_game.dart';
+import 'Games/Depth_game.dart';
 import 'package:flutterapp/Graph_Simulators/learn/depth_search_learn.dart';
 import 'package:flutterapp/Graph_Simulators/learn/breadth_search_learn.dart';
-import 'Binary_Breadth_Game.dart';
-import 'Binary_Search_Tree_Game.dart';
+import 'Games/Binary_Breadth_Game.dart';
+import 'Games/Binary_Search_Tree_Game.dart';
 
 class GraphChoices extends StatefulWidget {
   const GraphChoices({Key? key}) : super(key: key);
