@@ -404,7 +404,7 @@ class _SplittingGameState extends State<SplittingGame> {
           onTap: () => onGapTap(i),
           child: AnimatedContainer(
             duration: Duration(milliseconds: 300),
-            width: gaps[i] == "-" ? 40 : 5,
+            width: gaps[i] == "-" ? 100 : 10,
             height: 40,
             color: gaps[i] == "-" ? Colors.transparent : Colors.grey[400],
             margin: EdgeInsets.symmetric(horizontal: 4),
