@@ -21,16 +21,9 @@ class GraphChoices extends StatefulWidget {
 class _GraphChoices extends State<GraphChoices> {
   int _current = 0;
   dynamic _selectedIndex = {};
-
-  final List<Color> _backgroundColors = [
-    const Color.fromARGB(255, 255, 205, 202),
-    const Color.fromARGB(255, 193, 255, 195),
-    const Color.fromARGB(255, 152, 240, 255),
-  ];
-
   var text = "??";
 
-  List<dynamic> _products = [
+  final List<dynamic> _products = [
     {
       'title': 'Binary Search Tree',
       'image': 'assets/Tree_img.png',
@@ -65,7 +58,6 @@ class _GraphChoices extends State<GraphChoices> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Tutorial Button
                 SizedBox(height: 20),
                 TextButton(
                   style: ButtonStyle(
@@ -117,7 +109,6 @@ class _GraphChoices extends State<GraphChoices> {
                     ),
                   ),
                 ),
-                // Simulation Button
                 SizedBox(height: 20),
                 TextButton(
                   style: ButtonStyle(
@@ -169,7 +160,6 @@ class _GraphChoices extends State<GraphChoices> {
                     ),
                   ),
                 ),
-                // Game Button (Placeholder or Other Future Feature)
                 SizedBox(height: 20),
                 TextButton(
                   style: ButtonStyle(
@@ -197,8 +187,6 @@ class _GraphChoices extends State<GraphChoices> {
                             builder: (context) => DepthGamePage()),
                       );
                     }
-
-                    // Placeholder for future game functionality
                   },
                   child: Container(
                     width: 230,
@@ -237,50 +225,35 @@ class _GraphChoices extends State<GraphChoices> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Set background to pure white
-      floatingActionButton: _selectedIndex.isNotEmpty
-          ? FloatingActionButton(
-              onPressed: () => _openAnimationDialog(context),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.arrow_forward_ios),
-                ],
-              ),
-            )
-          : null,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black), // Black arrow icon
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => MyApp()),
               (route) => false,
             );
-          }, // Navigate back
+          },
         ),
         title: Text(
-          'Sorting Algorithms',
-          style: TextStyle(
-            color: Colors.black,
-          ),
+          'Data Structures',
+          style: TextStyle(color: Colors.black),
         ),
       ),
-
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        child: CarouselSlider.builder(
-            carouselController: CarouselSliderController(),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Carousel Slider
+          CarouselSlider.builder(
             options: CarouselOptions(
               height: 450.0,
               aspectRatio: 16 / 9,
-              viewportFraction: 0.85,
+              viewportFraction: 0.75,
               enlargeCenterPage: true,
-              pageSnapping: true,
               onPageChanged: (index, reason) {
                 setState(() {
                   _current = index;
@@ -300,10 +273,10 @@ class _GraphChoices extends State<GraphChoices> {
                     }
                     text = movie['title'];
                   });
+                  _openAnimationDialog(context);
                 },
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 300),
-                  width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -329,43 +302,61 @@ class _GraphChoices extends State<GraphChoices> {
                             )
                           ],
                   ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 320,
-                          margin: EdgeInsets.only(top: 10),
-                          clipBehavior: Clip.hardEdge,
-                          decoration: BoxDecoration(
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 320,
+                        margin: EdgeInsets.only(top: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: ClipRRect(
                             borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Image.asset(
-                            movie['image'],
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          movie['title'],
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            child: Image.asset(
+                              movie['image'],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            ),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          movie['description'],
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        movie['title'],
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               );
-            }),
+            },
+          ),
+          SizedBox(height: 16),
+
+          // Centered Page Indicator Dots
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                _products.length,
+                (index) => Container(
+                  width: 8.0,
+                  height: 8.0,
+                  margin: EdgeInsets.symmetric(horizontal: 4.0),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _current == index ? Colors.green : Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
