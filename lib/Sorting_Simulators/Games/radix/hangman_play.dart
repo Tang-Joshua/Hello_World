@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
+import '../../Sorting_Choices.dart';
+
 void main() {
   runApp(RadixSortHangmanGame());
 }
@@ -290,9 +292,8 @@ class _RadixSortScreenState extends State<RadixSortScreen> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).popUntil(
-                  (route) => route.isFirst,
-                );
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SortingChoices()));
               },
               child: Text("Quit"),
             ),
