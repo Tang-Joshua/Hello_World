@@ -107,12 +107,15 @@ class _InsertionSortPageState extends State<InsertionSortPage>
                 children: [
                   Icon(Icons.info, color: Colors.orange, size: 24),
                   const SizedBox(width: 8),
-                  const Text(
-                    'How to Use Insertion Sort Visualization:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                  Flexible(
+                    child: Text(
+                      'How to Use Insertion Sort Visualization:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      softWrap: true,
                     ),
                   ),
                 ],

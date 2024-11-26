@@ -63,12 +63,15 @@ class _StacksPageState extends State<StacksPage>
                 children: [
                   Icon(Icons.info, color: Colors.teal, size: 24),
                   const SizedBox(width: 8),
-                  const Text(
-                    'How to Use Stacks Visualization:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                  Flexible(
+                    child: Text(
+                      'How to Use Stacks Visualization:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      softWrap: true,
                     ),
                   ),
                 ],

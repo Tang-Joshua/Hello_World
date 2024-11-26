@@ -155,12 +155,15 @@ class _MergeSortPageState extends State<MergeSortPage>
                 children: [
                   Icon(Icons.info, color: Colors.blue, size: 24),
                   const SizedBox(width: 8),
-                  const Text(
-                    'How to Use Merge Sort Visualization:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                  Flexible(
+                    child: Text(
+                      'How to Use Merge Sort Visualization:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      softWrap: true,
                     ),
                   ),
                 ],
