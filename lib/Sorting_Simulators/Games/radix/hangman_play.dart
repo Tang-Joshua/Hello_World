@@ -37,6 +37,9 @@ class _RadixSortScreenState extends State<RadixSortScreen> {
   void initState() {
     super.initState();
     _startGame();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showInstructions(context); // Automatically show instructions
+    });
   }
 
   void _startGame() {
@@ -139,6 +142,138 @@ class _RadixSortScreenState extends State<RadixSortScreen> {
     );
   }
 
+  void _showInstructions(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Instructions',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.blueAccent,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Section: Objective
+              Row(
+                children: [
+                  Icon(Icons.flag, color: Colors.green, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Objective:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Sort the numbers into ascending order using the Radix Sort method.',
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+
+              // Section: How to Play
+              Row(
+                children: [
+                  Icon(Icons.play_arrow, color: Colors.blue, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'How to Play:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              _buildInstructionStep(
+                icon: Icons.drag_handle,
+                text:
+                    'Drag the numbers into the correct position for the current digit place.',
+                iconColor: Colors.orange,
+              ),
+              _buildInstructionStep(
+                icon: Icons.loop,
+                text: 'Repeat for each digit place (ones, tens, hundreds).',
+                iconColor: Colors.green,
+              ),
+              const SizedBox(height: 16),
+
+              // Section: Rules
+              Row(
+                children: [
+                  Icon(Icons.rule, color: Colors.red, size: 24),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Rules:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              _buildInstructionStep(
+                icon: Icons.warning,
+                text: 'You have ${_maxMistakes} chances to make mistakes.',
+                iconColor: Colors.red,
+              ),
+              _buildInstructionStep(
+                icon: Icons.timer,
+                text: 'Complete the game within the allowed mistakes to win.',
+                iconColor: Colors.blue,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              'Close',
+              style: TextStyle(color: Colors.blueAccent),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInstructionStep({
+    required IconData icon,
+    required String text,
+    required Color iconColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _confirmQuitGame() {
     showDialog(
       context: context,
@@ -196,6 +331,12 @@ class _RadixSortScreenState extends State<RadixSortScreen> {
           IconButton(
             icon: Icon(Icons.exit_to_app),
             onPressed: _confirmQuitGame,
+          ),
+          IconButton(
+            icon: Icon(Icons.help_outline),
+            onPressed: () {
+              _showInstructions(context); // Show instructions when tapped
+            },
           ),
         ],
       ),
