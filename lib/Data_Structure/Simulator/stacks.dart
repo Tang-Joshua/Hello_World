@@ -342,64 +342,12 @@ class _StacksPageState extends State<StacksPage>
             icon: const Icon(Icons.help_outline),
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60.0),
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 6,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: TabBar(
-                controller: _tabController,
-                indicator: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 2,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                labelPadding: const EdgeInsets.symmetric(horizontal: 20.0),
-                tabs: [
-                  Tab(
-                    child: Text(
-                      'Simulate',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
           _buildSimulateTab(),
-          const Center(
-            child: Text(
-              'This feature is under construction.',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
-            ),
-          ),
+          // Center(child: Text('Tab 2 Content')), // Unused second tab
         ],
       ),
     );

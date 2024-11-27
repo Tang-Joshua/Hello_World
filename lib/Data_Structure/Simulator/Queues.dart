@@ -8,21 +8,17 @@ class QueuesPage extends StatefulWidget {
   State<QueuesPage> createState() => _QueuesPageState();
 }
 
-class _QueuesPageState extends State<QueuesPage>
-    with SingleTickerProviderStateMixin {
+class _QueuesPageState extends State<QueuesPage> {
   List<int> queue = [];
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   final TextEditingController _inputController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  late TabController _tabController;
   Color _visualizationBorderColor = Colors.grey;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInstructions();
     });
@@ -30,7 +26,6 @@ class _QueuesPageState extends State<QueuesPage>
 
   @override
   void dispose() {
-    _tabController.dispose();
     _inputController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -58,7 +53,6 @@ class _QueuesPageState extends State<QueuesPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Section Title
               Row(
                 children: [
                   Icon(Icons.info, color: Colors.indigo, size: 24),
@@ -77,8 +71,6 @@ class _QueuesPageState extends State<QueuesPage>
                 ],
               ),
               const SizedBox(height: 12),
-
-              // Step-by-step Instructions
               _buildSteps(
                 icon: Icons.add_box,
                 text: 'Enqueue: Adds a new item to the end of the queue.',
@@ -93,45 +85,6 @@ class _QueuesPageState extends State<QueuesPage>
                 icon: Icons.casino,
                 text:
                     'Randomize Input: Automatically fills the queue with random numbers.',
-                iconColor: Colors.purple,
-              ),
-              const SizedBox(height: 16),
-
-              // Button Guide
-              Row(
-                children: [
-                  Icon(Icons.help_outline, color: Colors.indigo, size: 24),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Button Guide:',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _buildButtonGuide(
-                icon: Icons.add_box,
-                label: 'Enqueue',
-                description: 'Adds a new item to the back of the queue.',
-                backgroundColor: Colors.green[100]!,
-                iconColor: Colors.green,
-              ),
-              _buildButtonGuide(
-                icon: Icons.remove_circle,
-                label: 'Dequeue',
-                description: 'Removes the front item from the queue.',
-                backgroundColor: Colors.red[100]!,
-                iconColor: Colors.red,
-              ),
-              _buildButtonGuide(
-                icon: Icons.casino,
-                label: 'Randomize Input',
-                description: 'Fills the queue with random items.',
-                backgroundColor: Colors.purple[100]!,
                 iconColor: Colors.purple,
               ),
             ],
@@ -165,51 +118,6 @@ class _QueuesPageState extends State<QueuesPage>
             child: Text(
               text,
               style: const TextStyle(fontSize: 14, color: Colors.black87),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-// Helper to build the button guide with colored background
-  Widget _buildButtonGuide({
-    required IconData icon,
-    required String label,
-    required String description,
-    required Color backgroundColor,
-    required Color iconColor,
-  }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: iconColor, size: 28),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: const TextStyle(fontSize: 14, color: Colors.black54),
-                ),
-              ],
             ),
           ),
         ],
@@ -348,132 +256,85 @@ class _QueuesPageState extends State<QueuesPage>
             icon: const Icon(Icons.help_outline, color: Colors.black),
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60.0),
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 6,
-                      offset: Offset(0, 3)),
-                ],
-              ),
-              child: TabBar(
-                controller: _tabController,
-                indicator: BoxDecoration(
-                  color: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                IconButton(
+                  onPressed: _autoGenerateInput,
+                  icon: const Icon(Icons.casino, color: Colors.blue),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: _inputController,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter numbers (comma or space-separated)',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Queue Visualization:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border:
+                      Border.all(color: _visualizationBorderColor, width: 2),
                   borderRadius: BorderRadius.circular(8),
+                  color: Colors.white,
                   boxShadow: const [
                     BoxShadow(
                         color: Colors.black12,
-                        blurRadius: 2,
-                        offset: Offset(0, 2)),
+                        blurRadius: 4,
+                        offset: Offset(2, 2)),
                   ],
                 ),
-                labelPadding: const EdgeInsets.symmetric(horizontal: 20.0),
-                tabs: const [
-                  Tab(
-                    child: Text('Simulate',
-                        style: TextStyle(color: Colors.blue, fontSize: 16)),
+                child: Center(
+                  child: AnimatedList(
+                    key: _listKey,
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    initialItemCount: queue.length,
+                    itemBuilder: (context, index, animation) {
+                      return _buildItem(queue[index], animation);
+                    },
                   ),
-                ],
+                ),
               ),
             ),
-          ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: enqueue,
+                  icon: const Icon(Icons.add, color: Colors.white),
+                  label: const Text('Enqueue',
+                      style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                ),
+                ElevatedButton.icon(
+                  onPressed: dequeue,
+                  icon: const Icon(Icons.remove, color: Colors.white),
+                  label: const Text('Dequeue',
+                      style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                ),
+              ],
+            ),
+          ],
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildSimulateTab(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSimulateTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              IconButton(
-                onPressed: _autoGenerateInput,
-                icon: const Icon(Icons.casino, color: Colors.blue),
-              ),
-              Expanded(
-                child: TextField(
-                  controller: _inputController,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter numbers (comma or space-separated)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'Queue Visualization:',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                border: Border.all(color: _visualizationBorderColor, width: 2),
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.white,
-                boxShadow: const [
-                  BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                      offset: Offset(2, 2)),
-                ],
-              ),
-              child: Center(
-                child: AnimatedList(
-                  key: _listKey,
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  initialItemCount: queue.length,
-                  itemBuilder: (context, index, animation) {
-                    return _buildItem(queue[index], animation);
-                  },
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton.icon(
-                onPressed: enqueue,
-                icon: const Icon(Icons.add, color: Colors.white),
-                label: const Text('Enqueue',
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-              ),
-              ElevatedButton.icon(
-                onPressed: dequeue,
-                icon: const Icon(Icons.remove, color: Colors.white),
-                label: const Text('Dequeue',
-                    style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

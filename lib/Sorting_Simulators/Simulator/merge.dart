@@ -391,7 +391,6 @@ class _MergeSortPageState extends State<MergeSortPage>
         controller: _tabController,
         children: [
           _buildVisualizationTab(),
-          _buildInstructionsTab(),
         ],
       ),
     );
@@ -443,29 +442,6 @@ class _MergeSortPageState extends State<MergeSortPage>
           ),
           const SizedBox(height: 10),
           _buildVisualizationContainer(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInstructionsTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            'Instructions:',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8),
-          Text(
-            '1. Enter numbers separated by commas and press the check button.\n'
-            '2. Use the random button to generate random numbers.\n'
-            '3. Press play to start the merge sort visualization.\n'
-            '4. Use the clear button to reset the visualization.\n',
-            style: TextStyle(fontSize: 14),
-          ),
         ],
       ),
     );

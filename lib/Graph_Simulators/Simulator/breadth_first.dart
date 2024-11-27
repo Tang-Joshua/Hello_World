@@ -537,7 +537,7 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
               controller: _tabController,
               children: [
                 _buildBinarySearchTab(),
-                _buildInstructionsTab(),
+                // _buildInstructionsTab(),
               ],
             ),
           ),
@@ -673,30 +673,30 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
     );
   }
 
-  Widget _buildInstructionsTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            'How to Use:',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8),
-          Text(
-            '1. Use the text boxes to edit node values directly.\n'
-            '2. Click the + icons to add nodes.\n'
-            '3. Click the - icons to delete nodes.\n'
-            '4. Use the "Convert" button to lock in values and create the tree.\n'
-            '5. Use "BFS Traversal" to perform a breadth-first traversal.\n'
-            '6. Use "Clear" to reset and start again.\n',
-            style: TextStyle(fontSize: 14),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildInstructionsTab() {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(16.0),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: const [
+  //         Text(
+  //           'How to Use:',
+  //           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //         ),
+  //         SizedBox(height: 8),
+  //         Text(
+  //           '1. Use the text boxes to edit node values directly.\n'
+  //           '2. Click the + icons to add nodes.\n'
+  //           '3. Click the - icons to delete nodes.\n'
+  //           '4. Use the "Convert" button to lock in values and create the tree.\n'
+  //           '5. Use "BFS Traversal" to perform a breadth-first traversal.\n'
+  //           '6. Use "Clear" to reset and start again.\n',
+  //           style: TextStyle(fontSize: 14),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
 
 class TreePainter extends CustomPainter {

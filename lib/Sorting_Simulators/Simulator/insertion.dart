@@ -335,10 +335,10 @@ class _InsertionSortPageState extends State<InsertionSortPage>
         controller: _tabController,
         children: [
           _buildSimulateTab(),
-          const Center(
-            child: Text('Instructions are under construction.',
-                style: TextStyle(fontSize: 18, color: Colors.grey)),
-          ),
+          // const Center(
+          //   child: Text('Instructions are under construction.',
+          //       style: TextStyle(fontSize: 18, color: Colors.grey)),
+          // ),
         ],
       ),
     );
@@ -368,9 +368,9 @@ class _InsertionSortPageState extends State<InsertionSortPage>
           ),
           tabs: const [
             Tab(child: Text('Simulate', style: TextStyle(color: Colors.blue))),
-            Tab(
-                child: Text('I\'ll Take a Shot',
-                    style: TextStyle(color: Colors.grey))),
+            // Tab(
+            //     child: Text('I\'ll Take a Shot',
+            //         style: TextStyle(color: Colors.grey))),
           ],
         ),
       ),
