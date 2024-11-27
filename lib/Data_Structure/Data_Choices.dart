@@ -142,8 +142,7 @@ class _DataChoices extends State<DataChoices> {
                     if (text == "Queues") {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => CardBattleGame()),
+                        MaterialPageRoute(builder: (context) => FifoGameApp()),
                       );
                     } else if (text == "Stacks") {
                       Navigator.push(

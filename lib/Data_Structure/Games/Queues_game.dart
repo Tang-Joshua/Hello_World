@@ -1,379 +1,491 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutterapp/Data_Structure/Data_Choices.dart';
+import 'dart:async';
+import 'dart:math';
 
-void main() {
-  runApp(CardBattleGame());
-}
+import '../Data_Choices.dart';
 
-class CardBattleGame extends StatelessWidget {
+void main() => runApp(FifoGameApp());
+
+class FifoGameApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: GameScreen(),
+      home: FifoGame(),
     );
   }
 }
 
-class GameScreen extends StatefulWidget {
+class FifoGame extends StatefulWidget {
   @override
-  _GameScreenState createState() => _GameScreenState();
+  _FifoGameState createState() => _FifoGameState();
 }
 
-class _GameScreenState extends State<GameScreen> {
-  List<CardModel> player1Deck = generateBalancedDeck();
-  List<CardModel> player2Deck = generateBalancedDeck();
-  int player1Score = 0;
-  int player2Score = 0;
-  int turn = 1;
-  CardModel? player1SelectedCard;
-  CardModel? player2SelectedCard;
-  List<CardModel>? player1Hand;
-  List<CardModel>? player2Hand;
-  bool isPlayer2CardHidden = true;
-  bool isCardSelectionLocked = false;
-  String message = "";
+class _FifoGameState extends State<FifoGame> {
+  List<Map<String, dynamic>> queue = [];
+  int score = 0;
+  int lives = 3;
+  bool isGameOver = false;
+  bool gameStarted = false; // Tracks if the game has started
+  late Timer itemAdder;
+  late Timer countdownTimer;
+  int timeLeft = 60;
+  String currentInstruction = "";
+  final Random random = Random();
+
+  // List of card suits
+  final List<String> cardSuits = ['♥', '♠', '♣', '♦'];
 
   @override
   void initState() {
     super.initState();
-    drawHands();
+    generateNewInstruction();
   }
 
-  void drawHands() {
-    if (player1Deck.length >= 2 && player2Deck.length >= 2 && turn <= 10) {
-      setState(() {
-        player1Hand = [player1Deck.removeLast(), player1Deck.removeLast()];
-        player2Hand = [player2Deck.removeLast(), player2Deck.removeLast()];
-        player1SelectedCard = null;
-        player2SelectedCard = null;
-        isPlayer2CardHidden = true;
-        isCardSelectionLocked = false;
-        message = "Turn $turn: Choose a card to play!";
-      });
-    } else {
-      _showGameOverDialog();
-    }
-  }
-
-  void playTurn() {
-    if (player1SelectedCard != null && player2SelectedCard != null) {
-      setState(() {
-        isCardSelectionLocked = true;
-
-        int player1InitialHealth = player1SelectedCard!.health;
-        int player2InitialHealth = player2SelectedCard!.health;
-
-        player1SelectedCard!.health -= player2SelectedCard!.attack;
-        player2SelectedCard!.health -= player1SelectedCard!.attack;
-
-        if (player1SelectedCard!.health > 0 &&
-            player2SelectedCard!.health <= 0) {
-          player1Score++;
-          message = "Turn $turn Winner: Player 1 wins this round!";
-        } else if (player2SelectedCard!.health > 0 &&
-            player1SelectedCard!.health <= 0) {
-          player2Score++;
-          message = "Turn $turn Winner: Player 2 (AI) wins this round!";
-        } else if (player1SelectedCard!.health > 0 &&
-            player2SelectedCard!.health > 0) {
-          message = "Turn $turn: It's a tie! Both cards survived.";
-        } else {
-          message = "Turn $turn: Both cards were defeated!";
-        }
-
-        player1SelectedCard!.health = player1InitialHealth;
-        player2SelectedCard!.health = player2InitialHealth;
-
-        turn++;
-        drawHands();
-      });
-    }
-  }
-
-  void selectCardForPlayer1(CardModel card) {
-    if (!isCardSelectionLocked) {
-      setState(() {
-        player1SelectedCard = card;
-        chooseCardForAI();
-        isPlayer2CardHidden = false;
-        isCardSelectionLocked = true;
-      });
-    }
-  }
-
-  void chooseCardForAI() {
-    player2SelectedCard =
-        player2Hand!.reduce((a, b) => a.attack >= b.attack ? a : b);
-  }
-
-  void resetGame() {
+  void startGame() {
     setState(() {
-      player1Deck = generateBalancedDeck();
-      player2Deck = generateBalancedDeck();
-      player1Score = 0;
-      player2Score = 0;
-      turn = 1;
-      player1SelectedCard = null;
-      player2SelectedCard = null;
-      player1Hand = null;
-      player2Hand = null;
-      isPlayer2CardHidden = true;
-      isCardSelectionLocked = false;
-      message = "";
-      drawHands();
+      gameStarted = true;
+    });
+
+    // Start adding cards periodically
+    itemAdder = Timer.periodic(Duration(seconds: 2), (timer) {
+      if (!isGameOver && queue.length < 5) {
+        setState(() {
+          String suit = cardSuits[random.nextInt(cardSuits.length)];
+          queue.add({
+            'suit': suit,
+            'color': (suit == '♥' || suit == '♦') ? Colors.red : Colors.black,
+          });
+        });
+
+        if (queue.length == 5) {
+          endGameWithMessage('Queue overflowed! The limit is 4 cards.');
+        }
+      }
+    });
+
+    // Start the countdown timer
+    countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (!isGameOver) {
+        setState(() {
+          timeLeft--;
+          if (timeLeft <= 0) {
+            endGame();
+          }
+        });
+      }
     });
   }
 
-  void _showGameOverDialog() {
-    String winner;
-    if (player1Score > player2Score) {
-      winner = "Player 1 Wins!";
-    } else if (player2Score > player1Score) {
-      winner = "Player 2 (AI) Wins!";
-    } else {
-      winner = "It's a Draw!";
-    }
-
+  void showInstructions() {
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Game Over"),
-          content: Text(
-              "Final Score:\nPlayer 1: $player1Score\nPlayer 2: $player2Score\n\n$winner"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                resetGame();
-              },
-              child: Text("Restart"),
+      barrierDismissible: true,
+      builder: (context) => AlertDialog(
+        title: Center(
+          child: Text(
+            '🎮 How to Play',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              color: Colors.blue,
             ),
-          ],
-        );
-      },
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '📜 Instructions:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+              SizedBox(height: 10),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black),
+                  children: [
+                    TextSpan(text: '1️⃣ '),
+                    TextSpan(
+                      text:
+                          'Follow the instructions shown at the top of the screen ',
+                      style: TextStyle(color: Colors.green[800]),
+                    ),
+                    TextSpan(
+                      text: '(e.g., Remove Card: ♥).\n\n',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    TextSpan(text: '2️⃣ '),
+                    TextSpan(
+                      text: 'Tap the ',
+                      style: TextStyle(color: Colors.blue[800]),
+                    ),
+                    TextSpan(
+                      text: '"Remove Latest Card" ',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.red),
+                    ),
+                    TextSpan(
+                      text: 'button to remove the latest card.\n\n',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    TextSpan(text: '3️⃣ '),
+                    TextSpan(
+                      text: 'Manage the queue carefully ',
+                      style: TextStyle(color: Colors.orange[800]),
+                    ),
+                    TextSpan(
+                      text:
+                          '(max 4 cards allowed). If it reaches 5, you lose immediately!\n\n',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    TextSpan(text: '4️⃣ '),
+                    TextSpan(
+                      text: 'If you make a mistake, you lose a heart ',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    TextSpan(
+                      text: 'and the latest card is still removed.\n\n',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    TextSpan(text: '🎯 '),
+                    TextSpan(
+                      text: 'Goal: ',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent),
+                    ),
+                    TextSpan(
+                      text:
+                          'Get the highest score by removing the correct cards!',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Got It!',
+              style: TextStyle(color: Colors.green, fontSize: 18),
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  void generateNewInstruction() {
+    setState(() {
+      List<String> instructions = ['♥', '♠', '♣', '♦', 'Any'];
+      currentInstruction = instructions[random.nextInt(instructions.length)];
+    });
+  }
+
+  void processItem() {
+    if (queue.isEmpty) return;
+
+    setState(() {
+      Map<String, dynamic> latestItem = queue.last;
+
+      if (_doesItemMatchInstruction(latestItem)) {
+        // Correct match: Remove the latest card and update score
+        queue.removeLast();
+        score++;
+        generateNewInstruction();
+      } else {
+        // Mistake: Remove the latest card and lose a heart
+        queue.removeLast();
+        lives--;
+
+        if (lives == 0) {
+          endGame();
+        }
+      }
+    });
+  }
+
+  bool _doesItemMatchInstruction(Map<String, dynamic> item) {
+    if (currentInstruction == 'Any') return true;
+    return item['suit'] == currentInstruction;
+  }
+
+  void endGame() {
+    setState(() {
+      isGameOver = true;
+    });
+    itemAdder.cancel();
+    countdownTimer.cancel();
+  }
+
+  void endGameWithMessage(String message) {
+    setState(() {
+      isGameOver = true;
+    });
+    itemAdder.cancel();
+    countdownTimer.cancel();
+  }
+
+  @override
+  void dispose() {
+    if (gameStarted) {
+      itemAdder.cancel();
+      countdownTimer.cancel();
+    }
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green[800],
+      backgroundColor: Colors.green[700],
       appBar: AppBar(
-        title: Text("Turn-Based Card Game"),
-        backgroundColor: Colors.green[700],
+        title:
+            Text('FIFO Delivery Line', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        backgroundColor: Colors.black,
         actions: [
           IconButton(
-            icon: Icon(Icons.info_outline),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('How to Play'),
-                  content: Text(
-                    'Each player selects a card to play. The card with higher attack and health wins the round.',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text('Close'),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DataChoices()),
-              );
-            },
+            icon: Icon(Icons.help_outline, color: Colors.white),
+            onPressed: showInstructions,
           ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "Turn: $turn",
-            style: TextStyle(color: Colors.white, fontSize: 24),
-          ),
-          SizedBox(height: 10),
-          Text(
-            message,
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Column(
-                children: [
-                  Text(
-                    "Player 1",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  Text(
-                    "Score: $player1Score",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  Row(
-                    children: player1Hand?.map((card) {
-                          return GestureDetector(
-                            onTap: () => selectCardForPlayer1(card),
-                            child: CardWidget(
-                              card: card,
-                              isSelected: card == player1SelectedCard,
-                            ),
-                          );
-                        }).toList() ??
-                        [],
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    "Player 2 (AI)",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  Text(
-                    "Score: $player2Score",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  Row(
+      body: isGameOver
+          ? buildGameOverScreen()
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.only(top: 8.0, left: 16.0, right: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      if (player2SelectedCard != null && !isPlayer2CardHidden)
-                        CardWidget(card: player2SelectedCard!)
-                      else
+                      Row(
+                        children: [
+                          Icon(Icons.timer, color: Colors.white, size: 20),
+                          SizedBox(width: 4),
+                          Text('$timeLeft',
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.white)),
+                        ],
+                      ),
+                      Row(
+                        children: List.generate(
+                          3,
+                          (index) => Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 2.0),
+                            child: Icon(
+                              Icons.favorite,
+                              color: index < lives ? Colors.red : Colors.grey,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Icon(Icons.score, color: Colors.white, size: 20),
+                          SizedBox(width: 4),
+                          Text('$score',
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.white)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 110), // Added space above "Remove Card"
+                if (gameStarted) // Show "Remove Card" only after the game starts
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Remove Card:',
+                          style: TextStyle(
+                              fontSize: 22,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(width: 10),
                         Container(
-                          width: 100,
-                          height: 150,
+                          width: 40,
+                          height: 60,
                           decoration: BoxDecoration(
-                            color: Colors.grey[700],
-                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            border: Border.all(color: Colors.black, width: 2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            currentInstruction,
+                            style: TextStyle(
+                              fontSize: currentInstruction == 'Any'
+                                  ? 16
+                                  : 28, // Smaller size for "Any"
+                              fontWeight: FontWeight.bold,
+                              color: (currentInstruction == '♥' ||
+                                      currentInstruction == '♦')
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                if (!gameStarted) // Show Start Button initially
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: startGame,
+                      style: ElevatedButton.styleFrom(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                        backgroundColor: Colors.green,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text('Start Game',
+                          style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                    ),
+                  ),
+                if (gameStarted) // Show Cards and Remove Button only after starting
+                  ...[
+                  SizedBox(height: 70),
+                  Container(
+                    height: 150,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: queue.length,
+                      itemBuilder: (context, index) {
+                        bool isLatest = index == queue.length - 1;
+                        return Container(
+                          width: 100,
+                          margin: EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: isLatest
+                                ? Border.all(color: Colors.blueAccent, width: 3)
+                                : null,
                             boxShadow: [
-                              BoxShadow(color: Colors.black26, blurRadius: 5)
+                              BoxShadow(
+                                color: Colors.black38,
+                                blurRadius: 8,
+                                offset: Offset(3, 3),
+                              ),
                             ],
                           ),
                           child: Center(
                             child: Text(
-                              "Hidden",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16),
+                              queue[index]['suit'],
+                              style: TextStyle(
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                                color: queue[index][
+                                    'color'], // Red for hearts/diamonds, Black for clubs/spades
+                              ),
                             ),
                           ),
-                        ),
-                    ],
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 100),
+                  ElevatedButton(
+                    onPressed: processItem,
+                    style: ElevatedButton.styleFrom(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Text('Remove Latest Card',
+                        style: TextStyle(fontSize: 18, color: Colors.white)),
                   ),
                 ],
-              ),
-            ],
-          ),
-          SizedBox(height: 30),
-          ElevatedButton(
-            onPressed:
-                player1SelectedCard != null && player2SelectedCard != null
-                    ? playTurn
-                    : null,
-            child: Text("Play Turn"),
-          ),
-          ElevatedButton(
-            onPressed: resetGame,
-            child: Text("Restart Game"),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red[400]),
-          ),
-        ],
-      ),
+              ],
+            ),
     );
   }
-}
 
-class CardModel {
-  final String name;
-  final int attack;
-  int health;
-  final Color color;
-
-  CardModel({
-    required this.name,
-    required this.attack,
-    required this.health,
-    required this.color,
-  });
-}
-
-class CardWidget extends StatelessWidget {
-  final CardModel card;
-  final bool isSelected;
-
-  CardWidget({required this.card, this.isSelected = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 100,
-      height: 150,
-      margin: EdgeInsets.symmetric(horizontal: 5),
-      padding: EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.yellow : card.color,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5)],
-        border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
-      ),
+  Widget buildGameOverScreen() {
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            card.name,
+            '💔 Game Over! 💔',
             style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           SizedBox(height: 10),
+          Text('Final Score: $score',
+              style: TextStyle(fontSize: 24, color: Colors.white)),
+          SizedBox(height: 20),
           Text(
-            "ATK: ${card.attack}",
-            style: TextStyle(color: Colors.white, fontSize: 14),
+            'Better luck next time! 🎲',
+            style: TextStyle(
+                fontSize: 16,
+                color: Colors.white70,
+                fontStyle: FontStyle.italic),
           ),
-          Text(
-            "HP: ${card.health}",
-            style: TextStyle(color: Colors.white, fontSize: 14),
+          SizedBox(height: 30),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    resetGame();
+                  });
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                child: Text('Retry',
+                    style: TextStyle(fontSize: 18, color: Colors.white)),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => DataChoices())),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent),
+                child: Text('Bakc to Menu',
+                    style: TextStyle(fontSize: 18, color: Colors.white)),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
-}
 
-// Function to generate balanced decks
-List<CardModel> generateBalancedDeck() {
-  List<CardModel> deck = [];
-  List<Color> colors = [
-    Colors.blue,
-    Colors.red,
-    Colors.orange,
-    Colors.purple,
-    Colors.cyan
-  ];
-  Random random = Random();
-
-  for (int i = 0; i < 10; i++) {
-    int attack = random.nextInt(5) + 5;
-    int health = random.nextInt(5) + 5;
-    deck.add(CardModel(
-      name: "Card ${i + 1}",
-      attack: attack,
-      health: health,
-      color: colors[random.nextInt(colors.length)],
-    ));
+  void resetGame() {
+    queue.clear();
+    score = 0;
+    lives = 3;
+    timeLeft = 60;
+    isGameOver = false;
+    gameStarted = false; // Reset the game state
+    generateNewInstruction();
   }
-
-  return deck;
 }
