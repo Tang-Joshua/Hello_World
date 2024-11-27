@@ -252,6 +252,16 @@ class _FifoGameState extends State<FifoGame> {
     return Scaffold(
       backgroundColor: Colors.green[700],
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        DataChoices())); // Go back to the previous screen
+          },
+        ),
         title:
             Text('FIFO Delivery Line', style: TextStyle(color: Colors.white)),
         centerTitle: true,

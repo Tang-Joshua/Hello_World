@@ -23,6 +23,8 @@ class _DepthGamePageState extends State<DepthGamePage> {
 
   late List<List<Color>> grid;
   int remainingMoves = maxMoves;
+  bool isAnimating = false; // Disable buttons during animation
+  bool showTopLeftBorder = true; // Show border for top-left cell initially
 
   @override
   void initState() {
@@ -46,40 +48,73 @@ class _DepthGamePageState extends State<DepthGamePage> {
     );
   }
 
-  void _floodFill(int x, int y, Color targetColor, Color replacementColor) {
-    if (x < 0 ||
-        x >= gridSize ||
-        y < 0 ||
-        y >= gridSize ||
-        grid[x][y] != targetColor ||
-        grid[x][y] == replacementColor) {
-      return;
+  Future<void> _waveFloodFill(
+      int x, int y, Color targetColor, Color replacementColor) async {
+    if (targetColor == replacementColor) return;
+
+    setState(() {
+      isAnimating = true;
+    });
+
+    List<List<bool>> visited =
+        List.generate(gridSize, (_) => List.filled(gridSize, false));
+
+    int animatedCells = 0; // Counter for animated cells
+
+    Future<void> floodCell(int x, int y, int delay) async {
+      if (x < 0 ||
+          x >= gridSize ||
+          y < 0 ||
+          y >= gridSize ||
+          visited[x][y] ||
+          grid[x][y] != targetColor) {
+        return;
+      }
+
+      visited[x][y] = true;
+
+      await Future.delayed(Duration(milliseconds: delay));
+
+      setState(() {
+        grid[x][y] = replacementColor;
+      });
+
+      animatedCells++;
+
+      // Adjust delay dynamically based on the number of animated cells
+      int nextDelay = max(10, delay - (animatedCells ~/ 5)); // Minimum 10ms
+
+      await floodCell(x + 1, y, nextDelay);
+      await floodCell(x - 1, y, nextDelay);
+      await floodCell(x, y + 1, nextDelay);
+      await floodCell(x, y - 1, nextDelay);
     }
 
-    grid[x][y] = replacementColor;
+    await floodCell(x, y, 50); // Start with an initial delay of 50ms
 
-    _floodFill(x + 1, y, targetColor, replacementColor);
-    _floodFill(x - 1, y, targetColor, replacementColor);
-    _floodFill(x, y + 1, targetColor, replacementColor);
-    _floodFill(x, y - 1, targetColor, replacementColor);
+    setState(() {
+      isAnimating = false;
+      showTopLeftBorder = false; // Remove border after animation
+    });
+
+    if (_isGameWon()) {
+      _showEndDialog("Congratulations! You Won!");
+    } else if (remainingMoves == 0) {
+      _showEndDialog("Game Over");
+    }
   }
 
-  void _onColorSelected(Color selectedColor) {
-    if (remainingMoves <= 0) return;
+  void _onColorSelected(Color selectedColor) async {
+    if (isAnimating || remainingMoves <= 0) return;
 
     Color targetColor = grid[0][0];
     if (selectedColor == targetColor) return;
 
     setState(() {
-      _floodFill(0, 0, targetColor, selectedColor);
       remainingMoves--;
-
-      if (_isGameWon()) {
-        _showEndDialog("You Won!");
-      } else if (remainingMoves == 0) {
-        _showEndDialog("Game Over");
-      }
     });
+
+    await _waveFloodFill(0, 0, targetColor, selectedColor);
   }
 
   bool _isGameWon() {
@@ -96,18 +131,110 @@ class _DepthGamePageState extends State<DepthGamePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("How to Play"),
-        content: Text(
-          "Flood the entire grid with a single color in $maxMoves moves or less.\n\n"
-          "Tap on a color below to flood-fill the grid starting from the top-left corner.",
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        title: Center(
+          child: Column(
+            children: [
+              Icon(Icons.colorize, size: 50, color: Colors.deepPurpleAccent),
+              SizedBox(height: 10),
+              Text(
+                "How to Play",
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _instructionStep(
+                icon: Icons.color_lens,
+                iconColor: Colors.blueAccent,
+                text:
+                    "Your goal is to flood the entire grid with one color in $maxMoves moves or fewer.",
+              ),
+              SizedBox(height: 12),
+              _instructionStep(
+                icon: Icons.touch_app,
+                iconColor: Colors.orange,
+                text:
+                    "Tap on a color button below. The grid will fill in a wave-like pattern starting from the top-left corner.",
+              ),
+              SizedBox(height: 12),
+              _instructionStep(
+                icon: Icons.animation,
+                iconColor: Colors.green,
+                text:
+                    "Watch the grid animate as the colors fill up! The wave spreads dynamically.",
+              ),
+              SizedBox(height: 12),
+              _instructionStep(
+                icon: Icons.lightbulb,
+                iconColor: Colors.yellow,
+                text:
+                    "Plan your moves wisely! Fill the grid with a single color before running out of moves.",
+              ),
+              SizedBox(height: 20),
+              Center(
+                child: Text(
+                  "Good luck, and have fun!",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurple,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text("Got it!"),
+          Center(
+            child: ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurpleAccent,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+              child: Text(
+                "Start Game",
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ),
           ),
         ],
       ),
+    );
+  }
+
+// Helper widget to format each instruction step
+  Widget _instructionStep(
+      {required IconData icon,
+      required Color iconColor,
+      required String text}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 24, color: iconColor),
+        SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 16, color: Colors.black87),
+          ),
+        ),
+      ],
     );
   }
 
@@ -115,24 +242,65 @@ class _DepthGamePageState extends State<DepthGamePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              setState(() {
-                remainingMoves = maxMoves;
-                _initializeGrid();
-              });
-            },
-            child: Text("Play Again"),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        title: Center(
+          child: Text(
+            message,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: message.contains("Won") ? Colors.green : Colors.red,
+            ),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.pop(context);
-            },
-            child: Text("Exit"),
+        ),
+        actions: [
+          Center(
+            child: Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      remainingMoves = maxMoves;
+                      _initializeGrid();
+                      showTopLeftBorder = true; // Reset border for a new game
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                  child: Text(
+                    "Play Again",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                  child: Text(
+                    "Exit",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -143,50 +311,113 @@ class _DepthGamePageState extends State<DepthGamePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Color Flood Game"),
+        title: Text(
+          "Color Flood Game",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
         backgroundColor: Colors.blueAccent,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.help_outline, color: Colors.white),
+            onPressed: _showInstructions,
+          ),
+        ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: gridSize,
-              ),
-              itemCount: gridSize * gridSize,
-              itemBuilder: (context, index) {
-                int x = index ~/ gridSize;
-                int y = index % gridSize;
-                return Container(
-                  margin: EdgeInsets.all(1.0),
+          GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: gridSize,
+            ),
+            itemCount: gridSize * gridSize,
+            itemBuilder: (context, index) {
+              int x = index ~/ gridSize;
+              int y = index % gridSize;
+
+              return AnimatedContainer(
+                duration: Duration(milliseconds: 200), // Faster animation
+                margin: EdgeInsets.all(1.0),
+                decoration: BoxDecoration(
                   color: grid[x][y],
-                );
-              },
-            ),
+                  border: (x == 0 && y == 0 && showTopLeftBorder)
+                      ? Border.all(color: Colors.black, width: 3)
+                      : null,
+                ),
+              );
+            },
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: colors.map((color) {
-                return GestureDetector(
-                  onTap: () => _onColorSelected(color),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    color: color,
+          Positioned(
+            bottom: 150,
+            left: 20,
+            right: 20,
+            child: Container(
+              padding: EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10,
+                    offset: Offset(0, 5),
                   ),
-                );
-              }).toList(),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  "Moves Left: $remainingMoves",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueAccent,
+                  ),
+                ),
+              ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              "Moves Left: $remainingMoves",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold, // Makes the text bold
+          Positioned(
+            bottom: 40,
+            left: 20,
+            right: 20,
+            child: Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: colors.map((color) {
+                  return GestureDetector(
+                    onTap: isAnimating ? null : () => _onColorSelected(color),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: color,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 5,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             ),
           ),
