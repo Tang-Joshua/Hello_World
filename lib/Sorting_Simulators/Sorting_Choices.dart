@@ -235,7 +235,7 @@ class _SortingChoices extends State<SortingChoices> {
           },
         ),
         title: Text(
-          'Data Structures',
+          'Sorting Algorithms',
           style: TextStyle(color: Colors.black),
         ),
       ),

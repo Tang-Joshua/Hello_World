@@ -523,26 +523,43 @@ class _BinarySearchPageState extends State<BinarySearchPage>
   }
 
   Widget buildList() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: _userNodeValues.map((value) {
-        bool isHighlighted = _highlightedIndex != null &&
-            _userNodeValues[_highlightedIndex!] == value;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal, // Enable horizontal scrolling
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: _userNodeValues.map((value) {
+          bool isHighlighted = _highlightedIndex != null &&
+              _userNodeValues[_highlightedIndex!] == value;
 
-        return AnimatedContainer(
-          duration: const Duration(seconds: 1), // Slower duration
-          margin: const EdgeInsets.symmetric(horizontal: 4.0),
-          padding: const EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            color: isHighlighted ? Colors.lightGreenAccent : Colors.green,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            value.toString(),
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
-        );
-      }).toList(),
+          return Stack(
+            alignment: Alignment.topCenter,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(seconds: 1), // Slower duration
+                margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: isHighlighted ? Colors.lightGreenAccent : Colors.green,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  value.toString(),
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+              if (isHighlighted)
+                Positioned(
+                  top: -20, // Adjust arrow position
+                  child: const Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.orange,
+                    size: 30,
+                  ),
+                ),
+            ],
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -574,8 +591,10 @@ class _BinarySearchPageState extends State<BinarySearchPage>
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: const Text('Binary Search Tree',
-            style: TextStyle(color: Colors.black)),
+        title: const Text(
+          'Binary Search Tree',
+          style: TextStyle(color: Colors.black),
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60.0),
           child: _buildTabBar(),
@@ -599,16 +618,16 @@ class _BinarySearchPageState extends State<BinarySearchPage>
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+          const Padding(
+            padding: EdgeInsets.all(16.0),
             child: Text(
               'Node List:',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: buildList(), // Display the list with highlight effect
+            child: buildList(), // Call the updated buildList method
           ),
         ],
       ),
@@ -709,12 +728,26 @@ class _BinarySearchPageState extends State<BinarySearchPage>
           const SizedBox(height: 20),
           Expanded(
             child: _isConverted
-                ? CustomPaint(
-                    painter: TreePainter(_root, _isChecked),
-                    child: Container(),
+                ? Center(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: CustomPaint(
+                          painter: TreePainter(_root, _isChecked),
+                          child: Container(
+                            constraints: BoxConstraints(
+                              minWidth: 400,
+                              minHeight:
+                                  _calculateTreeHeight(), // Dynamically calculate height
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   )
                 : Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border.all(color: Colors.grey, width: 2),
@@ -743,6 +776,18 @@ class _BinarySearchPageState extends State<BinarySearchPage>
         ],
       ),
     );
+  }
+
+  int _getTreeDepth(TreeNode? node) {
+    if (node == null) return 0;
+    return 1 + max(_getTreeDepth(node.left), _getTreeDepth(node.right));
+  }
+
+  double _calculateTreeHeight() {
+    int depth = _getTreeDepth(_root);
+    const double nodeHeight = 80; // Vertical spacing between levels
+    const double padding = 50; // Padding for the top and bottom
+    return depth * nodeHeight + padding; // Total height based on depth
   }
 
   // Widget _buildInstructionsTab() {

@@ -249,7 +249,7 @@ class _GraphChoices extends State<GraphChoices> {
               },
             ),
             title: Text(
-              'Data Structures',
+              'Graph Algorithms',
               style: TextStyle(color: Colors.black),
             ),
           ),

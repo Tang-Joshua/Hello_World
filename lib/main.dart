@@ -138,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         crossAxisCellCount: 1,
                         mainAxisCellCount: 1,
                         child: _buildGridButton(
-                          'Graph Algorithm',
+                          'Graph Algorithms',
                           Icons.graphic_eq,
                           () {
                             print('Graph Algorithm pressed');

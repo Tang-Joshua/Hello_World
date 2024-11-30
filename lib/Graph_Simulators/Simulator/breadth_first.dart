@@ -483,25 +483,28 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
   }
 
   Widget buildBfsList() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: _bfsTraversal.map((value) {
-        bool isHighlighted = _highlightedIndex != null &&
-            _userNodeValues[_highlightedIndex!] == value;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 600),
-          margin: const EdgeInsets.symmetric(horizontal: 4.0),
-          padding: const EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            color: isHighlighted ? Colors.lightGreenAccent : Colors.green,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            value.toString(),
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
-        );
-      }).toList(),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal, // Enable horizontal scrolling
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: _bfsTraversal.map((value) {
+          bool isHighlighted = _highlightedIndex != null &&
+              _userNodeValues[_highlightedIndex!] == value;
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 600),
+            margin: const EdgeInsets.symmetric(horizontal: 4.0),
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: isHighlighted ? Colors.lightGreenAccent : Colors.green,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              value.toString(),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -551,7 +554,35 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
           if (_bfsTraversal.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: buildBfsList(),
+              child: SizedBox(
+                height: 60, // Set a fixed height for the BFS list
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: _bfsTraversal.map((value) {
+                      bool isHighlighted = _highlightedIndex != null &&
+                          _userNodeValues[_highlightedIndex!] == value;
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 600),
+                        margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          color: isHighlighted
+                              ? Colors.lightGreenAccent
+                              : Colors.green,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          value.toString(),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 16),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
             ),
         ],
       ),
@@ -638,9 +669,24 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
           const SizedBox(height: 20),
           Expanded(
             child: _isConverted
-                ? CustomPaint(
-                    painter: TreePainter(_root, _highlightedNodes),
-                    child: Container(),
+                ? Center(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: CustomPaint(
+                          painter: TreePainter(_root, _highlightedNodes),
+                          child: Container(
+                            constraints: BoxConstraints(
+                              minWidth:
+                                  400, // Minimum width for horizontal scrolling
+                              minHeight:
+                                  _calculateTreeHeight(), // Dynamically calculated height
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   )
                 : Container(
                     padding: const EdgeInsets.all(12),
@@ -671,6 +717,18 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
         ],
       ),
     );
+  }
+
+  int _getTreeDepth(TreeNode? node) {
+    if (node == null) return 0;
+    return 1 + max(_getTreeDepth(node.left), _getTreeDepth(node.right));
+  }
+
+  double _calculateTreeHeight() {
+    int depth = _getTreeDepth(_root);
+    const double nodeHeight = 80; // Vertical spacing between levels
+    const double padding = 50; // Padding for the top and bottom
+    return depth * nodeHeight + padding; // Total height based on depth
   }
 
   // Widget _buildInstructionsTab() {
