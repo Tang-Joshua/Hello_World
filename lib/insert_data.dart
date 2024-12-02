@@ -11,6 +11,11 @@ class _InsertDataScreenState extends State<InsertDataScreen> {
   final TextEditingController ageController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // Variable to hold fetched users
+  List<Map<String, dynamic>> users = [];
+  String?
+      selectedUserId; // Store the ID of the selected user for update or delete
+
   Future<void> addUser(String name, int age) async {
     try {
       print("Attempting to add user: name=$name, age=$age");
@@ -23,6 +28,7 @@ class _InsertDataScreenState extends State<InsertDataScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("User added successfully")),
       );
+      fetchUsers(); // Refresh the users list after adding a user
     } catch (e) {
       print("Error adding user: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -31,46 +37,68 @@ class _InsertDataScreenState extends State<InsertDataScreen> {
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchUsers() async {
+  Future<void> fetchUsers() async {
     try {
       QuerySnapshot snapshot = await _firestore.collection('users').get();
-      return snapshot.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
-          .toList();
+      setState(() {
+        users = snapshot.docs
+            .map((doc) => {
+                  'id': doc.id, // Save the document ID
+                  ...doc.data() as Map<String, dynamic>
+                })
+            .toList();
+      });
     } catch (e) {
       print("Error fetching users: $e");
-      return [];
     }
   }
 
-  Future<void> showUsers() async {
-    List<Map<String, dynamic>> users = await fetchUsers();
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Users List"),
-          content: users.isEmpty
-              ? Text("No users found.")
-              : SingleChildScrollView(
-                  child: Column(
-                    children: users.map((user) {
-                      return ListTile(
-                        title: Text("Name: ${user['name']}"),
-                        subtitle: Text("Age: ${user['age']}"),
-                      );
-                    }).toList(),
-                  ),
-                ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text("Close"),
-            ),
-          ],
-        );
-      },
-    );
+  Future<void> updateUser(String userId, String name, int age) async {
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'name': name,
+        'age': age,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      print("User updated successfully");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("User updated successfully")),
+      );
+      fetchUsers(); // Refresh the users list after updating
+      setState(() {
+        selectedUserId = null; // Reset selected user after update
+      });
+    } catch (e) {
+      print("Error updating user: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to update user: $e")),
+      );
+    }
+  }
+
+  Future<void> deleteUser(String userId) async {
+    try {
+      await _firestore.collection('users').doc(userId).delete();
+      print("User deleted successfully");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("User deleted successfully")),
+      );
+      fetchUsers(); // Refresh the users list after deletion
+      setState(() {
+        selectedUserId = null; // Reset selected user after deletion
+      });
+    } catch (e) {
+      print("Error deleting user: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to delete user: $e")),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUsers(); // Fetch users when the screen is first loaded
   }
 
   @override
@@ -84,6 +112,7 @@ class _InsertDataScreenState extends State<InsertDataScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Name Input Field
             TextField(
               controller: nameController,
               decoration: InputDecoration(
@@ -92,6 +121,8 @@ class _InsertDataScreenState extends State<InsertDataScreen> {
               ),
             ),
             SizedBox(height: 16),
+
+            // Age Input Field
             TextField(
               controller: ageController,
               decoration: InputDecoration(
@@ -101,29 +132,100 @@ class _InsertDataScreenState extends State<InsertDataScreen> {
               keyboardType: TextInputType.number,
             ),
             SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    String name = nameController.text.trim();
-                    int? age = int.tryParse(ageController.text.trim());
-                    if (name.isNotEmpty && age != null && age > 0) {
-                      addUser(name, age);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Please enter valid data")),
-                      );
-                    }
-                  },
-                  child: Text("Add User"),
-                ),
-                ElevatedButton(
-                  onPressed: showUsers,
-                  child: Text("Show Users"),
-                ),
-              ],
+
+            // Add User Button
+            ElevatedButton(
+              onPressed: () {
+                String name = nameController.text.trim();
+                int? age = int.tryParse(ageController.text.trim());
+                if (name.isNotEmpty && age != null && age > 0) {
+                  addUser(name, age);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Please enter valid data")),
+                  );
+                }
+              },
+              child: Text("Add User"),
             ),
+            SizedBox(height: 16),
+
+            // Data Table displaying the list of users
+            if (users.isNotEmpty) ...[
+              Text(
+                "User List:",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              SizedBox(height: 8),
+              DataTable(
+                columns: [
+                  DataColumn(label: Text('Name')),
+                  DataColumn(label: Text('Age')),
+                  DataColumn(label: Text('Actions')),
+                ],
+                rows: users.map((user) {
+                  return DataRow(cells: [
+                    DataCell(Text(user['name'] ?? 'N/A')),
+                    DataCell(Text(user['age'].toString())),
+                    DataCell(
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () {
+                              setState(() {
+                                selectedUserId = user['id']; // Select this user
+                                nameController.text = user['name'];
+                                ageController.text = user['age'].toString();
+                              });
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              deleteUser(user['id']);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]);
+                }).toList(),
+              ),
+            ] else ...[
+              Center(child: Text("No users found")),
+            ],
+
+            // Update and Delete buttons if a user is selected
+            if (selectedUserId != null) ...[
+              SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      String name = nameController.text.trim();
+                      int? age = int.tryParse(ageController.text.trim());
+                      if (name.isNotEmpty && age != null && age > 0) {
+                        updateUser(selectedUserId!, name, age);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Please enter valid data")),
+                        );
+                      }
+                    },
+                    child: Text("Update User"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      deleteUser(selectedUserId!);
+                    },
+                    child: Text("Delete User"),
+                    // style: ElevatedButton.styleFrom(primary: Colors.red),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
