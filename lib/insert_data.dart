@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class InsertDataScreen extends StatefulWidget {
   @override
@@ -10,37 +9,17 @@ class InsertDataScreen extends StatefulWidget {
 class _InsertDataScreenState extends State<InsertDataScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
-
-  // Ensure Firebase is initialized
-  @override
-  void initState() {
-    super.initState();
-    _initializeFirebase();
-  }
-
-  Future<void> _initializeFirebase() async {
-    try {
-      await Firebase.initializeApp();
-      print("Firebase initialized successfully");
-    } catch (e) {
-      print("Error initializing Firebase: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error initializing Firebase: $e")),
-      );
-    }
-  }
-
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> addUser(String name, int age) async {
     try {
       print("Attempting to add user: name=$name, age=$age");
-      await _firestore.collection('users').add({
+      DocumentReference result = await _firestore.collection('users').add({
         'name': name,
         'age': age,
         'createdAt': FieldValue.serverTimestamp(),
       });
-      print("User added successfully");
+      print("User added successfully with ID: ${result.id}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("User added successfully")),
       );
@@ -127,10 +106,9 @@ class _InsertDataScreenState extends State<InsertDataScreen> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    String name = nameController.text;
-                    int age = int.tryParse(ageController.text) ?? 0;
-
-                    if (name.isNotEmpty && age > 0) {
+                    String name = nameController.text.trim();
+                    int? age = int.tryParse(ageController.text.trim());
+                    if (name.isNotEmpty && age != null && age > 0) {
                       addUser(name, age);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
