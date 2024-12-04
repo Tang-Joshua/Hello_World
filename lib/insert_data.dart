@@ -1,96 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class InsertDataScreen extends StatefulWidget {
+class UserManagementScreen extends StatefulWidget {
   @override
-  _InsertDataScreenState createState() => _InsertDataScreenState();
+  _UserManagementScreenState createState() => _UserManagementScreenState();
 }
 
-class _InsertDataScreenState extends State<InsertDataScreen> {
+class _UserManagementScreenState extends State<UserManagementScreen> {
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController ageController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController birthController = TextEditingController();
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Variable to hold fetched users
   List<Map<String, dynamic>> users = [];
-  String?
-      selectedUserId; // Store the ID of the selected user for update or delete
-
-  Future<void> addUser(String name, int age) async {
-    try {
-      print("Attempting to add user: name=$name, age=$age");
-      DocumentReference result = await _firestore.collection('users').add({
-        'name': name,
-        'age': age,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-      print("User added successfully with ID: ${result.id}");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("User added successfully")),
-      );
-      fetchUsers(); // Refresh the users list after adding a user
-    } catch (e) {
-      print("Error adding user: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to add user: $e")),
-      );
-    }
-  }
+  String? selectedUserId;
 
   Future<void> fetchUsers() async {
     try {
-      QuerySnapshot snapshot = await _firestore.collection('users').get();
+      QuerySnapshot snapshot = await _firestore.collection('Account').get();
       setState(() {
         users = snapshot.docs
             .map((doc) => {
-                  'id': doc.id, // Save the document ID
-                  ...doc.data() as Map<String, dynamic>
+                  'id': doc.id, // Store the document ID
+                  ...doc.data() as Map<String, dynamic>,
                 })
             .toList();
       });
     } catch (e) {
       print("Error fetching users: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error fetching users: $e")),
+      );
     }
   }
 
-  Future<void> updateUser(String userId, String name, int age) async {
+  Future<void> updateUser(String userId, String username, String email,
+      String password, String birth) async {
     try {
-      await _firestore.collection('users').doc(userId).update({
-        'name': name,
-        'age': age,
-        'updatedAt': FieldValue.serverTimestamp(),
+      await _firestore.collection('Account').doc(userId).update({
+        'username': username,
+        'email': email,
+        'password': password,
+        'birth': birth,
       });
-      print("User updated successfully");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("User updated successfully")),
+        const SnackBar(content: Text("User updated successfully")),
       );
-      fetchUsers(); // Refresh the users list after updating
+      fetchUsers();
       setState(() {
-        selectedUserId = null; // Reset selected user after update
+        selectedUserId = null; // Reset selected user
       });
     } catch (e) {
       print("Error updating user: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to update user: $e")),
+        SnackBar(content: Text("Error updating user: $e")),
       );
     }
   }
 
   Future<void> deleteUser(String userId) async {
     try {
-      await _firestore.collection('users').doc(userId).delete();
-      print("User deleted successfully");
+      await _firestore.collection('Account').doc(userId).delete();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("User deleted successfully")),
+        const SnackBar(content: Text("User deleted successfully")),
       );
-      fetchUsers(); // Refresh the users list after deletion
-      setState(() {
-        selectedUserId = null; // Reset selected user after deletion
-      });
+      fetchUsers();
     } catch (e) {
       print("Error deleting user: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to delete user: $e")),
+        SnackBar(content: Text("Error deleting user: $e")),
       );
     }
   }
@@ -98,134 +78,127 @@ class _InsertDataScreenState extends State<InsertDataScreen> {
   @override
   void initState() {
     super.initState();
-    fetchUsers(); // Fetch users when the screen is first loaded
+    fetchUsers(); // Fetch all users when the screen loads
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Firestore Example"),
+        title: const Text("User Management"),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Name Input Field
+            // User Input Fields
             TextField(
               controller: nameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Name",
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
-
-            // Age Input Field
+            const SizedBox(height: 8),
             TextField(
-              controller: ageController,
-              decoration: InputDecoration(
-                labelText: "Age",
+              controller: emailController,
+              decoration: const InputDecoration(
+                labelText: "Email",
                 border: OutlineInputBorder(),
               ),
-              keyboardType: TextInputType.number,
             ),
-            SizedBox(height: 16),
-
-            // Add User Button
-            ElevatedButton(
-              onPressed: () {
-                String name = nameController.text.trim();
-                int? age = int.tryParse(ageController.text.trim());
-                if (name.isNotEmpty && age != null && age > 0) {
-                  addUser(name, age);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Please enter valid data")),
-                  );
-                }
-              },
-              child: Text("Add User"),
+            const SizedBox(height: 8),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: "Password",
+                border: OutlineInputBorder(),
+              ),
             ),
-            SizedBox(height: 16),
-
-            // Data Table displaying the list of users
-            if (users.isNotEmpty) ...[
-              Text(
-                "User List:",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            const SizedBox(height: 8),
+            TextField(
+              controller: birthController,
+              decoration: const InputDecoration(
+                labelText: "Birth (YYYY-MM-DD)",
+                border: OutlineInputBorder(),
               ),
-              SizedBox(height: 8),
-              DataTable(
-                columns: [
-                  DataColumn(label: Text('Name')),
-                  DataColumn(label: Text('Age')),
-                  DataColumn(label: Text('Actions')),
-                ],
-                rows: users.map((user) {
-                  return DataRow(cells: [
-                    DataCell(Text(user['name'] ?? 'N/A')),
-                    DataCell(Text(user['age'].toString())),
-                    DataCell(
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () {
-                              setState(() {
-                                selectedUserId = user['id']; // Select this user
-                                nameController.text = user['name'];
-                                ageController.text = user['age'].toString();
-                              });
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              deleteUser(user['id']);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ]);
-                }).toList(),
-              ),
-            ] else ...[
-              Center(child: Text("No users found")),
-            ],
+            ),
+            const SizedBox(height: 16),
 
-            // Update and Delete buttons if a user is selected
-            if (selectedUserId != null) ...[
-              SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      String name = nameController.text.trim();
-                      int? age = int.tryParse(ageController.text.trim());
-                      if (name.isNotEmpty && age != null && age > 0) {
-                        updateUser(selectedUserId!, name, age);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Please enter valid data")),
+            // Update Button
+            if (selectedUserId != null)
+              ElevatedButton(
+                onPressed: () {
+                  String username = nameController.text.trim();
+                  String email = emailController.text.trim();
+                  String password = passwordController.text.trim();
+                  String birth = birthController.text.trim();
+                  if (username.isNotEmpty &&
+                      email.isNotEmpty &&
+                      password.isNotEmpty &&
+                      birth.isNotEmpty) {
+                    updateUser(
+                        selectedUserId!, username, email, password, birth);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Please fill all fields")),
+                    );
+                  }
+                },
+                child: const Text("Update User"),
+              ),
+
+            const SizedBox(height: 16),
+
+            // User List
+            Expanded(
+              child: users.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: users.length,
+                      itemBuilder: (context, index) {
+                        final user = users[index];
+                        return Card(
+                          child: ListTile(
+                            title: Text(user['username']),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Email: ${user['email']}"),
+                                Text("Birth: ${user['birth']}"),
+                              ],
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () {
+                                    setState(() {
+                                      selectedUserId = user['id'];
+                                      nameController.text = user['username'];
+                                      emailController.text = user['email'];
+                                      passwordController.text =
+                                          user['password'];
+                                      birthController.text = user['birth'];
+                                    });
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () {
+                                    deleteUser(user['id']);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         );
-                      }
-                    },
-                    child: Text("Update User"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      deleteUser(selectedUserId!);
-                    },
-                    child: Text("Delete User"),
-                    // style: ElevatedButton.styleFrom(primary: Colors.red),
-                  ),
-                ],
-              ),
-            ],
+                      },
+                    )
+                  : const Center(child: Text("No users found")),
+            ),
           ],
         ),
       ),

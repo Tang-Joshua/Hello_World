@@ -295,12 +295,19 @@ class _QueuesPageState extends State<QueuesPage> {
                   color: Colors.white,
                   boxShadow: const [
                     BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(2, 2)),
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(2, 2),
+                    ),
                   ],
                 ),
-                child: Center(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width *
+                        0.25, // 10% of screen width
+                    top: MediaQuery.of(context).size.height *
+                        0.25, // 20% of screen height
+                  ),
                   child: AnimatedList(
                     key: _listKey,
                     controller: _scrollController,

@@ -296,12 +296,15 @@ class _StacksPageState extends State<StacksPage>
       child: FadeTransition(
         opacity: animation,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-              190.0, 8.0, 0.0, 8.0), //adjust spacing of the box here
+          padding: EdgeInsets.only(
+            left: MediaQuery.of(context).size.width * 0.5 - 40,
+            top: 4.0, // Reduced space above the item
+            bottom: 4.0, // Reduced space below the item
+          ),
           child: Container(
-            width: 80,
-            height: 80,
-            alignment: Alignment.center,
+            width: 80, // Fixed width of the item
+            height: 80, // Fixed height of the item
+            alignment: Alignment.center, // Center text inside the item
             decoration: BoxDecoration(
               color: popping ? Colors.red : Colors.blueAccent,
               borderRadius: BorderRadius.circular(10),
@@ -406,6 +409,7 @@ class _StacksPageState extends State<StacksPage>
                     controller: _scrollController,
                     initialItemCount: stack.length,
                     reverse: true,
+                    shrinkWrap: true,
                     itemBuilder: (context, index, animation) {
                       return _buildItem(stack[index], animation);
                     },
