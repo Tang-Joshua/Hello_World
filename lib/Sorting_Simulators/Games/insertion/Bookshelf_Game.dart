@@ -346,24 +346,19 @@ class _GameScreenState extends State<GameScreen> {
       int itemCount = min(3 + currentRound, maxItemsPerRound);
       numbers = List.generate(itemCount, (_) => Random().nextInt(50));
 
-      // Randomize ascending or descending order for each round
       ascendingOrder = Random().nextBool();
 
-      // Sort targetOrder based on ascendingOrder
       targetOrder = List.from(numbers)..sort();
       if (!ascendingOrder) {
         targetOrder = targetOrder.reversed.toList();
       }
 
       shelfOrder = List<int?>.filled(itemCount, null);
-      timerSeconds = widget.singlePlayerTimeLimit; // Reset timer
-      gameOverSoundPlayed = false; // Reset game-over sound flag
+      timerSeconds = widget.singlePlayerTimeLimit;
+      gameOverSoundPlayed = false; // Reset sound flag
     });
 
-    // Stop any ongoing sounds
-    audioPlayer.stop();
-
-    // Restart timer
+    audioPlayer.stop(); // Stop any sound
     resetTimer();
   }
 
@@ -423,11 +418,9 @@ class _GameScreenState extends State<GameScreen> {
 
   void showGameOverDialog() async {
     if (!gameOverSoundPlayed) {
-      // Ensure sound plays only once
       gameOverSoundPlayed = true;
-      await audioPlayer.stop(); // Stop any current playback
-      await audioPlayer
-          .play(AssetSource('Sounds/gameover.mp3')); // Play game-over sound
+      await audioPlayer.stop(); // Stop any ongoing playback
+      await audioPlayer.play(AssetSource('Sounds/gameover.mp3'));
     }
 
     if (context.mounted) {
@@ -439,8 +432,8 @@ class _GameScreenState extends State<GameScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                resetGame(); // Reset the game state
+                Navigator.of(context).pop(); // Close dialog
+                resetGame(); // Reset game state
               },
               child: Text('Try Again', style: TextStyle(color: Colors.black87)),
             ),
@@ -455,13 +448,11 @@ class _GameScreenState extends State<GameScreen> {
       currentRound = 1;
       playerScore = 0;
       timerSeconds = widget.singlePlayerTimeLimit;
-      gameOverSoundPlayed = false; // Reset the sound flag
+      gameOverSoundPlayed = false; // Reset sound flag
+      _playBackgroundMusic();
     });
 
-    // Stop any playing sound
-    audioPlayer.stop();
-
-    // Start a new round
+    audioPlayer.stop(); // Stop ongoing sounds
     startNewRound();
   }
 
@@ -485,8 +476,8 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void dispose() {
     timer?.cancel();
-    audioPlayer.stop(); // Stop any playback on widget dispose
-    audioPlayer.dispose(); // Dispose of audio player
+    audioPlayer.stop(); // Ensure all sounds are stopped
+    audioPlayer.dispose(); // Dispose of player resources
     super.dispose();
   }
 
