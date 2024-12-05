@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class MergeSortPage extends StatefulWidget {
   const MergeSortPage({Key? key}) : super(key: key);
@@ -15,6 +16,8 @@ class _MergeSortPageState extends State<MergeSortPage>
   bool isSorting = false;
   late ScrollController _scrollController;
   late TabController _tabController;
+  late AudioPlayer _audioPlayer;
+  bool isMusicPlaying = false;
 
   bool isInsertClicked = false; // To track if insert/check button was clicked
 
@@ -28,6 +31,9 @@ class _MergeSortPageState extends State<MergeSortPage>
     super.initState();
     _scrollController = ScrollController();
     _tabController = TabController(length: 2, vsync: this);
+
+    _audioPlayer = AudioPlayer();
+    _playBackgroundMusic(); // Start background music
 
     inputController.addListener(() {
       setState(() {});
@@ -43,7 +49,28 @@ class _MergeSortPageState extends State<MergeSortPage>
     inputController.dispose();
     _scrollController.dispose();
     _tabController.dispose();
+    _stopBackgroundMusic(); // Stop music when exiting the page
     super.dispose();
+  }
+
+  void _stopBackgroundMusic() async {
+    try {
+      await _audioPlayer.stop();
+      setState(() => isMusicPlaying = false);
+    } catch (e) {
+      print("Error stopping background music: $e");
+    }
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop); // Loop the music
+      await _audioPlayer.setVolume(0.2); // Adjust volume as needed
+      await _audioPlayer.play(AssetSource('Sounds/simulationall.mp3'));
+      setState(() => isMusicPlaying = true);
+    } catch (e) {
+      print("Error playing background music: $e");
+    }
   }
 
   Future<void> sort() async {
