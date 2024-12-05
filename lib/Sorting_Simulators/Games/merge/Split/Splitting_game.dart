@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 
 class SplittingGame extends StatefulWidget {
   final dynamic level;
@@ -21,18 +22,52 @@ class _SplittingGameState extends State<SplittingGame> {
   int hearts = 0;
   int timeRemaining = 0; // Timer in seconds
   Timer? timer;
+  late AudioPlayer backgroundMusicPlayer;
+  late AudioPlayer effectPlayer;
 
   @override
   void initState() {
     super.initState();
     level = (widget.level is String) ? int.parse(widget.level) : widget.level;
+    backgroundMusicPlayer = AudioPlayer();
+    effectPlayer = AudioPlayer();
     resetGame();
+    _playBackgroundMusic(); // Start the background music
   }
 
   @override
   void dispose() {
-    timer?.cancel(); // Cancel the timer when the widget is disposed
+    backgroundMusicPlayer.dispose();
+    effectPlayer.dispose();
+    timer?.cancel();
     super.dispose();
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await backgroundMusicPlayer.setReleaseMode(ReleaseMode.loop);
+      await backgroundMusicPlayer
+          .setVolume(0.2); // Lower volume for background music
+      await backgroundMusicPlayer.play(AssetSource('Sounds/radix.mp3'));
+    } catch (e) {
+      print('Error playing background music: $e');
+    }
+  }
+
+  void _playWinSound() async {
+    try {
+      await effectPlayer.play(AssetSource('Sounds/win.mp3'));
+    } catch (e) {
+      print('Error playing win sound: $e');
+    }
+  }
+
+  void _playGameOverSound() async {
+    try {
+      await effectPlayer.play(AssetSource('Sounds/gameover.mp3'));
+    } catch (e) {
+      print('Error playing game-over sound: $e');
+    }
   }
 
   void resetGame() {
@@ -242,6 +277,7 @@ class _SplittingGameState extends State<SplittingGame> {
 
   void showCompletionDialog() {
     timer?.cancel();
+    _playWinSound(); // Play win sound
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -301,6 +337,7 @@ class _SplittingGameState extends State<SplittingGame> {
 
   void showFailureDialog(String message) {
     timer?.cancel();
+    _playGameOverSound(); // Play game-over sound
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

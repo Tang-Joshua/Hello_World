@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
-
+import 'package:audioplayers/audioplayers.dart';
 import '../Data_Choices.dart';
 
 void main() => runApp(FifoGameApp());
@@ -36,10 +36,16 @@ class _FifoGameState extends State<FifoGame> {
   // List of card suits
   final List<String> cardSuits = ['♥', '♠', '♣', '♦'];
 
+  late AudioPlayer backgroundMusicPlayer;
+  late AudioPlayer effectPlayer;
+
   @override
   void initState() {
     super.initState();
+    backgroundMusicPlayer = AudioPlayer();
+    effectPlayer = AudioPlayer();
     generateNewInstruction();
+    _playBackgroundMusic(); // Start background music
   }
 
   void startGame() {
@@ -70,11 +76,20 @@ class _FifoGameState extends State<FifoGame> {
         setState(() {
           timeLeft--;
           if (timeLeft <= 0) {
+            _playWinSound(); // Play win sound
             endGame();
           }
         });
       }
     });
+  }
+
+  void _playClickSound() async {
+    try {
+      await effectPlayer.play(AssetSource('Sounds/queuescardclick.mp3'));
+    } catch (e) {
+      print('Error playing click sound: $e');
+    }
   }
 
   void showInstructions() {
@@ -200,6 +215,8 @@ class _FifoGameState extends State<FifoGame> {
     setState(() {
       Map<String, dynamic> latestItem = queue.last;
 
+      _playClickSound(); // Play click sound when a card is removed
+
       if (_doesItemMatchInstruction(latestItem)) {
         // Correct match: Remove the latest card and update score
         queue.removeLast();
@@ -222,12 +239,40 @@ class _FifoGameState extends State<FifoGame> {
     return item['suit'] == currentInstruction;
   }
 
+  void _playBackgroundMusic() async {
+    try {
+      await backgroundMusicPlayer.setReleaseMode(ReleaseMode.loop);
+      await backgroundMusicPlayer
+          .setVolume(0.3); // Lower volume for background music
+      await backgroundMusicPlayer.play(AssetSource('Sounds/queues.mp3'));
+    } catch (e) {
+      print('Error playing background music: $e');
+    }
+  }
+
+  void _playWinSound() async {
+    try {
+      await effectPlayer.play(AssetSource('Sounds/win.mp3'));
+    } catch (e) {
+      print('Error playing win sound: $e');
+    }
+  }
+
+  void _playGameOverSound() async {
+    try {
+      await effectPlayer.play(AssetSource('Sounds/gameover.mp3'));
+    } catch (e) {
+      print('Error playing game-over sound: $e');
+    }
+  }
+
   void endGame() {
     setState(() {
       isGameOver = true;
     });
     itemAdder.cancel();
     countdownTimer.cancel();
+    _playGameOverSound(); // Play game-over sound
   }
 
   void endGameWithMessage(String message) {
@@ -244,6 +289,8 @@ class _FifoGameState extends State<FifoGame> {
       itemAdder.cancel();
       countdownTimer.cancel();
     }
+    backgroundMusicPlayer.dispose();
+    effectPlayer.dispose();
     super.dispose();
   }
 

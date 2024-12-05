@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math';
 
 import '../../Sorting_Choices.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(BookshelfGame());
@@ -316,14 +317,28 @@ class _GameScreenState extends State<GameScreen> {
   List<int> targetOrder = [];
   List<int?> shelfOrder = [];
   bool ascendingOrder = true;
+  late AudioPlayer audioPlayer;
+  bool gameOverSoundPlayed = false; // Add this line to track sound state
 
   static const int maxItemsPerRound = 10;
 
   @override
   void initState() {
     super.initState();
+    audioPlayer = AudioPlayer();
     timerSeconds = widget.singlePlayerTimeLimit;
+    _playBackgroundMusic();
     startNewRound();
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await audioPlayer.setReleaseMode(ReleaseMode.loop); // Enable looping
+      await audioPlayer.setVolume(0.2); // Set desired volume (30%)
+      await audioPlayer.play(AssetSource('Sounds/radix.mp3')); // Play music
+    } catch (e) {
+      print('Error playing background music: $e');
+    }
   }
 
   void startNewRound() {
@@ -341,9 +356,15 @@ class _GameScreenState extends State<GameScreen> {
       }
 
       shelfOrder = List<int?>.filled(itemCount, null);
-      timerSeconds = widget.singlePlayerTimeLimit; // Set timer for new round
-      resetTimer();
+      timerSeconds = widget.singlePlayerTimeLimit; // Reset timer
+      gameOverSoundPlayed = false; // Reset game-over sound flag
     });
+
+    // Stop any ongoing sounds
+    audioPlayer.stop();
+
+    // Restart timer
+    resetTimer();
   }
 
   void resetTimer() {
@@ -378,7 +399,10 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  void showWinnerDialog(String message) {
+  void showWinnerDialog(String message) async {
+    // Play the win sound
+    await audioPlayer.play(AssetSource('Sounds/win.mp3'));
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -397,23 +421,33 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  void showGameOverDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Game Over'),
-        content: Text("Time's up! You didn't reach the required score."),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              resetGame();
-            },
-            child: Text('Try Again', style: TextStyle(color: Colors.black87)),
-          ),
-        ],
-      ),
-    );
+  void showGameOverDialog() async {
+    if (!gameOverSoundPlayed) {
+      // Ensure sound plays only once
+      gameOverSoundPlayed = true;
+      await audioPlayer.stop(); // Stop any current playback
+      await audioPlayer
+          .play(AssetSource('Sounds/gameover.mp3')); // Play game-over sound
+    }
+
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Game Over'),
+          content: Text("Time's up! You didn't reach the required score."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                resetGame(); // Reset the game state
+              },
+              child: Text('Try Again', style: TextStyle(color: Colors.black87)),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   void resetGame() {
@@ -421,8 +455,14 @@ class _GameScreenState extends State<GameScreen> {
       currentRound = 1;
       playerScore = 0;
       timerSeconds = widget.singlePlayerTimeLimit;
-      startNewRound();
+      gameOverSoundPlayed = false; // Reset the sound flag
     });
+
+    // Stop any playing sound
+    audioPlayer.stop();
+
+    // Start a new round
+    startNewRound();
   }
 
   void checkIfSorted() {
@@ -445,6 +485,8 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void dispose() {
     timer?.cancel();
+    audioPlayer.stop(); // Stop any playback on widget dispose
+    audioPlayer.dispose(); // Dispose of audio player
     super.dispose();
   }
 
@@ -467,123 +509,138 @@ class _GameScreenState extends State<GameScreen> {
           },
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: 'Arrange the books in ',
-                    style: TextStyle(fontSize: 22, color: Colors.black54),
-                  ),
-                  TextSpan(
-                    text: ascendingOrder ? 'Ascending' : 'Descending',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: ascendingOrder ? Colors.green : Colors.red,
+      body: SingleChildScrollView(
+        // Make the entire content scrollable
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Arrange the books in ',
+                      style: TextStyle(fontSize: 22, color: Colors.black54),
                     ),
-                  ),
-                  TextSpan(
-                    text: ' order.',
-                    style: TextStyle(fontSize: 22, color: Colors.black54),
-                  ),
+                    TextSpan(
+                      text: ascendingOrder ? 'Ascending' : 'Descending',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: ascendingOrder ? Colors.green : Colors.red,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' order.',
+                      style: TextStyle(fontSize: 22, color: Colors.black54),
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Text(
+              'Time Remaining: $timerSeconds seconds',
+              style: TextStyle(fontSize: 18, color: Colors.redAccent),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Score: $playerScore / ${widget.scoreGoal}',
+              style: TextStyle(fontSize: 18, color: Colors.black87),
+            ),
+            SizedBox(height: 20),
+
+            // Scrollable shelf layout
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal, // Horizontal scroll for shelf
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (int i = 0; i < shelfOrder.length; i++)
+                    DragTarget<int>(
+                      onWillAcceptWithDetails: (details) => true,
+                      onAcceptWithDetails: (details) {
+                        setState(() {
+                          int data = details.data;
+                          if (shelfOrder[i] != null) {
+                            numbers.add(shelfOrder[i]!);
+                          }
+                          shelfOrder[i] = data;
+                          numbers.remove(data);
+                        });
+                        checkIfSorted();
+                      },
+                      builder: (context, candidateData, rejectedData) {
+                        return Container(
+                          width: boxSize,
+                          height: boxSize,
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          decoration: BoxDecoration(
+                            color: shelfOrder[i] != null
+                                ? Colors.black87
+                                : Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: candidateData.isNotEmpty
+                                  ? Colors.blue
+                                  : Colors.transparent,
+                              width: 3,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              shelfOrder[i]?.toString() ?? '',
+                              style: TextStyle(
+                                fontSize: isTablet ? 24 : 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                 ],
               ),
-              textAlign: TextAlign.center,
             ),
-          ),
-          Text(
-            'Time Remaining: $timerSeconds seconds',
-            style: TextStyle(fontSize: 18, color: Colors.redAccent),
-          ),
-          SizedBox(height: 20),
-          Text(
-            'Score: $playerScore / ${widget.scoreGoal}',
-            style: TextStyle(fontSize: 18, color: Colors.black87),
-          ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (int i = 0; i < shelfOrder.length; i++)
-                DragTarget<int>(
-                  onWillAcceptWithDetails: (details) => true,
-                  onAcceptWithDetails: (details) {
-                    setState(() {
-                      int data = details.data;
-                      if (shelfOrder[i] != null) {
-                        numbers.add(shelfOrder[i]!);
-                      }
-                      shelfOrder[i] = data;
-                      numbers.remove(data);
-                    });
-                    checkIfSorted();
-                  },
-                  builder: (context, candidateData, rejectedData) {
-                    return Container(
-                      width: boxSize,
-                      height: boxSize,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        color: shelfOrder[i] != null
-                            ? Colors.black87
-                            : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: candidateData.isNotEmpty
-                              ? Colors.blue
-                              : Colors.transparent,
-                          width: 3,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          shelfOrder[i]?.toString() ?? '',
-                          style: TextStyle(
-                            fontSize: isTablet ? 24 : 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+            SizedBox(height: 20),
+
+            // Scrollable draggable numbers
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                children: numbers
+                    .map((number) => Draggable<int>(
+                          data: number,
+                          feedback: BookWidget(
+                              number: number,
+                              isDragging: true,
+                              boxSize: boxSize),
+                          childWhenDragging: Opacity(
+                            opacity: 0.3,
+                            child: BookWidget(number: number, boxSize: boxSize),
                           ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-            ],
-          ),
-          SizedBox(height: 20),
-          Wrap(
-            alignment: WrapAlignment.center,
-            children: numbers
-                .map((number) => Draggable<int>(
-                      data: number,
-                      feedback: BookWidget(
-                          number: number, isDragging: true, boxSize: boxSize),
-                      childWhenDragging: Opacity(
-                        opacity: 0.3,
-                        child: BookWidget(number: number, boxSize: boxSize),
-                      ),
-                      child: BookWidget(number: number, boxSize: boxSize),
-                    ))
-                .toList(),
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: clearShelf,
-            child: Text("Clear"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black87,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                          child: BookWidget(number: number, boxSize: boxSize),
+                        ))
+                    .toList(),
               ),
             ),
-          ),
-        ],
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: clearShelf,
+              child: Text("Clear"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black87,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

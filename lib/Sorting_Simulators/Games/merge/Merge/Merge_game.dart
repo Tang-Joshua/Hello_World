@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 
 class MergeSortGamePage extends StatefulWidget {
   final String level;
@@ -20,18 +21,51 @@ class _MergeSortGamePageState extends State<MergeSortGamePage> {
   late int hearts;
   bool isGameComplete = false;
   Timer? timer;
+  late AudioPlayer backgroundMusicPlayer;
+  late AudioPlayer effectPlayer;
 
   @override
   void initState() {
     super.initState();
+    backgroundMusicPlayer = AudioPlayer();
+    effectPlayer = AudioPlayer();
     initializeGame();
+    _playBackgroundMusic(); // Start background music
     if (timeRemaining > 0) startTimer();
   }
 
   @override
   void dispose() {
+    backgroundMusicPlayer.dispose();
+    effectPlayer.dispose();
     timer?.cancel();
     super.dispose();
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await backgroundMusicPlayer.setReleaseMode(ReleaseMode.loop);
+      await backgroundMusicPlayer.setVolume(0.2); // Set a lower volume
+      await backgroundMusicPlayer.play(AssetSource('Sounds/radix.mp3'));
+    } catch (e) {
+      print('Error playing background music: $e');
+    }
+  }
+
+  void _playWinSound() async {
+    try {
+      await effectPlayer.play(AssetSource('Sounds/win.mp3'));
+    } catch (e) {
+      print('Error playing win sound: $e');
+    }
+  }
+
+  void _playGameOverSound() async {
+    try {
+      await effectPlayer.play(AssetSource('Sounds/gameover.mp3'));
+    } catch (e) {
+      print('Error playing game-over sound: $e');
+    }
   }
 
   void initializeGame() {
@@ -632,12 +666,11 @@ class _MergeSortGamePageState extends State<MergeSortGamePage> {
 
     if (selectedChoice.toString() == correctChoice.toString()) {
       setState(() {
-        // Add the correct stage to the visualized stages
         visualizedStages.add(correctChoice);
-
         currentStage++;
         if (currentStage >= stages.length) {
           isGameComplete = true;
+          _playWinSound(); // Play win sound when the game is complete
         }
       });
     } else if (hearts > 0) {
@@ -651,6 +684,7 @@ class _MergeSortGamePageState extends State<MergeSortGamePage> {
   }
 
   void showGameOverDialog(String message) {
+    _playGameOverSound(); // Play game-over sound
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

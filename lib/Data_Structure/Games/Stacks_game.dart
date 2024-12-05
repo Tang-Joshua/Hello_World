@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutterapp/Data_Structure/Data_Choices.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 void main() => runApp(TowerOfHanoiApp());
 
@@ -31,14 +32,54 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
   Timer? timer;
   bool isFirstMove = true;
   int numDisks = 4; // Default to 4 disks
+  late AudioPlayer backgroundMusicPlayer;
+  late AudioPlayer effectPlayer;
 
   @override
   void initState() {
     super.initState();
-    _initializeGame();
+    backgroundMusicPlayer = AudioPlayer();
+    effectPlayer = AudioPlayer();
+
+    // Play background music
+    _playBackgroundMusic();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInstructions(context); // Automatically show instructions on load
     });
+  }
+
+  @override
+  void dispose() {
+    backgroundMusicPlayer.dispose();
+    effectPlayer.dispose();
+    super.dispose();
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await backgroundMusicPlayer.setReleaseMode(ReleaseMode.loop);
+      await backgroundMusicPlayer.setVolume(0.3);
+      await backgroundMusicPlayer.play(AssetSource('Sounds/stacks.mp3'));
+    } catch (e) {
+      print('Error playing background music: $e');
+    }
+  }
+
+  void _playWinSound() async {
+    try {
+      await effectPlayer.play(AssetSource('Sounds/win.mp3'));
+    } catch (e) {
+      print('Error playing win sound: $e');
+    }
+  }
+
+  void _playGameOverSound() async {
+    try {
+      await effectPlayer.play(AssetSource('Sounds/gameover.mp3'));
+    } catch (e) {
+      print('Error playing game over sound: $e');
+    }
   }
 
   void _initializeGame() {
@@ -293,6 +334,7 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
 
   void _showWinDialog() {
     timer?.cancel();
+    _playWinSound(); // Play win sound
     showDialog(
       context: context,
       builder: (context) {
@@ -314,6 +356,7 @@ class _TowerOfHanoiScreenState extends State<TowerOfHanoiScreen> {
   }
 
   void _showTimeoutDialog() {
+    _playGameOverSound(); // Play game-over sound
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

@@ -9,6 +9,7 @@ import 'package:flutterapp/Sorting_Simulators/Sorting_Choices.dart';
 import 'package:flutterapp/Graph_Simulators/Graph_Choices.dart';
 import 'package:flutterapp/Data_Structure/Data_Choices.dart';
 import 'package:flutter/rendering.dart';
+import 'music.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -150,7 +151,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => CenterButtonScreen()),
                       );
                     },
                   ),

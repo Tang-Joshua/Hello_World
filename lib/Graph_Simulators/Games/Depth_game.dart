@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'dart:math';
 
 class DepthGamePage extends StatefulWidget {
@@ -26,15 +27,46 @@ class _DepthGamePageState extends State<DepthGamePage> {
   bool isAnimating = false; // Disable buttons during animation
   bool showTopLeftBorder = true; // Show border for top-left cell initially
 
+  late AudioPlayer audioPlayer;
+
+  late AudioPlayer backgroundMusicPlayer; // New player for background music
+
   @override
   void initState() {
     super.initState();
+    audioPlayer = AudioPlayer();
+    backgroundMusicPlayer = AudioPlayer();
     _initializeGrid();
+
+    // Play background music
+    _playBackgroundMusic();
 
     // Show instructions popup
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInstructions();
     });
+  }
+
+  @override
+  void dispose() {
+    audioPlayer.dispose();
+    backgroundMusicPlayer.dispose(); // Dispose of background music player
+    super.dispose();
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await backgroundMusicPlayer.setReleaseMode(ReleaseMode.loop); // Loop mode
+      await backgroundMusicPlayer.setVolume(0.3); // Set volume to max
+      await backgroundMusicPlayer
+          .play(AssetSource('Sounds/radix.mp3')); // Play background music
+    } catch (e) {
+      print('Error playing background music: $e');
+    }
+  }
+
+  void _playSound(String assetPath) async {
+    await audioPlayer.play(AssetSource(assetPath));
   }
 
   void _initializeGrid() {
@@ -59,9 +91,7 @@ class _DepthGamePageState extends State<DepthGamePage> {
     List<List<bool>> visited =
         List.generate(gridSize, (_) => List.filled(gridSize, false));
 
-    int animatedCells = 0; // Counter for animated cells
-
-    Future<void> floodCell(int x, int y, int delay) async {
+    Future<void> floodCell(int x, int y) async {
       if (x < 0 ||
           x >= gridSize ||
           y < 0 ||
@@ -72,33 +102,28 @@ class _DepthGamePageState extends State<DepthGamePage> {
       }
 
       visited[x][y] = true;
-
-      await Future.delayed(Duration(milliseconds: delay));
+      await Future.delayed(Duration(milliseconds: 50));
 
       setState(() {
         grid[x][y] = replacementColor;
       });
 
-      animatedCells++;
-
-      // Adjust delay dynamically based on the number of animated cells
-      int nextDelay = max(10, delay - (animatedCells ~/ 5)); // Minimum 10ms
-
-      await floodCell(x + 1, y, nextDelay);
-      await floodCell(x - 1, y, nextDelay);
-      await floodCell(x, y + 1, nextDelay);
-      await floodCell(x, y - 1, nextDelay);
+      await floodCell(x + 1, y);
+      await floodCell(x - 1, y);
+      await floodCell(x, y + 1);
+      await floodCell(x, y - 1);
     }
 
-    await floodCell(x, y, 50); // Start with an initial delay of 50ms
+    await floodCell(x, y);
 
     setState(() {
       isAnimating = false;
-      showTopLeftBorder = false; // Remove border after animation
+      showTopLeftBorder = false;
     });
 
     if (_isGameWon()) {
-      _showEndDialog("Congratulations! You Won!");
+      _showEndDialog(
+          "Congratulations! You Won!"); // Winning sound will play here
     } else if (remainingMoves == 0) {
       _showEndDialog("Game Over");
     }
@@ -113,6 +138,8 @@ class _DepthGamePageState extends State<DepthGamePage> {
     setState(() {
       remainingMoves--;
     });
+
+    _playSound('Sounds/binarysearchclick.mp3'); // Add this line
 
     await _waveFloodFill(0, 0, targetColor, selectedColor);
   }
@@ -218,7 +245,6 @@ class _DepthGamePageState extends State<DepthGamePage> {
     );
   }
 
-// Helper widget to format each instruction step
   Widget _instructionStep(
       {required IconData icon,
       required Color iconColor,
@@ -239,6 +265,19 @@ class _DepthGamePageState extends State<DepthGamePage> {
   }
 
   void _showEndDialog(String message) {
+    if (message.contains("Won")) {
+      _playSound('Sounds/win.mp3'); // Play win sound only for win
+    } else {
+      _playSound('Sounds/gameover.mp3'); // Gameover sound remains
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+          // AlertDialog code here
+          ),
+    );
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

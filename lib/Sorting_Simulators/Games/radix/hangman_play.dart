@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart'; // Import audioplayers
 import 'dart:math';
 
 import '../../Sorting_Choices.dart';
@@ -35,13 +36,30 @@ class _RadixSortScreenState extends State<RadixSortScreen> {
   int _currentDigitPlace = 1;
   List<int> _targetOrder = [];
 
+  final AudioPlayer _audioPlayer = AudioPlayer(); // Background music player
+  bool _isMusicPlaying = true; // To track music playback state
+
+  // final AudioPlayer _audioPlayer = AudioPlayer(); // Background music player
+  late AudioCache _audioCache; // Cache for preloading music
+  // bool _isMusicPlaying = true; // To track music playback state
+
   @override
   void initState() {
     super.initState();
     _startGame();
+
+    // Automatically play background music when the game starts
+    _playBackgroundMusic();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInstructions(context); // Automatically show instructions
     });
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose(); // Stop and dispose of the background music player
+    super.dispose();
   }
 
   void _startGame() {
@@ -54,6 +72,35 @@ class _RadixSortScreenState extends State<RadixSortScreen> {
       _remainingNumbers = List.from(_numbers);
       _currentDigitPlace = 1;
       _updateTargetOrder();
+    });
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop); // Enable looping
+      await _audioPlayer.setVolume(0.2); // Set desired volume (50%)
+      await _audioPlayer.play(AssetSource('Sounds/radix.mp3'));
+    } catch (e) {
+      print('Error playing background music: $e');
+    }
+  }
+
+  void _playSound(String soundPath) async {
+    try {
+      await _audioPlayer.play(AssetSource(soundPath));
+    } catch (e) {
+      print('Error playing sound: $e');
+    }
+  }
+
+  void _toggleMusic() async {
+    if (_isMusicPlaying) {
+      await _audioPlayer.pause(); // Pause music
+    } else {
+      await _audioPlayer.resume(); // Resume music
+    }
+    setState(() {
+      _isMusicPlaying = !_isMusicPlaying; // Toggle the music state
     });
   }
 
@@ -104,8 +151,8 @@ class _RadixSortScreenState extends State<RadixSortScreen> {
         _advanceToNextDigitPlace();
       } else {
         _gameWon = true;
-        _showEndGameDialog(
-            "Congratulations!", "You've successfully sorted the list.");
+        _showEndGameDialog("Congratulations!",
+            "You've successfully sorted the list."); // Winner sound will play here
       }
     } else if (_mistakes >= _maxMistakes) {
       _gameLost = true;
@@ -124,6 +171,12 @@ class _RadixSortScreenState extends State<RadixSortScreen> {
   }
 
   void _showEndGameDialog(String title, String message) {
+    if (title.contains("Congratulations!")) {
+      _playSound('Sounds/win.mp3'); // Play winner sound
+    } else if (title.contains("Game Over")) {
+      _playSound('Sounds/gameover.mp3'); // Optional: Play a "game over" sound
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {

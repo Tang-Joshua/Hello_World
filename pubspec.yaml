@@ -66,3 +66,14 @@ flutter:
     - assets/Queue.mp4
     - assets/Merge_Sort.mp4
     - assets/Stacks.mp4
+    - assets/Sounds/win.mp3
+    - assets/Sounds/radix.mp3
+    - assets/Sounds/pop2.mp3
+    - assets/Sounds/gameover.mp3
+    - assets/Sounds/binarysearch.mp3
+    - assets/Sounds/binarysearchclick.mp3
+    - assets/Sounds/breadthfirst.mp3
+    - assets/Sounds/breadthfirstclick.mp3
+    - assets/Sounds/stacks.mp3
+    - assets/Sounds/queues.mp3
+    - assets/Sounds/queuescardclick.mp3

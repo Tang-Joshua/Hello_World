@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:audioplayers/audioplayers.dart'; // Import audioplayers
 import 'package:flutterapp/insert_data.dart';
 
 import 'Sign_Up.dart';
@@ -13,6 +14,31 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  late AudioPlayer backgroundMusicPlayer; // Declare the AudioPlayer
+
+  @override
+  void initState() {
+    super.initState();
+    backgroundMusicPlayer = AudioPlayer(); // Initialize the AudioPlayer
+    _playBackgroundMusic(); // Play the background music
+  }
+
+  @override
+  void dispose() {
+    backgroundMusicPlayer.dispose(); // Dispose of the AudioPlayer
+    super.dispose();
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await backgroundMusicPlayer.setReleaseMode(ReleaseMode.loop); // Loop mode
+      await backgroundMusicPlayer.setVolume(0.5); // Set desired volume
+      await backgroundMusicPlayer.play(AssetSource('assets/radix.mp3'));
+    } catch (e) {
+      print('Error playing background music: $e');
+    }
+  }
 
   Future<void> login(String username, String password) async {
     try {

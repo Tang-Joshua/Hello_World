@@ -4,6 +4,7 @@ import 'dart:math';
 import 'dart:collection';
 
 import '../Graph_Choices.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class Node {
   int value;
@@ -429,10 +430,14 @@ class _StarGameScreenState extends State<StarGameScreen> {
   List<Node> selectedNodes = [];
   List<Color> lineColors = [];
   Map<Node, Offset> nodePositions = {};
+  late AudioPlayer backgroundMusicPlayer; // For background music
+  late AudioPlayer effectPlayer; // For click, win, and gameover sounds
 
   @override
   void initState() {
     super.initState();
+    effectPlayer = AudioPlayer(); // Initialize the effects player
+    _playBackgroundMusic(); // Start background music
     currentRound = 1;
     _setDifficulty();
     _startNewRound();
@@ -453,6 +458,43 @@ class _StarGameScreenState extends State<StarGameScreen> {
     }
   }
 
+  void _playBackgroundMusic() async {
+    backgroundMusicPlayer = AudioPlayer();
+    try {
+      await backgroundMusicPlayer
+          .setReleaseMode(ReleaseMode.loop); // Loop music
+      await backgroundMusicPlayer.setVolume(0.5); // Set volume
+      await backgroundMusicPlayer
+          .play(AssetSource('Sounds/breadthfirst.mp3')); // Play file
+    } catch (e) {
+      print('Error playing background music: $e');
+    }
+  }
+
+  void _playClickSound() async {
+    try {
+      await effectPlayer.play(AssetSource('Sounds/breadthfirstclick.mp3'));
+    } catch (e) {
+      print('Error playing click sound: $e');
+    }
+  }
+
+  void _playWinSound() async {
+    try {
+      await effectPlayer.play(AssetSource('Sounds/win.mp3'));
+    } catch (e) {
+      print('Error playing win sound: $e');
+    }
+  }
+
+  void _playGameOverSound() async {
+    try {
+      await effectPlayer.play(AssetSource('Sounds/gameover.mp3'));
+    } catch (e) {
+      print('Error playing game over sound: $e');
+    }
+  }
+
   void _startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (timeLeft > 0 && !gameOver) {
@@ -462,6 +504,7 @@ class _StarGameScreenState extends State<StarGameScreen> {
       } else {
         _timer.cancel();
         _triggerGameOver("Time's up! Game over.");
+        _playGameOverSound(); // Play game-over sound
       }
     });
   }
@@ -504,6 +547,7 @@ class _StarGameScreenState extends State<StarGameScreen> {
 
     if (currentStep < traversalPath.length &&
         traversalPath[currentStep] == node) {
+      _playClickSound(); // Play click sound
       setState(() {
         selectedNodes.add(node);
         lineColors.add(_generateRandomColor());
@@ -517,12 +561,14 @@ class _StarGameScreenState extends State<StarGameScreen> {
           } else {
             _triggerGameOver("Congratulations! You've completed all rounds!");
             _timer.cancel();
+            _playWinSound(); // Play win sound
           }
         }
       });
     } else {
       _timer.cancel();
       _triggerGameOver("Wrong node! Game over.");
+      _playGameOverSound(); // Play game-over sound
     }
   }
 
@@ -534,6 +580,8 @@ class _StarGameScreenState extends State<StarGameScreen> {
   @override
   void dispose() {
     _timer.cancel();
+    backgroundMusicPlayer.stop(); // Stop the background music
+    backgroundMusicPlayer.dispose(); // Dispose of the player
     super.dispose();
   }
 

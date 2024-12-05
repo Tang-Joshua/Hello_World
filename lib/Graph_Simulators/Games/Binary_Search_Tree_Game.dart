@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutterapp/Graph_Simulators/Graph_Choices.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(BinarySearchTreeGameApp());
@@ -340,6 +341,8 @@ class _BinaryTreeGameScreenState extends State<BinaryTreeGameScreen> {
   bool isGameOver = false;
   String? selectedDirection;
   List<int> deck = List.generate(15, (index) => Random().nextInt(50) + 1);
+  late AudioPlayer backgroundMusicPlayer; // For background music
+  late AudioPlayer clickSoundPlayer; // For click sounds
 
   int round = 1;
   int timerValue = 50;
@@ -350,11 +353,53 @@ class _BinaryTreeGameScreenState extends State<BinaryTreeGameScreen> {
     super.initState();
     setDifficulty(widget.difficulty);
     resetGame();
+    _playBackgroundMusic(); // Play background music
+  }
+
+  void _playBackgroundMusic() async {
+    backgroundMusicPlayer = AudioPlayer();
+    try {
+      await backgroundMusicPlayer
+          .setReleaseMode(ReleaseMode.loop); // Loop music
+      await backgroundMusicPlayer.setVolume(0.3); // Set volume
+      await backgroundMusicPlayer.play(AssetSource('Sounds/binarysearch.mp3'));
+    } catch (e) {
+      print('Error playing background music: $e');
+    }
+  }
+
+  void _playClickSound() async {
+    clickSoundPlayer = AudioPlayer();
+    try {
+      await clickSoundPlayer.play(AssetSource('Sounds/binarysearchclick.mp3'));
+    } catch (e) {
+      print('Error playing click sound: $e');
+    }
+  }
+
+  void _playWinSound() async {
+    try {
+      await clickSoundPlayer.play(AssetSource('Sounds/win.mp3'));
+    } catch (e) {
+      print('Error playing win sound: $e');
+    }
+  }
+
+  void _playGameOverSound() async {
+    try {
+      final gameOverPlayer = AudioPlayer(); // Use a separate instance
+      await gameOverPlayer.play(AssetSource('Sounds/gameover.mp3'));
+    } catch (e) {
+      print('Error playing game over sound: $e');
+    }
   }
 
   @override
   void dispose() {
     timer?.cancel();
+    backgroundMusicPlayer.stop(); // Stop the background music
+    backgroundMusicPlayer.dispose(); // Dispose of the player
+    clickSoundPlayer.dispose(); // Dispose of the click sound player
     super.dispose();
   }
 
@@ -377,6 +422,7 @@ class _BinaryTreeGameScreenState extends State<BinaryTreeGameScreen> {
           isGameOver = true;
           feedback = 'Time\'s up! Game Over.';
           timer.cancel();
+          _playGameOverSound(); // Add this here if missing
         }
       });
     });
@@ -417,6 +463,7 @@ class _BinaryTreeGameScreenState extends State<BinaryTreeGameScreen> {
         hasWon = true;
         isGameOver = true;
         timer?.cancel();
+        _playWinSound(); // Play win sound
       });
     }
   }
@@ -425,6 +472,7 @@ class _BinaryTreeGameScreenState extends State<BinaryTreeGameScreen> {
     setState(() {
       selectedDirection = direction;
       feedback = 'You selected "$direction". Now pick a number from the deck.';
+      _playClickSound(); // Play click sound
     });
   }
 
@@ -451,6 +499,7 @@ class _BinaryTreeGameScreenState extends State<BinaryTreeGameScreen> {
         feedback = 'Incorrect choice! Game Over.';
         isGameOver = true;
         timer?.cancel();
+        _playGameOverSound(); // Ensure this is called here
       });
       return;
     }
@@ -466,6 +515,7 @@ class _BinaryTreeGameScreenState extends State<BinaryTreeGameScreen> {
         Future.delayed(Duration(seconds: 2), nextRound);
       }
     });
+    _playClickSound();
   }
 
   @override
@@ -478,6 +528,7 @@ class _BinaryTreeGameScreenState extends State<BinaryTreeGameScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
+            backgroundMusicPlayer.stop(); // Stop the background music
             Navigator.pop(context);
             timer?.cancel();
           },
