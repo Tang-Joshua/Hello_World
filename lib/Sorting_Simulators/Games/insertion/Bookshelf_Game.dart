@@ -619,17 +619,6 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: clearShelf,
-              child: Text("Clear"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black87,
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
           ],
         ),
       ),

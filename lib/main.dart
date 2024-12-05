@@ -1,114 +1,83 @@
 import 'package:flutter/material.dart';
-
-import 'package:firebase_core/firebase_core.dart';
-
-import 'Login.dart';
-import 'firebase_options.dart';
-
 import 'package:flutterapp/Sorting_Simulators/Sorting_Choices.dart';
 import 'package:flutterapp/Graph_Simulators/Graph_Choices.dart';
 import 'package:flutterapp/Data_Structure/Data_Choices.dart';
-import 'package:flutter/rendering.dart';
-import 'music.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-    demoProjectId: "demo-project-id",
-  );
-  debugPaintSizeEnabled = false;
+void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'AL-GO!',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 68, 237, 133),
-        ),
-        useMaterial3: false,
-      ),
-      home: const MyHomePage(),
+      home: DashboardScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
+class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          // Background gradient
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color.fromARGB(255, 190, 240, 190),
-                    Color.fromARGB(255, 240, 250, 240),
-                  ],
+      backgroundColor: const Color(0xFFF5F6FA), // Light background color
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(2), // Adjusted AppBar height
+        child: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // AL-GO Title
+            ShaderMask(
+              shaderCallback: (Rect bounds) {
+                return LinearGradient(
+                  colors: [Colors.blue.shade500, Colors.green.shade400],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ).createShader(bounds);
+              },
+              child: const Text(
+                'AL-GO!',
+                style: TextStyle(
+                  fontSize: 90, // Larger font size for prominence
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white, // Gradient applied here
+                  fontFamily: 'CrimsonPro', // Elegant font style
+                  letterSpacing: 2.0,
                 ),
               ),
             ),
-          ),
-
-          // Background curves
-          Positioned.fill(
-            child: ClipPath(
-              clipper: MyClipper(),
-              child: Container(
-                color: Colors.green.shade400.withOpacity(0.4),
-              ),
+            const SizedBox(
+                height: 90), // Space between AL-GO and "Select an Algorithm"
+            const Text(
+              'Select an Algorithm',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
-          ),
-          Positioned.fill(
-            child: ClipPath(
-              clipper: MySecondClipper(),
-              child: Container(
-                color: Colors.green.shade600.withOpacity(0.6),
-              ),
-            ),
-          ),
-
-          // Content
-          SafeArea(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+            const SizedBox(height: 20),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: GridView.count(
+                shrinkWrap: true, // Make GridView height fit the content
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  // Title
-                  Text(
-                    "AL-GO!",
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-
-                  // Sorting Algorithms Button
-                  _buildMenuButton(
-                    context,
-                    label: "SORTING ALGORITHMS",
-                    onPressed: () {
+                  _buildBox(
+                    icon: Icons.sort,
+                    title: "Sorting",
+                    itemCount: "Explore Sorting Techniques",
+                    color: Colors.blue.shade300,
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -116,149 +85,103 @@ class _MyHomePageState extends State<MyHomePage> {
                       );
                     },
                   ),
-                  const SizedBox(height: 16),
-
-                  // Graph Algorithms Button
-                  _buildMenuButton(
-                    context,
-                    label: "GRAPH ALGORITHMS",
-                    onPressed: () {
+                  _buildBox(
+                    icon: Icons.graphic_eq,
+                    title: "Graph",
+                    itemCount: "Explore Graph Algorithms",
+                    color: Colors.green.shade400,
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => GraphChoices()),
                       );
                     },
                   ),
-                  const SizedBox(height: 16),
-
-                  // Data Structures Button
-                  _buildMenuButton(
-                    context,
-                    label: "DATA STRUCTURES",
-                    onPressed: () {
+                  _buildBox(
+                    icon: Icons.storage_rounded,
+                    title: "Data Structures",
+                    itemCount: "Learn Data Structures",
+                    color: Colors.orange.shade400,
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => DataChoices()),
                       );
                     },
                   ),
-                  const SizedBox(height: 16),
-
-                  // Account Button
-                  _buildMenuButton(
-                    context,
-                    label: "ACCOUNT",
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CenterButtonScreen()),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 40),
-
-                  // Exit Button
-                  _buildMenuButton(
-                    context,
-                    label: "EXIT",
-                    onPressed: () {
-                      // Exit action (can close app or return to main screen)
-                      print("Exit selected");
-                    },
-                    isExit: true,
-                  ),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     // Exit action: Close the app
+      //     print("Exit selected");
+      //   },
+      //   backgroundColor: Colors.red, // Red color for exit
+      //   child: const Icon(Icons.exit_to_app, color: Colors.white), // Exit icon
+      // ),
     );
   }
 
-  Widget _buildMenuButton(
-    BuildContext context, {
-    required String label,
-    required VoidCallback onPressed,
-    bool isExit = false,
+  Widget _buildBox({
+    required IconData icon,
+    required String title,
+    required String itemCount,
+    required Color color,
+    required VoidCallback onTap,
   }) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isExit ? Colors.grey : Colors.green.shade700,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 60),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
           color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: const Offset(4, 4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, size: 28, color: Colors.white),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                itemCount,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-}
-
-// Clipper for the first curve
-class MyClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(0, size.height * 0.6);
-
-    Offset firstControlPoint = Offset(size.width * 0.25, size.height * 0.55);
-    Offset firstEndPoint = Offset(size.width * 0.5, size.height * 0.65);
-    path.quadraticBezierTo(
-      firstControlPoint.dx,
-      firstControlPoint.dy,
-      firstEndPoint.dx,
-      firstEndPoint.dy,
-    );
-
-    Offset secondControlPoint = Offset(size.width * 0.75, size.height * 0.75);
-    Offset secondEndPoint = Offset(size.width, size.height * 0.6);
-    path.quadraticBezierTo(
-      secondControlPoint.dx,
-      secondControlPoint.dy,
-      secondEndPoint.dx,
-      secondEndPoint.dy,
-    );
-
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
-
-// Clipper for the second curve
-class MySecondClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(0, size.height * 0.5);
-
-    Offset firstControlPoint = Offset(size.width * 0.5, size.height * 0.75);
-    Offset firstEndPoint = Offset(size.width, size.height * 0.5);
-    path.quadraticBezierTo(
-      firstControlPoint.dx,
-      firstControlPoint.dy,
-      firstEndPoint.dx,
-      firstEndPoint.dy,
-    );
-
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

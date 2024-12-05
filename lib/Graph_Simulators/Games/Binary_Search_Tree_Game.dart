@@ -414,22 +414,30 @@ class _BinaryTreeGameScreenState extends State<BinaryTreeGameScreen> {
   }
 
   void startTimer() {
-    timer?.cancel();
+    timer?.cancel(); // Cancel any existing timer
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        timerValue--;
-        if (timerValue <= 0) {
-          isGameOver = true;
-          feedback = 'Time\'s up! Game Over.';
-          timer.cancel();
-          _playGameOverSound(); // Add this here if missing
-        }
-      });
+      if (!isGameOver) {
+        // Prevent timer from running if the game is over
+        setState(() {
+          if (timerValue > 0) {
+            timerValue--;
+          } else {
+            // Trigger game-over state
+            isGameOver = true;
+            feedback = 'Time\'s up! Game Over.';
+            timer.cancel(); // Stop the timer
+            _playGameOverSound(); // Play game-over sound
+          }
+        });
+      } else {
+        timer.cancel(); // Ensure timer stops completely if already game over
+      }
     });
   }
 
   void resetGame() {
     setState(() {
+      // Reset all game state variables
       deck.shuffle();
       bstValues.clear();
       lastInsertedValue = null;
@@ -437,6 +445,15 @@ class _BinaryTreeGameScreenState extends State<BinaryTreeGameScreen> {
       hasWon = false;
       isGameOver = false;
       selectedDirection = null;
+
+      // Reset timer value based on difficulty
+      timerValue = widget.difficulty == 'Easy'
+          ? 50
+          : widget.difficulty == 'Medium'
+              ? 30
+              : 25;
+
+      // Restart the timer
       startTimer();
     });
   }
@@ -565,7 +582,9 @@ class _BinaryTreeGameScreenState extends State<BinaryTreeGameScreen> {
           if (isGameOver) ...[
             CustomButton(
               label: 'Try Again',
-              onTap: resetGame,
+              onTap: () {
+                resetGame(); // Call resetGame to reset the state
+              },
             ),
           ] else ...[
             Row(
