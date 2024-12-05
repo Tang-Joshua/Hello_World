@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(const MaterialApp(home: BreadthFirstPage()));
@@ -37,6 +38,9 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
   final Map<int, List<int?>> _userTreeStructure =
       {}; // Store user-defined structure
 
+  late AudioPlayer _audioPlayer;
+  bool isMusicPlaying = false; // To track the music state
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +54,9 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
+    _audioPlayer = AudioPlayer(); // Initialize the AudioPlayer
+    _playBackgroundMusic(); // Start playing background music
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInstructions();
     });
@@ -59,7 +66,29 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
   void dispose() {
     _tabController.dispose();
     _animationController.dispose();
+    _stopBackgroundMusic(); // Stop the music
     super.dispose();
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop); // Loop the music
+      await _audioPlayer.setVolume(0.2); // Set a lower volume
+      await _audioPlayer
+          .play(AssetSource('Sounds/simulationall.mp3')); // Play the file
+      setState(() => isMusicPlaying = true);
+    } catch (e) {
+      print("Error playing background music: $e");
+    }
+  }
+
+  void _stopBackgroundMusic() async {
+    try {
+      await _audioPlayer.stop();
+      setState(() => isMusicPlaying = false);
+    } catch (e) {
+      print("Error stopping background music: $e");
+    }
   }
 
   void _initializeRootNode() {
@@ -514,7 +543,10 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            _stopBackgroundMusic(); // Stop music on back navigation
+            Navigator.of(context).pop();
+          },
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -528,8 +560,7 @@ class _BreadthFirstPageState extends State<BreadthFirstPage>
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline, color: Colors.black),
-            onPressed:
-                _showInstructions, // Call the method to show instructions
+            onPressed: _showInstructions,
           ),
         ],
       ),

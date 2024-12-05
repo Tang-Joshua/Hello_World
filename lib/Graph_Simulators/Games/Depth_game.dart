@@ -57,7 +57,7 @@ class _DepthGamePageState extends State<DepthGamePage> {
   void _playBackgroundMusic() async {
     try {
       await backgroundMusicPlayer.setReleaseMode(ReleaseMode.loop); // Loop mode
-      await backgroundMusicPlayer.setVolume(0.3); // Set volume to max
+      await backgroundMusicPlayer.setVolume(0.1); // Set volume to max
       await backgroundMusicPlayer
           .play(AssetSource('Sounds/radix.mp3')); // Play background music
     } catch (e) {

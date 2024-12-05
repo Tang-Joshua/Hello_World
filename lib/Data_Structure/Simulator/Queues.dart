@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class QueuesPage extends StatefulWidget {
   const QueuesPage({Key? key}) : super(key: key);
@@ -14,11 +15,16 @@ class _QueuesPageState extends State<QueuesPage> {
   final TextEditingController _inputController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  late AudioPlayer _audioPlayer;
+  bool isMusicPlaying = false;
+
   Color _visualizationBorderColor = Colors.grey;
 
   @override
   void initState() {
     super.initState();
+    _audioPlayer = AudioPlayer();
+    _playBackgroundMusic();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInstructions();
     });
@@ -28,7 +34,30 @@ class _QueuesPageState extends State<QueuesPage> {
   void dispose() {
     _inputController.dispose();
     _scrollController.dispose();
+    _stopBackgroundMusic();
     super.dispose();
+  }
+
+  // Initialize the AudioPlayer and play background music:
+  void _playBackgroundMusic() async {
+    try {
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop); // Loop the music
+      await _audioPlayer.setVolume(0.2); // Adjust the volume
+      await _audioPlayer.play(AssetSource('Sounds/simulationall.mp3'));
+      setState(() => isMusicPlaying = true);
+    } catch (e) {
+      print("Error playing background music: $e");
+    }
+  }
+
+// Stop the background music:
+  void _stopBackgroundMusic() async {
+    try {
+      await _audioPlayer.stop();
+      setState(() => isMusicPlaying = false);
+    } catch (e) {
+      print("Error stopping background music: $e");
+    }
   }
 
   void _autoGenerateInput() {

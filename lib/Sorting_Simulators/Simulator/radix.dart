@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
+import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -29,6 +30,7 @@ class _RadixSortPageState extends State<RadixSortPage>
   bool showInsertButton = false; // Control the visibility of the Insert button
   late TabController _tabController;
   Duration animationDelay = Duration(milliseconds: 600);
+  late AudioPlayer _audioPlayer;
 
   @override
   void initState() {
@@ -45,13 +47,32 @@ class _RadixSortPageState extends State<RadixSortPage>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInstructions();
     });
+    _audioPlayer = AudioPlayer();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _playBackgroundMusic();
+    });
   }
 
   @override
   void dispose() {
     inputController.dispose();
     _tabController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop); // Loop the music
+      await _audioPlayer.setVolume(0.2); // Adjust volume as needed
+      await _audioPlayer.play(AssetSource('Sounds/simulationall.mp3'));
+    } catch (e) {
+      print("Error playing background music: $e");
+    }
+  }
+
+  void _stopMusic() async {
+    await _audioPlayer.stop();
   }
 
   void _insertit() {

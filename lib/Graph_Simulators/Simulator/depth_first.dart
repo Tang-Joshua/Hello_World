@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(const MaterialApp(home: DepthFirstPage()));
@@ -34,6 +35,9 @@ class _DepthFirstPageState extends State<DepthFirstPage>
   Set<int> _highlightedNodes = {};
   int? _highlightedIndex;
 
+  late AudioPlayer _audioPlayer;
+  bool isMusicPlaying = false; // Track the music state
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +50,8 @@ class _DepthFirstPageState extends State<DepthFirstPage>
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
+    _audioPlayer = AudioPlayer(); // Initialize AudioPlayer
+    _playBackgroundMusic(); // Play music
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInstructions();
     });
@@ -56,6 +62,26 @@ class _DepthFirstPageState extends State<DepthFirstPage>
     _tabController.dispose();
     _animationController.dispose();
     super.dispose();
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop); // Loop the music
+      await _audioPlayer.setVolume(0.2); // Set volume level
+      await _audioPlayer.play(AssetSource('Sounds/simulationall.mp3'));
+      setState(() => isMusicPlaying = true);
+    } catch (e) {
+      print("Error playing background music: $e");
+    }
+  }
+
+  void _stopBackgroundMusic() async {
+    try {
+      await _audioPlayer.stop();
+      setState(() => isMusicPlaying = false);
+    } catch (e) {
+      print("Error stopping background music: $e");
+    }
   }
 
   void _initializeRootNode() {
@@ -478,7 +504,10 @@ class _DepthFirstPageState extends State<DepthFirstPage>
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            _stopBackgroundMusic(); // Stop music
+            Navigator.of(context).pop();
+          },
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -492,8 +521,7 @@ class _DepthFirstPageState extends State<DepthFirstPage>
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline, color: Colors.black),
-            onPressed:
-                _showInstructions, // Call the method to show instructions
+            onPressed: _showInstructions,
           ),
         ],
       ),

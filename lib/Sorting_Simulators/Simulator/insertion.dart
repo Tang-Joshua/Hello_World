@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class InsertionSortPage extends StatefulWidget {
   const InsertionSortPage({Key? key}) : super(key: key);
@@ -19,11 +20,16 @@ class _InsertionSortPageState extends State<InsertionSortPage>
   bool isSorting = false;
   bool isSortEnabled = false;
 
+  late AudioPlayer _audioPlayer; // Add AudioPlayer
+  bool isMusicPlaying = false; // Track music state
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _scrollController = ScrollController(); // Initialize ScrollController.
+    _audioPlayer = AudioPlayer(); // Initialize AudioPlayer
+    _playBackgroundMusic(); // Start playing music
 
     inputController.addListener(() {
       setState(() {}); // Rebuild the UI whenever input changes.
@@ -39,7 +45,30 @@ class _InsertionSortPageState extends State<InsertionSortPage>
     inputController.dispose();
     _tabController.dispose();
     _scrollController.dispose(); // Dispose the ScrollController.
+    _stopBackgroundMusic(); // Stop music
     super.dispose();
+  }
+
+  // Play background music
+  void _playBackgroundMusic() async {
+    try {
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop); // Loop the music
+      await _audioPlayer.setVolume(0.2); // Adjust volume as needed
+      await _audioPlayer.play(AssetSource('Sounds/simulationall.mp3'));
+      setState(() => isMusicPlaying = true);
+    } catch (e) {
+      print("Error playing background music: $e");
+    }
+  }
+
+  // Stop background music
+  void _stopBackgroundMusic() async {
+    try {
+      await _audioPlayer.stop();
+      setState(() => isMusicPlaying = false);
+    } catch (e) {
+      print("Error stopping background music: $e");
+    }
   }
 
   /// Smooth Insertion Sort with centered scrolling.
@@ -313,7 +342,10 @@ class _InsertionSortPageState extends State<InsertionSortPage>
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            _stopBackgroundMusic(); // Stop music on back navigation
+            Navigator.of(context).pop();
+          },
         ),
         backgroundColor: Colors.white,
         elevation: 0,

@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class StacksPage extends StatefulWidget {
   const StacksPage({Key? key}) : super(key: key);
@@ -18,10 +19,15 @@ class _StacksPageState extends State<StacksPage>
   late TabController _tabController;
   Color _visualizationBorderColor = Colors.grey;
 
+  late AudioPlayer _audioPlayer;
+  bool isMusicPlaying = false; // Track music state
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _audioPlayer = AudioPlayer();
+    _playBackgroundMusic();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInstructions();
@@ -33,7 +39,29 @@ class _StacksPageState extends State<StacksPage>
     _inputController.dispose();
     _scrollController.dispose();
     _tabController.dispose();
+    _stopBackgroundMusic(); // Stop music
     super.dispose();
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop); // Set loop mode
+      await _audioPlayer.setVolume(0.2); // Adjust volume
+      await _audioPlayer
+          .play(AssetSource('Sounds/simulationall.mp3')); // Play file
+      setState(() => isMusicPlaying = true);
+    } catch (e) {
+      print("Error playing background music: $e");
+    }
+  }
+
+  void _stopBackgroundMusic() async {
+    try {
+      await _audioPlayer.stop();
+      setState(() => isMusicPlaying = false);
+    } catch (e) {
+      print("Error stopping background music: $e");
+    }
   }
 
   void _autoGenerateInput() {
@@ -339,6 +367,13 @@ class _StacksPageState extends State<StacksPage>
           style: TextStyle(color: Colors.black),
         ),
         iconTheme: const IconThemeData(color: Colors.black),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            _stopBackgroundMusic(); // Stop music when navigating back
+            Navigator.of(context).pop();
+          },
+        ),
         actions: [
           IconButton(
             onPressed: _showInstructions,

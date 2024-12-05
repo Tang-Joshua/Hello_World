@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(const MaterialApp(home: BinarySearchPage()));
@@ -34,12 +35,17 @@ class _BinarySearchPageState extends State<BinarySearchPage>
   bool _isConverted = false;
   bool _isChecked = false;
   List<int> _userNodeValues = [];
+  late AudioPlayer _audioPlayer;
+  bool isMusicPlaying = false; // To track the state of the music
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _initializeRootNode();
+
+    _audioPlayer = AudioPlayer(); // Initialize the audio player
+    _playBackgroundMusic(); // Start playing background music
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInstructions();
@@ -50,7 +56,29 @@ class _BinarySearchPageState extends State<BinarySearchPage>
   void dispose() {
     _tabController.dispose();
     _animationController?.dispose();
+    _stopBackgroundMusic(); // Stop the music
     super.dispose();
+  }
+
+  void _playBackgroundMusic() async {
+    try {
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop); // Loop the audio
+      await _audioPlayer.setVolume(0.2); // Lower the volume
+      await _audioPlayer
+          .play(AssetSource('Sounds/simulationall.mp3')); // Play music file
+      setState(() => isMusicPlaying = true);
+    } catch (e) {
+      print("Error playing background music: $e");
+    }
+  }
+
+  void _stopBackgroundMusic() async {
+    try {
+      await _audioPlayer.stop();
+      setState(() => isMusicPlaying = false);
+    } catch (e) {
+      print("Error stopping background music: $e");
+    }
   }
 
   void _initializeRootNode() {
@@ -586,7 +614,10 @@ class _BinarySearchPageState extends State<BinarySearchPage>
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            _stopBackgroundMusic(); // Stop music when navigating back
+            Navigator.of(context).pop();
+          },
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -602,8 +633,7 @@ class _BinarySearchPageState extends State<BinarySearchPage>
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline, color: Colors.black),
-            onPressed:
-                _showInstructions, // Call the method to show instructions
+            onPressed: _showInstructions,
           ),
         ],
       ),
