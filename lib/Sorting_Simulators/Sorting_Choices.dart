@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:wave/wave.dart';
+import 'package:wave/config.dart';
 import 'package:flutterapp/main.dart';
 import 'Games/merge/merge_mainmenu.dart';
 import 'Simulator/radix.dart';
@@ -239,115 +241,144 @@ class _SortingChoices extends State<SortingChoices> {
           style: TextStyle(color: Colors.black),
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
         children: [
-          // Carousel Slider
-          CarouselSlider.builder(
-            options: CarouselOptions(
-              height: 450.0,
-              aspectRatio: 16 / 9,
-              viewportFraction: 0.75,
-              enlargeCenterPage: true,
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _current = index;
-                });
-              },
-            ),
-            itemCount: _products.length,
-            itemBuilder: (BuildContext context, int index, int realIdx) {
-              var movie = _products[index];
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (_selectedIndex == movie) {
-                      _selectedIndex = {};
-                    } else {
-                      _selectedIndex = movie;
-                    }
-                    text = movie['title'];
-                  });
-                  _openAnimationDialog(context);
-                },
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: _selectedIndex == movie
-                        ? Border.all(
-                            color: Color.fromARGB(255, 22, 207, 62),
-                            width: 3,
-                          )
-                        : null,
-                    boxShadow: _selectedIndex == movie
-                        ? [
-                            BoxShadow(
-                              color: Color.fromARGB(255, 70, 155, 129),
-                              blurRadius: 30,
-                              offset: Offset(0, 10),
-                            )
-                          ]
-                        : [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              blurRadius: 20,
-                              offset: Offset(0, 5),
-                            )
-                          ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 320,
-                        margin: EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.asset(
-                              movie['image'],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Carousel Slider
+              CarouselSlider.builder(
+                options: CarouselOptions(
+                  height: 450.0,
+                  aspectRatio: 16 / 9,
+                  viewportFraction: 0.75,
+                  enlargeCenterPage: true,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _current = index;
+                    });
+                  },
+                ),
+                itemCount: _products.length,
+                itemBuilder: (BuildContext context, int index, int realIdx) {
+                  var movie = _products[index];
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (_selectedIndex == movie) {
+                          _selectedIndex = {};
+                        } else {
+                          _selectedIndex = movie;
+                        }
+                        text = movie['title'];
+                      });
+                      _openAnimationDialog(context);
+                    },
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: _selectedIndex == movie
+                            ? Border.all(
+                                color: Color.fromARGB(255, 22, 207, 62),
+                                width: 3,
+                              )
+                            : null,
+                        boxShadow: _selectedIndex == movie
+                            ? [
+                                BoxShadow(
+                                  color: Color.fromARGB(255, 70, 155, 129),
+                                  blurRadius: 30,
+                                  offset: Offset(0, 10),
+                                )
+                              ]
+                            : [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  blurRadius: 20,
+                                  offset: Offset(0, 5),
+                                )
+                              ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 320,
+                            margin: EdgeInsets.only(top: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.asset(
+                                  movie['image'],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          SizedBox(height: 20),
+                          Text(
+                            movie['title'],
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 20),
-                      Text(
-                        movie['title'],
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-          SizedBox(height: 16),
+                    ),
+                  );
+                },
+              ),
+              SizedBox(height: 16),
 
-          // Centered Page Indicator Dots
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                _products.length,
-                (index) => Container(
-                  width: 8.0,
-                  height: 8.0,
-                  margin: EdgeInsets.symmetric(horizontal: 4.0),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _current == index ? Colors.green : Colors.grey,
+              // Centered Page Indicator Dots
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _products.length,
+                    (index) => Container(
+                      width: 8.0,
+                      height: 8.0,
+                      margin: EdgeInsets.symmetric(horizontal: 4.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _current == index ? Colors.green : Colors.grey,
+                      ),
+                    ),
                   ),
                 ),
+              ),
+            ],
+          ),
+
+          // Wave at the Bottom
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: SizedBox(
+              height: 200,
+              child: WaveWidget(
+                config: CustomConfig(
+                  gradients: [
+                    [Colors.lightGreen.shade300, Colors.lightGreen.shade200],
+                    [Colors.green.shade400, Colors.green.shade300],
+                  ],
+                  durations: [32000, 20000],
+                  heightPercentages: [0.2, 0.25],
+                  gradientBegin: Alignment.bottomLeft,
+                  gradientEnd: Alignment.topRight,
+                ),
+                size: const Size(double.infinity, double.infinity),
+                waveAmplitude: 15,
               ),
             ),
           ),

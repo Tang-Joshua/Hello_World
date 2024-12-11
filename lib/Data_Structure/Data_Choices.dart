@@ -1,5 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:wave/wave.dart';
+import 'package:wave/config.dart';
 import 'package:flutterapp/Data_Structure/Simulator/Queues.dart';
 import 'package:flutterapp/Data_Structure/Simulator/stacks.dart';
 import 'package:flutterapp/main.dart';
@@ -208,115 +210,145 @@ class _DataChoices extends State<DataChoices> {
           style: TextStyle(color: Colors.black),
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
         children: [
-          // Carousel Slider
-          CarouselSlider.builder(
-            options: CarouselOptions(
-              height: 450.0,
-              aspectRatio: 16 / 9,
-              viewportFraction: 0.75,
-              enlargeCenterPage: true,
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _current = index;
-                });
-              },
-            ),
-            itemCount: _products.length,
-            itemBuilder: (BuildContext context, int index, int realIdx) {
-              var movie = _products[index];
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (_selectedIndex == movie) {
-                      _selectedIndex = {};
-                    } else {
-                      _selectedIndex = movie;
-                    }
-                    text = movie['title'];
-                  });
-                  _openAnimationDialog(context);
-                },
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: _selectedIndex == movie
-                        ? Border.all(
-                            color: Color.fromARGB(255, 22, 207, 62),
-                            width: 3,
-                          )
-                        : null,
-                    boxShadow: _selectedIndex == movie
-                        ? [
-                            BoxShadow(
-                              color: Color.fromARGB(255, 70, 155, 129),
-                              blurRadius: 30,
-                              offset: Offset(0, 10),
-                            )
-                          ]
-                        : [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              blurRadius: 20,
-                              offset: Offset(0, 5),
-                            )
-                          ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 320,
-                        margin: EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.asset(
-                              movie['image'],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
+          // Main Content
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Carousel Slider
+              CarouselSlider.builder(
+                options: CarouselOptions(
+                  height: 450.0,
+                  aspectRatio: 16 / 9,
+                  viewportFraction: 0.75,
+                  enlargeCenterPage: true,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _current = index;
+                    });
+                  },
+                ),
+                itemCount: _products.length,
+                itemBuilder: (BuildContext context, int index, int realIdx) {
+                  var movie = _products[index];
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (_selectedIndex == movie) {
+                          _selectedIndex = {};
+                        } else {
+                          _selectedIndex = movie;
+                        }
+                        text = movie['title'];
+                      });
+                      _openAnimationDialog(context);
+                    },
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: _selectedIndex == movie
+                            ? Border.all(
+                                color: Color.fromARGB(255, 22, 207, 62),
+                                width: 3,
+                              )
+                            : null,
+                        boxShadow: _selectedIndex == movie
+                            ? [
+                                BoxShadow(
+                                  color: Color.fromARGB(255, 70, 155, 129),
+                                  blurRadius: 30,
+                                  offset: Offset(0, 10),
+                                )
+                              ]
+                            : [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  blurRadius: 20,
+                                  offset: Offset(0, 5),
+                                )
+                              ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 320,
+                            margin: EdgeInsets.only(top: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.asset(
+                                  movie['image'],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          SizedBox(height: 20),
+                          Text(
+                            movie['title'],
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 20),
-                      Text(
-                        movie['title'],
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-          SizedBox(height: 16),
+                    ),
+                  );
+                },
+              ),
+              SizedBox(height: 16),
 
-          // Centered Page Indicator Dots
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                _products.length,
-                (index) => Container(
-                  width: 8.0,
-                  height: 8.0,
-                  margin: EdgeInsets.symmetric(horizontal: 4.0),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _current == index ? Colors.green : Colors.grey,
+              // Centered Page Indicator Dots
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _products.length,
+                    (index) => Container(
+                      width: 8.0,
+                      height: 8.0,
+                      margin: EdgeInsets.symmetric(horizontal: 4.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _current == index ? Colors.green : Colors.grey,
+                      ),
+                    ),
                   ),
                 ),
+              ),
+            ],
+          ),
+
+          // Wave Background at the Bottom
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: SizedBox(
+              height: 200,
+              child: WaveWidget(
+                config: CustomConfig(
+                  gradients: [
+                    [Colors.teal.shade300, Colors.teal.shade200],
+                    [Colors.teal.shade400, Colors.teal.shade300],
+                  ],
+                  durations: [20000, 12000],
+                  heightPercentages: [0.25, 0.30],
+                  gradientBegin: Alignment.bottomLeft,
+                  gradientEnd: Alignment.topRight,
+                ),
+                waveAmplitude: 15,
+                size: const Size(double.infinity, double.infinity),
               ),
             ),
           ),

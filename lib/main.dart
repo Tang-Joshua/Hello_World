@@ -1,4 +1,8 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:wave/wave.dart';
+import 'package:wave/config.dart';
+
 import 'package:flutterapp/Sorting_Simulators/Sorting_Choices.dart';
 import 'package:flutterapp/Graph_Simulators/Graph_Choices.dart';
 import 'package:flutterapp/Data_Structure/Data_Choices.dart';
@@ -22,166 +26,270 @@ class MyApp extends StatelessWidget {
 class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final double buttonWidth = MediaQuery.of(context).size.width * 0.8;
+    final double buttonHeight = MediaQuery.of(context).size.height * 0.07;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA), // Light background color
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(2), // Adjusted AppBar height
-        child: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // AL-GO Title
-            ShaderMask(
-              shaderCallback: (Rect bounds) {
-                return LinearGradient(
-                  colors: [Colors.blue.shade500, Colors.green.shade400],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ).createShader(bounds);
-              },
-              child: const Text(
-                'AL-GO!',
-                style: TextStyle(
-                  fontSize: 90, // Larger font size for prominence
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white, // Gradient applied here
-                  fontFamily: 'CrimsonPro', // Elegant font style
-                  letterSpacing: 2.0,
-                ),
-              ),
-            ),
-            const SizedBox(
-                height: 90), // Space between AL-GO and "Select an Algorithm"
-            const Text(
-              'Select an Algorithm',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.9,
-              child: GridView.count(
-                shrinkWrap: true, // Make GridView height fit the content
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  _buildBox(
-                    icon: Icons.sort,
-                    title: "Sorting",
-                    itemCount: "Explore Sorting Techniques",
-                    color: Colors.blue.shade300,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SortingChoices()),
-                      );
-                    },
-                  ),
-                  _buildBox(
-                    icon: Icons.graphic_eq,
-                    title: "Graph",
-                    itemCount: "Explore Graph Algorithms",
-                    color: Colors.green.shade400,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => GraphChoices()),
-                      );
-                    },
-                  ),
-                  _buildBox(
-                    icon: Icons.storage_rounded,
-                    title: "Data Structures",
-                    itemCount: "Learn Data Structures",
-                    color: Colors.orange.shade400,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => DataChoices()),
-                      );
-                    },
-                  ),
+      body: Stack(
+        children: [
+          // Moving wave background
+          Positioned.fill(
+            child: WaveWidget(
+              config: CustomConfig(
+                gradients: [
+                  [Colors.green.shade400, Colors.green.shade300],
+                  [Colors.green.shade600, Colors.green.shade400],
+                  [Colors.green.shade800, Colors.green.shade600],
+                  [Colors.lightGreen, Colors.green.shade400],
                 ],
+                durations: [32000, 21000, 18000, 5000],
+                heightPercentages: [
+                  0.50,
+                  0.55,
+                  0.58,
+                  0.62
+                ], // Lowered wave heights
+                gradientBegin: Alignment.topLeft,
+                gradientEnd: Alignment.bottomRight,
               ),
+              size: const Size(double.infinity, double.infinity),
+              waveAmplitude: 20, // Adds curvature to the waves
             ),
-          ],
-        ),
+          ),
+
+          // Content overlaying the waves
+          SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: Column(
+              children: [
+                const Spacer(flex: 2), // Flexible space above the title
+                // Cool "AL-GO!" text design
+                CoolTextDesign(),
+                const Spacer(
+                    flex: 1), // Flexible space between title and buttons
+
+                // Buttons with navigation functionality
+                Column(
+                  children: [
+                    buildButton(
+                      context,
+                      "SORTING ALGORITHMS",
+                      buttonWidth,
+                      buttonHeight,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                SortingChoices(), // Sorting page
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 15),
+                    buildButton(
+                      context,
+                      "GRAPH ALGORITHMS",
+                      buttonWidth,
+                      buttonHeight,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GraphChoices(), // Graph page
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 15),
+                    buildButton(
+                      context,
+                      "DATA STRUCTURES",
+                      buttonWidth,
+                      buttonHeight,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                DataChoices(), // Data structures page
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+
+                const Spacer(flex: 2), // Flexible space at the bottom
+              ],
+            ),
+          ),
+        ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     // Exit action: Close the app
-      //     print("Exit selected");
-      //   },
-      //   backgroundColor: Colors.red, // Red color for exit
-      //   child: const Icon(Icons.exit_to_app, color: Colors.white), // Exit icon
-      // ),
     );
   }
 
-  Widget _buildBox({
-    required IconData icon,
-    required String title,
-    required String itemCount,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-              offset: const Offset(4, 4),
-            ),
-          ],
+  Widget buildButton(BuildContext context, String text, double width,
+      double height, VoidCallback onPressed) {
+    return SizedBox(
+      width: width,
+      height: height,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15), // Smooth edges
+          ),
+          backgroundColor:
+              const Color(0xFF607D8B), // Solid gray color (Material Blue Gray)
+          elevation: 2, // Subtle elevation
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: MediaQuery.of(context).size.width * 0.045,
+            fontWeight: FontWeight.bold,
+            color: Colors.white, // White font for contrast
+            fontFamily: 'RobotoMono', // Clean, technical font
+            letterSpacing: 1.1, // Slight letter spacing
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CoolTextDesign extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Glowing shadow effect
+        RichText(
+          text: TextSpan(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, size: 28, color: Colors.white),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
+              TextSpan(
+                text: 'AL-',
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.23,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  fontFamily: 'Arial',
+                  color: Colors.black,
+                  shadows: [
+                    Shadow(
+                      offset: const Offset(0, 2),
+                      blurRadius: 10,
+                      color: Colors.black.withOpacity(0.5),
+                    ),
+                    Shadow(
+                      offset: const Offset(0, 4),
+                      blurRadius: 20,
+                      color: Colors.black.withOpacity(0.3),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                itemCount,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
+              TextSpan(
+                text: 'GO',
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.23,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Arial',
+                  foreground: Paint()
+                    ..shader = LinearGradient(
+                      colors: [
+                        const Color.fromARGB(255, 41, 95, 43),
+                        Colors.green.shade700,
+                        Colors.green.shade400,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ).createShader(Rect.fromLTWH(0, 0, 200, 70)),
+                  shadows: [
+                    Shadow(
+                      offset: const Offset(0, 2),
+                      blurRadius: 10,
+                      color: Colors.green.withOpacity(0.6),
+                    ),
+                    Shadow(
+                      offset: const Offset(0, 4),
+                      blurRadius: 20,
+                      color: Colors.green.withOpacity(0.4),
+                    ),
+                  ],
+                ),
+              ),
+              TextSpan(
+                text: '!',
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.23,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Arial',
+                  color: Colors.black,
+                  shadows: [
+                    Shadow(
+                      offset: const Offset(0, 2),
+                      blurRadius: 10,
+                      color: Colors.black.withOpacity(0.5),
+                    ),
+                    Shadow(
+                      offset: const Offset(0, 4),
+                      blurRadius: 20,
+                      color: Colors.black.withOpacity(0.3),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
-      ),
+        // Outline for extra pop
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: 'AL-',
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.23,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Arial',
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 2
+                    ..color = Colors.black,
+                ),
+              ),
+              TextSpan(
+                text: 'GO',
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.23,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Arial',
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 2
+                    ..color = Colors.black,
+                ),
+              ),
+              TextSpan(
+                text: '!',
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.23,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Arial',
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 2
+                    ..color = Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

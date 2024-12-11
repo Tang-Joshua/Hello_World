@@ -1,5 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:wave/wave.dart';
+import 'package:wave/config.dart';
 import 'package:flutterapp/Graph_Simulators/Simulator/binary_search_tree.dart'; // Simulation Page
 import 'package:flutterapp/Graph_Simulators/Simulator/breadth_first.dart';
 import 'package:flutterapp/Graph_Simulators/Simulator/depth_first.dart';
@@ -224,39 +226,32 @@ class _GraphChoices extends State<GraphChoices> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false, // Disable the debug banner
-        theme: ThemeData(
-          brightness: Brightness.light, // Set to light mode
-          scaffoldBackgroundColor: Colors.white, // White background
-          fontFamily: 'Default', // Default font
-          primaryColor: Colors.blue,
-          useMaterial3: false, // Default primary color
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => MyApp()),
+              (route) => false,
+            );
+          },
         ),
-        home: Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyApp()),
-                  (route) => false,
-                );
-              },
-            ),
-            title: Text(
-              'Graph Algorithms',
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          body: Column(
+        title: Text(
+          'Graph Algorithms',
+          style: TextStyle(color: Colors.black),
+        ),
+      ),
+      body: Stack(
+        children: [
+          // Main Content
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Carousel Slider
               CarouselSlider.builder(
                 options: CarouselOptions(
                   height: 450.0,
@@ -368,6 +363,32 @@ class _GraphChoices extends State<GraphChoices> {
               ),
             ],
           ),
-        ));
+
+          // Wave Background at the Bottom
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: SizedBox(
+              height: 200,
+              child: WaveWidget(
+                config: CustomConfig(
+                  gradients: [
+                    [Colors.yellow.shade200, Colors.yellow.shade200],
+                    [Colors.amber.shade300, Colors.amber.shade300],
+                  ],
+                  durations: [25000, 18000],
+                  heightPercentages: [0.2, 0.25],
+                  gradientBegin: Alignment.bottomLeft,
+                  gradientEnd: Alignment.topRight,
+                ),
+                waveAmplitude: 10,
+                size: const Size(double.infinity, double.infinity),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

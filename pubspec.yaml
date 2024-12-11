@@ -23,6 +23,7 @@ dependencies:
   firebase_core: ^3.8.0
   firebase_database: ^11.1.6
   cloud_firestore: ^5.5.0
+  wave: ^0.2.0
 
 dev_dependencies:
   flutter_test:
@@ -78,3 +79,4 @@ flutter:
     - assets/Sounds/queues.mp3
     - assets/Sounds/queuescardclick.mp3
     - assets/Sounds/simulationall.mp3
+    - assets/bg_homepage.png
